@@ -163,7 +163,6 @@ class Tree(object):
 		# check identifier replication
 		all_nodes = self.nodes + new_tree.nodes
 		ids = [i.identifier for i in all_nodes]
-		print ids
 		idset = set(ids)
 		if len(idset) != len(ids):
 			raise ValueError, 'Duplicated nodes exists.'
