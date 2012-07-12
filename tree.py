@@ -122,18 +122,19 @@ class Tree(object):
 		if filterfunc is None:
 			filterfunc = real_true
 			
-		yield position
-		queue = self[position].fpointer
-		while queue:
-			if filterfunc(queue[0]):
-				yield queue[0]
-				expansion = self[queue[0]].fpointer
-				if mode is _DEPTH:
-					queue = expansion + queue[1:]  # depth-first
-				elif mode is _WIDTH:
-					queue = queue[1:] + expansion  # width-first
-			else:
-				queue = queue[1:]
+		if filterfunc(position):
+			yield position
+			queue = self[position].fpointer
+			while queue:
+				if filterfunc(queue[0]):
+					yield queue[0]
+					expansion = self[queue[0]].fpointer
+					if mode is _DEPTH:
+						queue = expansion + queue[1:]  # depth-first
+					elif mode is _WIDTH:
+						queue = queue[1:] + expansion  # width-first
+				else:
+					queue = queue[1:]
 				
 	def subtree(self, position):
 		"""
@@ -234,7 +235,7 @@ if __name__ == "__main__":
 	for node in tree.expand_tree(mode=_DEPTH):
 		print tree[node].name
 	print("="*80)
-	for node in tree.expand_tree(filter = lambda x: x != 'george', mode=_DEPTH):
+	for node in tree.expand_tree(filter = lambda x: x != 'harry', mode=_DEPTH):
 		print tree[node].name
 	print("="*80)
 	sub_t = tree.subtree('diane')
