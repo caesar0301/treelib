@@ -118,15 +118,14 @@ class Tree(object):
 
 		if position is None:
 			position = self.root
-		filterfunc = filter
-		if filterfunc is None:
-			filterfunc = real_true
-			
-		if filterfunc(position):
+		if filter is None:
+			filter = real_true
+
+		if filter(position):
 			yield position
 			queue = self[position].fpointer
 			while queue:
-				if filterfunc(queue[0]):
+				if filter(queue[0]):
 					yield queue[0]
 					expansion = self[queue[0]].fpointer
 					if mode is _DEPTH:
@@ -171,6 +170,21 @@ class Tree(object):
 		new_tree[new_tree.root].bpointer = position
 		self.__update_fpointer(position, new_tree.root, _ADD)
 		self.nodes += new_tree.nodes
+
+	def rsearch(self, position, filter=None):
+		"""
+		Search the tree from position to the root along links reversedly.
+		"""
+		def real_true(p):
+			return True
+
+		if filter is None:
+			filter = real_true
+		current = position
+		while current != None:
+			if filter(current):
+				yield current
+			current = self[current].bpointer
 
 
 	def __update_fpointer(self, position, identifier, mode):
@@ -258,6 +272,10 @@ if __name__ == "__main__":
 	print("="*80)
 	tree.move_node('jill', 'harry')
 	tree.show()
+
+	print("="*80)
+	for node in tree.rsearch('carol', filter=lambda x: x!='harry'):
+		print node
 
 	# Run unit tests
 	unittest.main()
