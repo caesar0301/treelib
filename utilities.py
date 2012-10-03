@@ -1,8 +1,9 @@
 # Python 2/3 Tree Implementation
 #
 # Copyright (C) 2011
-# Original: Brett Alistair Kromkamp - brettkromkamp@gmail.com
-# Edited by: Xiaming Chen - chenxm35@gmail.com
+# Brett Alistair Kromkamp - brettkromkamp@gmail.com
+# Copyright (C) 2012
+# Xiaming Chen - chenxm35@gmail.com
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
