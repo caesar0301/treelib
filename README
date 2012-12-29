@@ -1,39 +1,45 @@
-# Tree Implementation in python
+pyTree
+========
 
-# Published by: Brett Alistair Kromkamp - brettkromkamp@gmail.com
-# Edited by: Xiaming Chen - chenxm35@gmail.com
+Tree Implementation in python
+
+Author
+=======
+Published by: Brett Alistair Kromkamp - brettkromkamp@gmail.com
+Edited by: Xiaming Chen - chenxm35@gmail.com
 
 
-# Example usage
+Usage Examples
+=======
 
-# Create a tree
+* Create a tree
 
-tree = Tree()
-tree.create_node("Harry", "harry")  # root node
-tree.create_node("Jane", "jane", parent = "harry")
-tree.create_node("Bill", "bill", parent = "harry")
-tree.create_node("Joe", "joe", parent = "jane")
-tree.create_node("Diane", "diane", parent = "jane")
-tree.create_node("George", "george", parent = "diane")
-tree.create_node("Mary", "mary", parent = "diane")
-tree.create_node("Jill", "jill", parent = "george")
-tree.create_node("Carol", "carol", parent = "jill")
-tree.create_node("Grace", "grace", parent = "bill")
-tree.create_node("Mark", "mark", parent = "jane")
-tree.show()
+    tree = Tree()
+    tree.create_node("Harry", "harry")  # root node
+    tree.create_node("Jane", "jane", parent = "harry")
+    tree.create_node("Bill", "bill", parent = "harry")
+    tree.create_node("Joe", "joe", parent = "jane")
+    tree.create_node("Diane", "diane", parent = "jane")
+    tree.create_node("George", "george", parent = "diane")
+    tree.create_node("Mary", "mary", parent = "diane")
+    tree.create_node("Jill", "jill", parent = "george")
+    tree.create_node("Carol", "carol", parent = "jill")
+    tree.create_node("Grace", "grace", parent = "bill")
+    tree.create_node("Mark", "mark", parent = "jane")
+    tree.show()
 
-# Result:
-Harry [harry]
-('+', 'Jane [jane]')
-('++', 'Joe [joe]')
-('++', 'Diane [diane]')
-('+++', 'George [george]')
-('++++', 'Jill [jill]')
-('+++++', 'Carol [carol]')
-('+++', 'Mary [mary]')
-('++', 'Mark [mark]')
-('+', 'Bill [bill]')
-('++', 'Grace [grace]')
+Result:
+    Harry [harry]
+    ('+', 'Jane [jane]')
+    ('++', 'Joe [joe]')
+    ('++', 'Diane [diane]')
+    ('+++', 'George [george]')
+    ('++++', 'Jill [jill]')
+    ('+++++', 'Carol [carol]')
+    ('+++', 'Mary [mary]')
+    ('++', 'Mark [mark]')
+    ('+', 'Bill [bill]')
+    ('++', 'Grace [grace]')
 
 # Expand a tree with mode being _DEPTH or _WIDTH
 
