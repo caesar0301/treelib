@@ -51,6 +51,9 @@ class Tree(object):
 			if node.identifier == position:
 				break
 		return index
+		
+	def get_node(self, position):
+		return self.nodes[self.get_index(position)]
 
 	def create_node(self, name, identifier=None, parent=None):
 		"""
