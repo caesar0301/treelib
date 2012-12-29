@@ -3,16 +3,18 @@ pyTree
 
 Tree Implementation in python
 
-Author
+History
 =======
+
 Published by: Brett Alistair Kromkamp - brettkromkamp@gmail.com
+
 Edited by: Xiaming Chen - chenxm35@gmail.com
 
 
 Usage Examples
 =======
 
-* Create a tree
+Example 1: Create a tree
 
     tree = Tree()
     tree.create_node("Harry", "harry")  # root node
@@ -29,6 +31,7 @@ Usage Examples
     tree.show()
 
 Result:
+
     Harry [harry]
     ('+', 'Jane [jane]')
     ('++', 'Joe [joe]')
@@ -41,113 +44,115 @@ Result:
     ('+', 'Bill [bill]')
     ('++', 'Grace [grace]')
 
-# Expand a tree with mode being _DEPTH or _WIDTH
+Example 2: expand a tree with mode being _DEPTH or _WIDTH
 
-for node in tree.expand_tree(mode=_DEPTH):
+    for node in tree.expand_tree(mode=_DEPTH):
 	print tree[node].name
 
-# Result:
-Harry
-Jane
-Joe
-Diane
-George
-Jill
-Carol
-Mary
-Mark
-Bill
-Grace
+Result:
 
-# Expand tree with filter
+    Harry
+    Jane
+    Joe
+    Diane
+    George
+    Jill
+    Carol
+    Mary
+    Mark
+    Bill
+    Grace
 
-for node in tree.expand_tree(filter = lambda x: x != 'george', mode=_DEPTH):
+Example 3: expand tree with filter
+
+    for node in tree.expand_tree(filter = lambda x: x != 'george', mode=_DEPTH):
 	print tree[node].name
 
-# Result
-Harry
-Jane
-Joe
-Diane
-Mary
-Mark
-Bill
-Grace
+Result:
 
-# Get a subtree
+    Harry
+    Jane
+    Joe
+    Diane
+    Mary
+    Mark
+    Bill
+    Grace
 
-sub_t = tree.subtree('diane')
-sub_t.show()
+Example 4: get a subtree
 
-# Result
-Diane [diane]
-('+', 'George [george]')
-('++', 'Jill [jill]')
-('+++', 'Carol [carol]')
-('+', 'Mary [mary]')
+    sub_t = tree.subtree('diane')
+    sub_t.show()
 
-# Paste a new tree to original one
+Result:
 
-new_tree = Tree()
-new_tree.create_node("1", "1")  # root node
-new_tree.create_node("2", "2", parent = "1")
-new_tree.create_node("3", "3", parent = "1")
-tree.paste('jill', new_tree)
-tree.show()
+    Diane [diane]
+    ('+', 'George [george]')
+    ('++', 'Jill [jill]')
+    ('+++', 'Carol [carol]')
+    ('+', 'Mary [mary]')
 
-# Results
+Example 5: paste a new tree to original one
 
-['harry', 'jane', 'bill', 'joe', 'diane', 'george', 'mary', 'jill', 'carol', 'grace', 'mark', '1', '2', '3']
-Harry [harry]
-('+', 'Jane [jane]')
-('++', 'Joe [joe]')
-('++', 'Diane [diane]')
-('+++', 'George [george]')
-('++++', 'Jill [jill]')
-('+++++', 'Carol [carol]')
-('+++++', '1 [1]')
-('++++++', '2 [2]')
-('++++++', '3 [3]')
-('+++', 'Mary [mary]')
-('++', 'Mark [mark]')
-('+', 'Bill [bill]')
-('++', 'Grace [grace]')
+    new_tree = Tree()
+    new_tree.create_node("1", "1")  # root node
+    new_tree.create_node("2", "2", parent = "1")
+    new_tree.create_node("3", "3", parent = "1")
+    tree.paste('jill', new_tree)
+    tree.show()
 
-# Remove a node from tree
+Result:
 
-tree.remove_node('1')
-tree.show()
+    ['harry', 'jane', 'bill', 'joe', 'diane', 'george', 'mary', 'jill', 'carol', 'grace', 'mark', '1', '2', '3']
+    Harry [harry]
+    ('+', 'Jane [jane]')
+    ('++', 'Joe [joe]')
+    ('++', 'Diane [diane]')
+    ('+++', 'George [george]')
+    ('++++', 'Jill [jill]')
+    ('+++++', 'Carol [carol]')
+    ('+++++', '1 [1]')
+    ('++++++', '2 [2]')
+    ('++++++', '3 [3]')
+    ('+++', 'Mary [mary]')
+    ('++', 'Mark [mark]')
+    ('+', 'Bill [bill]')
+    ('++', 'Grace [grace]')
 
-# Result
+Example 6: temove a node from tree
 
-Harry [harry]
-('+', 'Jane [jane]')
-('++', 'Joe [joe]')
-('++', 'Diane [diane]')
-('+++', 'George [george]')
-('++++', 'Jill [jill]')
-('+++++', 'Carol [carol]')
-('+++', 'Mary [mary]')
-('++', 'Mark [mark]')
-('+', 'Bill [bill]')
-('++', 'Grace [grace]')
+    tree.remove_node('1')
+    tree.show()
 
+Result:
 
-# Move a node
+    Harry [harry]
+    ('+', 'Jane [jane]')
+    ('++', 'Joe [joe]')
+    ('++', 'Diane [diane]')
+    ('+++', 'George [george]')
+    ('++++', 'Jill [jill]')
+    ('+++++', 'Carol [carol]')
+    ('+++', 'Mary [mary]')
+    ('++', 'Mark [mark]')
+    ('+', 'Bill [bill]')
+    ('++', 'Grace [grace]')
 
-tree.move_node('jill', 'harry')
-tree.show()
+Example 7: Move a node
+
+    tree.move_node('jill', 'harry')
+    tree.show()
 	
-Results:
+Result:
 
-Harry [harry]
-('+', 'Jane [jane]')
-('++', 'Joe [joe]')
-('++', 'Diane [diane]')
-('+++', 'George [george]')
-('+++', 'Mary [mary]')
-('++', 'Mark [mark]')
-('+', 'Bill [bill]')
-('++', 'Grace [grace]')
-('+', 'Jill [jill]')
-('++', 'Carol [carol]')
+    Harry [harry]
+    ('+', 'Jane [jane]')
+    ('++', 'Joe [joe]')
+    ('++', 'Diane [diane]')
+    ('+++', 'George [george]')
+    ('+++', 'Mary [mary]')
+    ('++', 'Mark [mark]')
+    ('+', 'Bill [bill]')
+    ('++', 'Grace [grace]')
+    ('+', 'Jill [jill]')
+    ('++', 'Carol [carol]')
