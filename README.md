@@ -119,7 +119,7 @@ Result:
     ('+', 'Bill [bill]')
     ('++', 'Grace [grace]')
 
-Example 6: temove a node from tree
+Example 6: remove a node from tree
 
     tree.remove_node('1')
     tree.show()
