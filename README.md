@@ -166,3 +166,18 @@ Result:
     |    |___ Mark[mark]
     |___ Bill[bill]
     |___ Jill[jill]
+
+
+Advanced Usage
+=======
+
+You can also inherit and modify the behaviors of the tree structure to meet your need easily and conveniently.
+For example, to define a tree structure with data payload for each node, you can program like the way below:
+
+    import pyTree
+
+    class myNode(pyTree.node):
+        def __init__(self, payload):
+            self.data = payload
+    ...
+    new_node = myNode("1234567890")
