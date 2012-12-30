@@ -45,7 +45,7 @@ are also available to make operations on the tree (e.g., `t` in the description 
     t.get_index(nid)  # To get the index of the node with ID == nid
     t.get_node(nid)   # To get the object of the node with ID == nid
     t.is_branch(nid)  # To get the children (only sons) list of the node with ID == nid
-    t.move_node(source, destination) # To move node from one parent (source) to another parent (destination)
+    t.move_node(source, destination) # To move node (source) from its parent to another parent (destination)
     t.paste(nid, new_tree)           # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree
     t.remove_node(identifier)        # To remove the node (with all its successor) from the tree
     t.rsearch(nid, filter=None)      # To search the tree from `nid` to the root along links reversedly
