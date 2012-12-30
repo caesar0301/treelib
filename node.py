@@ -34,7 +34,7 @@ import unittest
 import uuid
 
 def sanitize_id(id):
-	return id.strip().replace(" ", "")
+	return id.strip().replace(" ", "_")
 
 # Module constants
 (_ADD, _DELETE, _INSERT) = range(3)
