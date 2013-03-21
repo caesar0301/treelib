@@ -5,6 +5,8 @@
 # Copyright (C) 2012
 # Xiaming Chen - chenxm35@gmail.com
 # All rights reserved.
+# Copyright (C) 2013
+# Holger Bast - holgerbast@gmx.de
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -45,7 +47,7 @@ class MultipleRootError(Exception):
 
 class Tree(object):
     def __init__(self):
-        self.nodes = {}     # Node object
+        self.nodes = {}     # Node object {node:identifier : node}
         self.root = None    # identifier
 
     def add_node(self, node, parent=None):
@@ -58,7 +60,6 @@ class Tree(object):
                 raise MultipleRootError
             else:
                 self.root = node.identifier
-        #self.nodes.append(node)
         self.nodes.update({node.identifier : node})
         self.__update_fpointer(parent, node.identifier, _ADD)
         node.bpointer = parent
@@ -96,14 +97,7 @@ class Tree(object):
                 else:
                     queue = queue[1:]
 
-    # def get_index(self, nid):
-    #     for index, node in enumerate(self.nodes):
-    #         if node.identifier == nid:
-    #             break
-    #     return index
-
     def get_node(self, nid):
-        #return self.nodes[self.get_index(nid)]
         return self.nodes[nid]
 
     def is_branch(self, nid):
@@ -122,31 +116,40 @@ class Tree(object):
         self.__update_fpointer(destination, source, _ADD)
         self.__update_bpointer(source, destination)
 
-    # def paste(self, nid, new_tree):
-    #     """
-    #     Paste a new tree to the original one by linking the root
-    #     of new tree to nid.
-    #     """
-    #     assert isinstance(new_tree, Tree)
-    #
-    #     # check identifier replication
-    #     all_nodes = self.nodes + new_tree.nodes
-    #     ids = [i.identifier for i in all_nodes]
-    #     idset = set(ids)
-    #     if len(idset) != len(ids):
-    #         raise ValueError, 'Duplicated nodes exists.'
-    #
-    #     new_tree[new_tree.root].bpointer = nid
-    #     self.__update_fpointer(nid, new_tree.root, _ADD)
-    #     self.nodes += new_tree.nodes
+    def paste(self, nid, new_tree):
+        """
+        Paste a new tree to the original one by linking the root
+        of new tree to nid.
+        """
+        assert isinstance(new_tree, Tree)
+
+        # check identifier replication
+
+        if set(new_tree.nodes) & set(self.nodes):
+            # error, duplicate node identifier
+            # TODO: PEP8: deprecated form of raising exception
+            raise ValueError, 'Duplicated nodes exists.'
+
+        new_tree[new_tree.root].bpointer = nid
+        self.__update_fpointer(nid, new_tree.root, _ADD)
+        self.nodes.update(new_tree.nodes)
 
     def remove_node(self, identifier):
         """
         Remove a node indicated by 'identifier'. All the successors are removed, too.
         """
         parent = self[identifier].bpointer
+        remove = []  # temp. list for nodes which will be removed
         for id in self.expand_tree(identifier):
-            self.nodes.remove(self[id])
+            # TODO: implementing this function as a recursive function:
+            #       check if node has children
+            #       true -> run remove_node with child_id
+            #       no -> delete node
+            remove.append(id)
+
+        for id in remove:
+            del(self.nodes[id])
+
         self.__update_fpointer(parent, identifier, _DELETE)
 
     def rsearch(self, nid, filter=None):
@@ -160,7 +163,7 @@ class Tree(object):
         if filter is None:
             filter = real_true
         current = nid
-        while current != None:
+        while current is not None:
             if filter(current):
                 yield current
             current = self[current].bpointer
@@ -204,30 +207,28 @@ class Tree(object):
             for element in queue:
                 self.show(element, level)  # recursive call
 
-    # def subtree(self, nid):
-    #     """
-    #     Return a COPY of subtree of the whole tree with the nid being the new root.
-    #     And the structure of the subtree is maintained from the old tree.
-    #     """
-    #     st = Tree()
-    #     st.root = nid
-    #     for node_n in self.expand_tree(nid):
-    #         st.nodes.append(self[node_n])
-    #     return st
+    def subtree(self, nid):
+        """
+        Return a COPY of subtree of the whole tree with the nid being the new root.
+        And the structure of the subtree is maintained from the old tree.
+        """
+        st = Tree()
+        st.root = nid
+        for node_n in self.expand_tree(nid):
+            st.nodes.update({self[node_n].identifier : self[node_n]})
+        return st
 
     def __contains__(self, identifier):
         return [node.identifier for node in self.nodes
                 if node.identifier is identifier]
 
     def __getitem__(self, key):
-        #return self.nodes[self.get_index(key)]
         return self.nodes.get(key)
 
     def __len__(self):
         return len(self.nodes)
 
     def __setitem__(self, key, item):
-        #self.nodes[self.get_index(key)] = item
         self.nodes.update({key: item})
 
     def __update_bpointer(self, nid, identifier):
@@ -256,55 +257,55 @@ class TestTree(unittest.TestCase):
 #--------------------------------------------------------------------------------
 
 # Module testing
-#
-# if __name__ == "__main__":
-#
-#     # Example usage
-#     tree = Tree()
-#     tree.create_node("Harry", "harry")  # root node
-#     tree.create_node("Jane", "jane", parent="harry")
-#     tree.create_node("Bill", "bill", parent="harry")
-#     tree.create_node("Diane", "diane", parent="jane")
-#     tree.create_node("George", "george", parent="diane")
-#     tree.create_node("Mary", "mary", parent="diane")
-#     tree.create_node("Jill", "jill", parent="george")
-#     tree.create_node("Mark", "mark", parent="jane")
-#     tree.show()
-#
-#     print("=" * 80)
-#     for node in tree.expand_tree(mode=_DEPTH):
-#         print tree[node].name
-#
-#     print("=" * 80)
-#     for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=_DEPTH):
-#         print tree[node].name
-#
-#     print("=" * 80)
-#     sub_t = tree.subtree('diane')
-#     sub_t.show()
-#
-#     print("=" * 80)
-#     print tree.is_branch('diane')
-#
-#     print("=" * 80)
-#     new_tree = Tree()
-#     new_tree.create_node("n1", "1")  # root node
-#     new_tree.create_node("n2", "2", parent="1")
-#     new_tree.create_node("n3", "3", parent="1")
-#     tree.paste('jill', new_tree)
-#     tree.show()
-#
-#     print("=" * 80)
-#     tree.remove_node('1')
-#     tree.show()
-#
-#     print("=" * 80)
-#     tree.move_node('jill', 'harry')
-#     tree.show()
-#
-#     print("=" * 80)
-#     for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
-#         print node
-#
-#     # Run unit tests
-#     unittest.main()
+
+if __name__ == "__main__":
+
+    # Example usage
+    tree = Tree()
+    tree.create_node("Harry", "harry")  # root node
+    tree.create_node("Jane", "jane", parent="harry")
+    tree.create_node("Bill", "bill", parent="harry")
+    tree.create_node("Diane", "diane", parent="jane")
+    tree.create_node("George", "george", parent="diane")
+    tree.create_node("Mary", "mary", parent="diane")
+    tree.create_node("Jill", "jill", parent="george")
+    tree.create_node("Mark", "mark", parent="jane")
+    tree.show()
+
+    print("=" * 80)
+    for node in tree.expand_tree(mode=_DEPTH):
+        print tree[node].name
+
+    print("=" * 80)
+    for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=_DEPTH):
+        print tree[node].name
+
+    print("=" * 80)
+    sub_t = tree.subtree('diane')
+    sub_t.show()
+
+    print("=" * 80)
+    print tree.is_branch('diane')
+
+    print("=" * 80)
+    new_tree = Tree()
+    new_tree.create_node("n1", "1")  # root node
+    new_tree.create_node("n2", "2", parent="1")
+    new_tree.create_node("n3", "3", parent="1")
+    tree.paste('jill', new_tree)
+    tree.show()
+
+    print("=" * 80)
+    tree.remove_node('1')
+    tree.show()
+
+    print("=" * 80)
+    tree.move_node('jill', 'harry')
+    tree.show()
+
+    print("=" * 80)
+    for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
+        print node
+
+    # Run unit tests
+    unittest.main()
