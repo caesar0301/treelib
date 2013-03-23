@@ -6,9 +6,11 @@ Tree Implementation in python: simple to use for you.
 History
 =======
 
-Published by: Brett Alistair Kromkamp - brettkromkamp@gmail.com
+Replace list with dict for nodes indexing: Holger Bast - holgerbast@gmx.de
 
 Edited by: Xiaming Chen - chenxm35@gmail.com
+
+Published first by: Brett Alistair Kromkamp - brettkromkamp@gmail.com
 
 
 Useful APIs
@@ -42,7 +44,6 @@ are also available to make operations on the tree (e.g., `t` in the description 
     t.add_node(node, parent=None)  # Add a new node object to the tree and make the parent as the root by default
     t.create_node(name, identifier=None, parent=None)  # To create a new node and add it to the tree
     t.expand_tree(nid = None, mode=_DEPTH, filter = None) # To traverse the tree nodes with different modes (_DEPTH, _WIDTH); `nid` refers to the expanding point to start; `filter` refers to the function of one varible to act on the node
-    t.get_index(nid)  # To get the index of the node with ID == nid
     t.get_node(nid)   # To get the object of the node with ID == nid
     t.is_branch(nid)  # To get the children (only sons) list of the node with ID == nid
     t.move_node(source, destination) # To move node (source) from its parent to another parent (destination)

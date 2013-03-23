@@ -90,16 +90,16 @@ class TestNode(unittest.TestCase):
 
 	def test_initialization(self):
 		self.assertEqual(self.node1.name, "Test One")
-		self.assertEqual(self.node1.identifier, "identifier1")
+		self.assertEqual(self.node1.identifier, "ide_ntifier_1")
 		self.assertEqual(self.node1.expanded, True)
 
 	def test_set_fpointer(self):
 		self.node1.update_fpointer(" identi fier 2")
-		self.assertEqual(self.node1.fpointer, ['identifier2'])
+		self.assertEqual(self.node1.fpointer, ['identi_fier_2'])
 
 	def test_set_bpointer(self):
-		self.node1.bpointer = " identi fier 1"
-		self.assertEqual(self.node1.bpointer, 'identifier1')
+		self.node1.bpointer = " identi fier  1"
+		self.assertEqual(self.node1.bpointer, 'identi_fier__1')
 		
 	def test_set_data(self):
 		self.node1.data = {1:'hello', "two":'world'}
