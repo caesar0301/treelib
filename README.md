@@ -1,16 +1,23 @@
-pyTree
+treelib (previous pyTree to avoid conflict on PyPI)
 ========
 
 Tree Implementation in python: simple to use for you.
 
-History
+Contributors
 =======
 
-Replace list with dict for nodes indexing: Holger Bast - holgerbast@gmx.de
+Brett Alistair Kromkamp - brettkromkamp@gmail.com
 
-Edited by: Xiaming Chen - chenxm35@gmail.com
+Basic framework finished.
 
-Published first by: Brett Alistair Kromkamp - brettkromkamp@gmail.com
+Xiaming Chen - chenxm35@gmail.com
+
+For reasearch utility, I finish main parts and make the library freely public.
+
+Holger Bast - holgerbast@gmx.de
+
+Replace list with dict for nodes indexing and improve the performance to a
+large extend.
 
 
 Useful APIs
