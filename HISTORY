@@ -1,0 +1,22 @@
+May 1, 2013
+Pulish the module on PyPI with version 1.2 under GNU General Pulic License
+version 3.  
+
+Mar 21, 2013
+Replace the list implementation with dict to improve performance to a
+large extend. Thanks to @aronadaal
+
+Dec 30, 2012
+Make a pretty print routine to the tree and give some examples in README
+
+Dec 19, 2012
+Little modification and add get_node routine by @pgebhard.
+
+Jul 13, 2012
+Add rsearch routines to implement reversed searching from leaf to tree root.
+
+Jul 07, 2012
+Initiate the project on GitHub.
+For my research paper, I need the python implementation of tree structure.
+Based on the imcompleted code of Brett A. Kromkamp, I finished all methods
+and added subtree and paste routines.

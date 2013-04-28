@@ -1,22 +1,25 @@
+# treelib - Simple to use for you.
 # Python 2/3 Tree Implementation
 #
-# Copyright (C) 2011
-# Brett Alistair Kromkamp - brettkromkamp@gmail.com
-# Copyright (C) 2012
-# Xiaming Chen - chenxm35@gmail.com
+# Copyright (C) 2011    Brett Alistair Kromkamp - brettkromkamp@gmail.com
+# Copyright (C) 2012,2013   Xiaming Chen - chenxm35@gmail.com
+# Copyright (C) 2013    Holger Bast - holgerbast@gmx.de
 # All rights reserved.
-# Copyright (C) 2013
-# Holger Bast - holgerbast@gmx.de
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
+# This file is part of project treelib.
 #
-# Redistributions of source code must retain the above copyright notice, this list
-# of conditions and the following disclaimer.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Redistributions in binary form must reproduce the above copyright notice, this
-# list of conditions and the following disclaimer in the documentation and/or
-# other materials provided with the distribution.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Neither the name of the copyright holder nor the names of the contributors
 # may be used to endorse or promote products derived from this software without
@@ -270,42 +273,53 @@ if __name__ == "__main__":
     tree.create_node("Mary", "mary", parent="diane")
     tree.create_node("Jill", "jill", parent="george")
     tree.create_node("Mark", "mark", parent="jane")
-    tree.show()
 
-    print("=" * 80)
+    print("#"*4 + "Breakdown of out family")
+    tree.show()
+    print('\n') 
+
+    print("#"*4 + "All family members in DEPTH mode")
     for node in tree.expand_tree(mode=_DEPTH):
         print tree[node].name
+    print('\n') 
 
-    print("=" * 80)
+    print("#"*4 + "All family members without Diane sub-family")
     for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=_DEPTH):
         print tree[node].name
+    print('\n') 
 
-    print("=" * 80)
+    print("#"*4 + "Let me introduce Diane family only")
     sub_t = tree.subtree('diane')
     sub_t.show()
+    print('\n') 
 
-    print("=" * 80)
+    print("#"*4 + "Children of Diane")
     print tree.is_branch('diane')
+    print('\n')
 
-    print("=" * 80)
+    print("#"*4 + "OOhh~ new members enter Jill's family")
     new_tree = Tree()
     new_tree.create_node("n1", "1")  # root node
     new_tree.create_node("n2", "2", parent="1")
     new_tree.create_node("n3", "3", parent="1")
     tree.paste('jill', new_tree)
     tree.show()
+    print('\n')
 
-    print("=" * 80)
+    print("#"*4 + "We are sorry they are gone accidently :(")
     tree.remove_node('1')
     tree.show()
+    print('\n')
 
-    print("=" * 80)
+    print("#"*4 + "Now Jill moves to live with Grand-x-father Harry")
     tree.move_node('jill', 'harry')
     tree.show()
+    print('\n')
 
-    print("=" * 80)
+    print("#"*4 + "A big family for George to talk to Grand-x-father Harry")
     for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
         print node
+    print('\n')
 
     # Run unit tests
     unittest.main()
