@@ -13,8 +13,8 @@ class Node(object):
         self._fpointer = []
 
 
-    def sanitize_id(self, id):
-        return id.strip().replace(" ", "_")
+    def sanitize_id(self, identifier):
+        return identifier.strip().replace(" ", "_")
 
 
     def set_identifier(self, identifier):
