@@ -1,45 +1,6 @@
-# treelib - Simple to use for you.
-# Python 2/3 Tree Implementation
-#
-# Copyright (C) 2011    Brett Alistair Kromkamp - brettkromkamp@gmail.com
-# Copyright (C) 2012,2013   Xiaming Chen - chenxm35@gmail.com
-# Copyright (C) 2013    Holger Bast - holgerbast@gmx.de
-# All rights reserved.
-#
-# This file is part of project treelib.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Neither the name of the copyright holder nor the names of the contributors
-# may be used to endorse or promote products derived from this software without
-# specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import unittest
-
 from node import Node
 
-# Module constants
+
 (_ADD, _DELETE, _INSERT) = range(3)
 (_ROOT, _DEPTH, _WIDTH) = range(3)
 
@@ -49,9 +10,50 @@ class MultipleRootError(Exception):
 
 
 class Tree(object):
+    """
+    tree = Tree()
+    tree.create_node("Harry", "harry")  # root node
+    tree.create_node("Jane", "jane", parent="harry")
+    tree.create_node("Bill", "bill", parent="harry")
+    tree.create_node("Diane", "diane", parent="jane")
+    tree.create_node("George", "george", parent="diane")
+    tree.create_node("Mary", "mary", parent="diane")
+    tree.create_node("Jill", "jill", parent="george")
+    tree.create_node("Mark", "mark", parent="jane")
+
+    tree.show()
+
+    for node in tree.expand_tree(mode=_DEPTH):
+        print tree[node].name
+
+    for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=_DEPTH):
+        print tree[node].name
+
+    sub_t = tree.subtree('diane')
+        sub_t.show()
+
+    print tree.is_branch('diane')
+
+    new_tree = Tree()
+    new_tree.create_node("n1", "1")  # root node
+    new_tree.create_node("n2", "2", parent="1")
+    new_tree.create_node("n3", "3", parent="1")
+    tree.paste('jill', new_tree)
+    tree.show()
+
+    tree.remove_node('1')
+    tree.show()
+
+    tree.move_node('jill', 'harry')
+    tree.show()
+
+    for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
+        print node
+    """
     def __init__(self):
-        self.nodes = {}     # Node object {node:identifier : node}
-        self.root = None    # identifier
+        self.nodes = {}
+        self.root = None
+
 
     def add_node(self, node, parent=None):
         """
@@ -67,13 +69,15 @@ class Tree(object):
         self.__update_fpointer(parent, node.identifier, _ADD)
         node.bpointer = parent
 
-    def create_node(self, name, identifier=None, parent=None):
+
+    def create_node(self, tag, identifier=None, parent=None):
         """
         Create a child node for the node indicated by the 'parent' parameter
         """
-        node = Node(name, identifier)
+        node = Node(tag, identifier)
         self.add_node(node, parent)
         return node
+
 
     def expand_tree(self, nid=None, mode=_DEPTH, filter=None):
         # Python generator. Loosly based on an algorithm from 'Essential LISP' by
@@ -100,14 +104,17 @@ class Tree(object):
                 else:
                     queue = queue[1:]
 
+
     def get_node(self, nid):
         return self.nodes[nid]
+
 
     def is_branch(self, nid):
         """
         Return the following nodes of [nid]
         """
         return self[nid].fpointer
+
 
     def move_node(self, source, destination):
         """
@@ -119,6 +126,7 @@ class Tree(object):
         self.__update_fpointer(destination, source, _ADD)
         self.__update_bpointer(source, destination)
 
+
     def paste(self, nid, new_tree):
         """
         Paste a new tree to the original one by linking the root
@@ -126,23 +134,20 @@ class Tree(object):
         """
         assert isinstance(new_tree, Tree)
 
-        # check identifier replication
-
         if set(new_tree.nodes) & set(self.nodes):
-            # error, duplicate node identifier
-            # TODO: PEP8: deprecated form of raising exception
-            raise ValueError, 'Duplicated nodes exists.'
+            raise ValueError('Duplicated nodes exists.')
 
         new_tree[new_tree.root].bpointer = nid
         self.__update_fpointer(nid, new_tree.root, _ADD)
         self.nodes.update(new_tree.nodes)
+
 
     def remove_node(self, identifier):
         """
         Remove a node indicated by 'identifier'. All the successors are removed, too.
         """
         parent = self[identifier].bpointer
-        remove = []  # temp. list for nodes which will be removed
+        remove = []
         for id in self.expand_tree(identifier):
             # TODO: implementing this function as a recursive function:
             #       check if node has children
@@ -154,6 +159,7 @@ class Tree(object):
             del(self.nodes[id])
 
         self.__update_fpointer(parent, identifier, _DELETE)
+
 
     def rsearch(self, nid, filter=None):
         """
@@ -170,6 +176,7 @@ class Tree(object):
             if filter(current):
                 yield current
             current = self[current].bpointer
+
 
     def show(self, nid=None, level=_ROOT):
         """"
@@ -192,10 +199,10 @@ class Tree(object):
 
         if nid is None:
             nid = self.root
-        label = "{0}[{1}]".format(self[nid].name, self[nid].identifier)
+        label = "{0}[{1}]".format(self[nid].tag, self[nid].identifier)
 
         queue = self[nid].fpointer
-        #print level
+
         if level == _ROOT:
             print(label)
         else:
@@ -208,7 +215,8 @@ class Tree(object):
         if self[nid].expanded:
             level += 1
             for element in queue:
-                self.show(element, level)  # recursive call
+                self.show(element, level)
+
 
     def subtree(self, nid):
         """
@@ -221,105 +229,30 @@ class Tree(object):
             st.nodes.update({self[node_n].identifier : self[node_n]})
         return st
 
+
     def __contains__(self, identifier):
         return [node.identifier for node in self.nodes
                 if node.identifier is identifier]
 
+
     def __getitem__(self, key):
         return self.nodes.get(key)
+
 
     def __len__(self):
         return len(self.nodes)
 
+
     def __setitem__(self, key, item):
         self.nodes.update({key: item})
 
+
     def __update_bpointer(self, nid, identifier):
         self[nid].bpointer = identifier
+
 
     def __update_fpointer(self, nid, identifier, mode):
         if nid is None:
             return
         else:
             self[nid].update_fpointer(identifier, mode)
-
-#--------------------------------------------------------------------------------
-
-# Test suite
-
-class TestTree(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def test_initialization(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-#--------------------------------------------------------------------------------
-
-# Module testing
-
-if __name__ == "__main__":
-
-    # Example usage
-    tree = Tree()
-    tree.create_node("Harry", "harry")  # root node
-    tree.create_node("Jane", "jane", parent="harry")
-    tree.create_node("Bill", "bill", parent="harry")
-    tree.create_node("Diane", "diane", parent="jane")
-    tree.create_node("George", "george", parent="diane")
-    tree.create_node("Mary", "mary", parent="diane")
-    tree.create_node("Jill", "jill", parent="george")
-    tree.create_node("Mark", "mark", parent="jane")
-
-    print("#"*4 + "Breakdown of out family")
-    tree.show()
-    print('\n') 
-
-    print("#"*4 + "All family members in DEPTH mode")
-    for node in tree.expand_tree(mode=_DEPTH):
-        print tree[node].name
-    print('\n') 
-
-    print("#"*4 + "All family members without Diane sub-family")
-    for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=_DEPTH):
-        print tree[node].name
-    print('\n') 
-
-    print("#"*4 + "Let me introduce Diane family only")
-    sub_t = tree.subtree('diane')
-    sub_t.show()
-    print('\n') 
-
-    print("#"*4 + "Children of Diane")
-    print tree.is_branch('diane')
-    print('\n')
-
-    print("#"*4 + "OOhh~ new members enter Jill's family")
-    new_tree = Tree()
-    new_tree.create_node("n1", "1")  # root node
-    new_tree.create_node("n2", "2", parent="1")
-    new_tree.create_node("n3", "3", parent="1")
-    tree.paste('jill', new_tree)
-    tree.show()
-    print('\n')
-
-    print("#"*4 + "We are sorry they are gone accidently :(")
-    tree.remove_node('1')
-    tree.show()
-    print('\n')
-
-    print("#"*4 + "Now Jill moves to live with Grand-x-father Harry")
-    tree.move_node('jill', 'harry')
-    tree.show()
-    print('\n')
-
-    print("#"*4 + "A big family for George to talk to Grand-x-father Harry")
-    for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
-        print node
-    print('\n')
-
-    # Run unit tests
-    unittest.main()
