@@ -236,7 +236,7 @@ class Tree(object):
 
 
     def __getitem__(self, key):
-        return self.nodes.get(key)
+        return self.nodes[key]
 
 
     def __len__(self):
