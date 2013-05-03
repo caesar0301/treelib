@@ -42,6 +42,18 @@ class TreeCase(unittest.TestCase):
     def test_tree(self):
         self.assertIsInstance(self.tree, Tree)
 
+    def test_getitem(self):
+        """Nodes can be accessed via getitem."""
+        tree = Tree()
+        tree.create_node("Harry", "harry")
+        tree.create_node("Jane", "jane", parent="harry")
+
+        for node_id in tree.nodes:
+            try:
+                tree[node_id]
+            except AttributeError:
+                self.fail('Node access should be possible via getitem.')
+
     def tearDown(self):
         pass
 
