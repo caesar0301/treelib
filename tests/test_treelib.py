@@ -51,8 +51,15 @@ class TreeCase(unittest.TestCase):
         for node_id in tree.nodes:
             try:
                 tree[node_id]
-            except AttributeError:
+            except KeyError:
                 self.fail('Node access should be possible via getitem.')
+
+        try:
+            tree['root']
+        except KeyError:
+            pass
+        else:
+            self.fail('There should be no default fallback value for getitem.')
 
     def tearDown(self):
         pass
