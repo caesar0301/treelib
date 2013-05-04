@@ -5,3 +5,5 @@ include MANIFEST.in
 include TODO
 include setup.py
 recursive-include treelib *.py
+recursive-include tests *.py
+recursive-include examples *.py

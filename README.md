@@ -28,11 +28,11 @@ Useful APIs
 
 Add the import declaration to use `treelib` in your project:
 
-    from treelib import node, tree
+    from treelib import Node, Tree
 
-This module `treelib` mainly contains two classes: class `node` and class `tree`.
+This module `treelib` mainly contains two classes: class `Node` and class `Tree`.
 
-The class `node` defines basic properties and operations of a node like node identifier 
+The class `Node` defines basic properties and operations of a node like node identifier 
 (the mostly used property as ID which is unique for a node in a specific tree), node name 
 (readable for human), parent node, and children nodes. Some public methods are provided 
 to operate with an exsiting node (e.g., `a` in the description below):
@@ -56,7 +56,7 @@ to operate with an exsiting node (e.g., `a` in the description below):
     a.fpointer=[value]
     
     # Update the children list with different modes
-    a.update_fpointer(identifier, mode=[_ADD, _DELETE, _INSERT])
+    a.update_fpointer(identifier, mode=[Node.ADD, Node.DELETE, Node.INSERT])
 
 The class `tree` defines the tree-like structure based on the node structure. Public methods
 are also available to make operations on the tree (e.g., `t` in the description below):
@@ -76,14 +76,15 @@ are also available to make operations on the tree (e.g., `t` in the description 
     # To create a new node and add it to the tree
     t.create_node(name, identifier=None, parent=None)  
     
-    # To traverse the tree nodes with different modes (_DEPTH, _WIDTH); `nid` refers to the expanding point to start; `filter` refers to the function of one varible to act on the node
-    t.expand_tree(nid = None, mode=_DEPTH, filter = None) 
+    # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH); `nid` refers to 
+    # the expanding point to start; `filter` refers to the function of one varible to act on the node
+    t.expand_tree(nid = None, mode=Tree.DEPTH, filter = None) 
     
     # To get the object of the node with ID == nid
-    t.get_node(nid)  
+    t.get_node(nid)
     
     # To get the children (only sons) list of the node with ID == nid
-    t.is_branch(nid)  
+    t.is_branch(nid)
     
     # To move node (source) from its parent to another parent (destination)
     t.move_node(source, destination)
@@ -92,16 +93,16 @@ are also available to make operations on the tree (e.g., `t` in the description 
     t.paste(nid, new_tree) 
     
     # To remove the node (with all its successor) from the tree
-    t.remove_node(identifier)      
-    
+    t.remove_node(identifier)
+ 
     # To search the tree from `nid` to the root along links reversedly
-    t.rsearch(nid, filter=None)      
+    t.rsearch(nid, filter=None) 
     
     # To print the tree structure in hierarchy style; `nid` refers to the expanding point to start; `level` refers to the node level in the tree (root as level 0)
-    t.show(nid = None, level=_ROOT)  
+    t.show(nid = None, level=Tree.ROOT)
     
     # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here means all the nodes of the subtree are shared between the original tree and it
-    t.subtree(nid)    
+    t.subtree(nid)
 
 Basic Usage
 =======
@@ -130,10 +131,10 @@ Result:
     |    |___ Mark[mark]
     |___ Bill[bill]
 
-Example 2: expand a tree with mode being _DEPTH or _WIDTH
+Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
 
-    for node in tree.expand_tree(mode=_DEPTH):
-	   print tree[node].name
+    for node in tree.expand_tree(mode=Tree.DEPTH):
+	print tree[node].name
 
 Result:
 
@@ -148,8 +149,8 @@ Result:
 
 Example 3: expand tree with filter
 
-    for node in tree.expand_tree(filter = lambda x: x != 'george', mode=_DEPTH):
-	   print tree[node].name
+    for node in tree.expand_tree(filter = lambda x: x != 'george', mode=Tree.DEPTH):
+    	print tree[node].name
 
 Result:
 

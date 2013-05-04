@@ -1,55 +1,15 @@
 from node import Node
 
 
-(_ADD, _DELETE, _INSERT) = range(3)
-(_ROOT, _DEPTH, _WIDTH) = range(3)
-
-
 class MultipleRootError(Exception):
     pass
 
 
 class Tree(object):
-    """
-    tree = Tree()
-    tree.create_node("Harry", "harry")  # root node
-    tree.create_node("Jane", "jane", parent="harry")
-    tree.create_node("Bill", "bill", parent="harry")
-    tree.create_node("Diane", "diane", parent="jane")
-    tree.create_node("George", "george", parent="diane")
-    tree.create_node("Mary", "mary", parent="diane")
-    tree.create_node("Jill", "jill", parent="george")
-    tree.create_node("Mark", "mark", parent="jane")
 
-    tree.show()
+    (ROOT, DEPTH, WIDTH) = range(3)
 
-    for node in tree.expand_tree(mode=_DEPTH):
-        print tree[node].name
 
-    for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=_DEPTH):
-        print tree[node].name
-
-    sub_t = tree.subtree('diane')
-        sub_t.show()
-
-    print tree.is_branch('diane')
-
-    new_tree = Tree()
-    new_tree.create_node("n1", "1")  # root node
-    new_tree.create_node("n2", "2", parent="1")
-    new_tree.create_node("n3", "3", parent="1")
-    tree.paste('jill', new_tree)
-    tree.show()
-
-    tree.remove_node('1')
-    tree.show()
-
-    tree.move_node('jill', 'harry')
-    tree.show()
-
-    for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
-        print node
-    """
     def __init__(self):
         self.nodes = {}
         self.root = None
@@ -60,13 +20,19 @@ class Tree(object):
         Add a new node to tree.
         The 'node' parameter refers to an instance of Class::Node
         """
+        if not isinstance(node, Node):
+            raise OSError("First parameter must be object of Class::Node.")
+
         if parent is None:
             if self.root is not None:
                 raise MultipleRootError
             else:
                 self.root = node.identifier
+        else:
+            parent = Node.sanitize_id(parent)
+
         self.nodes.update({node.identifier : node})
-        self.__update_fpointer(parent, node.identifier, _ADD)
+        self.__update_fpointer(parent, node.identifier, Node.ADD)
         node.bpointer = parent
 
 
@@ -79,7 +45,7 @@ class Tree(object):
         return node
 
 
-    def expand_tree(self, nid=None, mode=_DEPTH, filter=None):
+    def expand_tree(self, nid=None, mode=DEPTH, filter=None):
         # Python generator. Loosly based on an algorithm from 'Essential LISP' by
         # John R. Anderson, Albert T. Corbett, and Brian J. Reiser, page 239-241
         def real_true(pos):
@@ -87,6 +53,9 @@ class Tree(object):
 
         if nid is None:
             nid = self.root
+        else:
+            nid = Node.sanitize_id(nid)
+
         if filter is None:
             filter = real_true
 
@@ -97,23 +66,40 @@ class Tree(object):
                 if filter(queue[0]):
                     yield queue[0]
                     expansion = self[queue[0]].fpointer
-                    if mode is _DEPTH:
+                    if mode is self.DEPTH:
                         queue = expansion + queue[1:]  # depth-first
-                    elif mode is _WIDTH:
+                    elif mode is self.WIDTH:
                         queue = queue[1:] + expansion  # width-first
                 else:
                     queue = queue[1:]
 
 
     def get_node(self, nid):
-        return self.nodes[nid]
+        """
+        Return the node with nid.
+        None returned if nid not exists.
+        """
+        if nid is not None:
+            nid = Node.sanitize_id(nid)
+        try:
+            node = self.nodes[nid]
+        except KeyError:
+            node = None
+        return node
 
 
     def is_branch(self, nid):
         """
-        Return the following nodes of [nid]
+        Return the following nodes of nid.
+        Empty list returned if nid not exists
         """
-        return self[nid].fpointer
+        if nid is not None:
+            nid = Node.sanitize_id(nid)
+        try:
+            fpointer = self[nid].fpointer
+        except KeyError:
+            fpointer = []
+        return fpointer
 
 
     def move_node(self, source, destination):
@@ -121,9 +107,11 @@ class Tree(object):
         Move a node indicated by the 'source' parameter to the parent node
         indicated by the 'dest' parameter
         """
+        source = Node.sanitize_id(source)
+        destination = Node.sanitize_id(destination)
         parent = self[source].bpointer
-        self.__update_fpointer(parent, source, _DELETE)
-        self.__update_fpointer(destination, source, _ADD)
+        self.__update_fpointer(parent, source, Node.DELETE)
+        self.__update_fpointer(destination, source, Node.ADD)
         self.__update_bpointer(source, destination)
 
 
@@ -133,12 +121,15 @@ class Tree(object):
         of new tree to nid.
         """
         assert isinstance(new_tree, Tree)
+        assert nid is not None
+
+        nid = Node.sanitize_id(nid)
 
         if set(new_tree.nodes) & set(self.nodes):
             raise ValueError('Duplicated nodes exists.')
 
         new_tree[new_tree.root].bpointer = nid
-        self.__update_fpointer(nid, new_tree.root, _ADD)
+        self.__update_fpointer(nid, new_tree.root, Node.ADD)
         self.nodes.update(new_tree.nodes)
 
 
@@ -146,6 +137,10 @@ class Tree(object):
         """
         Remove a node indicated by 'identifier'. All the successors are removed, too.
         """
+        if identifier is None:
+            return
+
+        identifier = Node.sanitize_id(identifier)
         parent = self[identifier].bpointer
         remove = []
         for id in self.expand_tree(identifier):
@@ -158,27 +153,28 @@ class Tree(object):
         for id in remove:
             del(self.nodes[id])
 
-        self.__update_fpointer(parent, identifier, _DELETE)
+        self.__update_fpointer(parent, identifier, Node.DELETE)
 
 
     def rsearch(self, nid, filter=None):
         """
         Search the tree from nid to the root along links reversedly.
         """
-
         def real_true(p):
             return True
 
+        if nid is None:
+            return
         if filter is None:
             filter = real_true
-        current = nid
+        current = Node.sanitize_id(nid)
         while current is not None:
             if filter(current):
                 yield current
             current = self[current].bpointer
 
 
-    def show(self, nid=None, level=_ROOT):
+    def show(self, nid=None, level=ROOT):
         """"
             Another implementation of printing tree using Stack
             Print tree structure in hierarchy style.
@@ -199,11 +195,14 @@ class Tree(object):
 
         if nid is None:
             nid = self.root
+        else:
+            nid = Node.sanitize_id(nid)
+
         label = "{0}[{1}]".format(self[nid].tag, self[nid].identifier)
 
         queue = self[nid].fpointer
 
-        if level == _ROOT:
+        if level == self.ROOT:
             print(label)
         else:
             if level <= 1:
@@ -224,7 +223,9 @@ class Tree(object):
         And the structure of the subtree is maintained from the old tree.
         """
         st = Tree()
-        st.root = nid
+        if nid is None:
+            return st
+        st.root = Node.sanitize_id(nid)
         for node_n in self.expand_tree(nid):
             st.nodes.update({self[node_n].identifier : self[node_n]})
         return st
