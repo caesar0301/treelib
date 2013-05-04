@@ -3,6 +3,10 @@ from node import Node
 
 class MultipleRootError(Exception):
     pass
+    
+    
+class DuplicatedNodeIdError(Exception):
+    pass
 
 
 class Tree(object):
@@ -22,6 +26,9 @@ class Tree(object):
         """
         if not isinstance(node, Node):
             raise OSError("First parameter must be object of Class::Node.")
+            
+        if node.identifier in self.nodes:
+            raise DuplicatedNodeIdError("Can't create node with ID '%s'" % node.identifier)
 
         if parent is None:
             if self.root is not None:
@@ -121,12 +128,15 @@ class Tree(object):
         of new tree to nid.
         """
         assert isinstance(new_tree, Tree)
-        assert nid is not None
 
+        if nid is None:
+            raise OSError("First parameter can't be None")
+            
         nid = Node.sanitize_id(nid)
 
-        if set(new_tree.nodes) & set(self.nodes):
-            raise ValueError('Duplicated nodes exists.')
+        set_joint = set(new_tree.nodes) & set(self.nodes)
+        if set_joint:
+            raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
         new_tree[new_tree.root].bpointer = nid
         self.__update_fpointer(nid, new_tree.root, Node.ADD)
