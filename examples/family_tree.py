@@ -17,28 +17,35 @@ tree.create_node("Mary", "mary", parent="diane")
 tree.create_node("Jill", "jill", parent="george")
 tree.create_node("Mark", "mark", parent="jane")
 
+
 print("#"*4 + "Breakdown of out family")
 tree.show()
 print('\n') 
+
 
 print("#"*4 + "All family members in DEPTH mode")
 for node in tree.expand_tree(mode=Tree.DEPTH):
     print tree[node].tag
 print('\n') 
 
+
 print("#"*4 + "All family members without Diane sub-family")
-for node in tree.expand_tree(filter=lambda x: x != 'diane', mode=Tree.DEPTH):
-    print tree[node].tag
+tree.show(idhidden=False, filter=lambda x: x.identifier != 'diane')
+# for node in tree.expand_tree(filter=lambda x: x.identifier != 'diane', mode=Tree.DEPTH):
+#     print tree[node].tag
 print('\n') 
+
 
 print("#"*4 + "Let me introduce Diane family only")
 sub_t = tree.subtree('diane')
 sub_t.show()
 print('\n') 
 
+
 print("#"*4 + "Children of Diane")
 print tree.is_branch('diane')
 print('\n')
+
 
 print("#"*4 + "OOhh~ new members enter Jill's family")
 new_tree = Tree()
@@ -49,17 +56,21 @@ tree.paste('jill', new_tree)
 tree.show()
 print('\n')
 
+
 print("#"*4 + "We are sorry they are gone accidently :(")
 tree.remove_node(1)
 tree.show()
 print('\n')
+
 
 print("#"*4 + "Now Jill moves to live with Grand-x-father Harry")
 tree.move_node('jill', 'harry')
 tree.show()
 print('\n')
 
+
 print("#"*4 + "A big family for George to talk to Grand-x-father Harry")
-for node in tree.rsearch('george', filter=lambda x: x != 'harry'):
+for node in tree.rsearch('george', filter=lambda x: x.identifier != 'harry'):
     print node
+print('harry')
 print('\n')

@@ -55,22 +55,20 @@ class Tree(object):
     def expand_tree(self, nid=None, mode=DEPTH, filter=None):
         # Python generator. Loosly based on an algorithm from 'Essential LISP' by
         # John R. Anderson, Albert T. Corbett, and Brian J. Reiser, page 239-241
-        def real_true(pos):
-            return True
-
+        # UPDATE: the @filter function is perform on Node object.
         if nid is None:
             nid = self.root
         else:
             nid = Node.sanitize_id(nid)
 
         if filter is None:
-            filter = real_true
+            filter = self._real_true
 
-        if filter(nid):
+        if filter(self[nid]):
             yield nid
             queue = self[nid].fpointer
             while queue:
-                if filter(queue[0]):
+                if filter(self[queue[0]]):
                     yield queue[0]
                     expansion = self[queue[0]].fpointer
                     if mode is self.DEPTH:
@@ -170,21 +168,23 @@ class Tree(object):
         """
         Search the tree from nid to the root along links reversedly.
         """
-        def real_true(p):
-            return True
-
         if nid is None:
             return
         if filter is None:
-            filter = real_true
+            filter = self._real_true
+
         current = Node.sanitize_id(nid)
         while current is not None:
-            if filter(current):
+            if filter(self[current]):
                 yield current
             current = self[current].bpointer
 
 
-    def show(self, nid=None, level=ROOT):
+    def _real_true(self, p):
+        return True
+
+
+    def show(self, nid=None, level=ROOT, idhidden=True, filter=None):
         """"
             Another implementation of printing tree using Stack
             Print tree structure in hierarchy style.
@@ -208,10 +208,15 @@ class Tree(object):
         else:
             nid = Node.sanitize_id(nid)
 
-        label = "{0}[{1}]".format(self[nid].tag, self[nid].identifier)
+        if idhidden:
+            label = "{0}".format(self[nid].tag)
+        else:
+            label = "{0}[{1}]".format(self[nid].tag, self[nid].identifier)
+
+        if filter is None:
+            filter = self._real_true
 
         queue = self[nid].fpointer
-
         if level == self.ROOT:
             print(label)
         else:
@@ -221,10 +226,11 @@ class Tree(object):
                 leading += ('|' + ' ' * 4) + (' ' * 5 * (level - 2))
             print("{0}{1}{2}".format(leading, lasting, label))
 
-        if self[nid].expanded:
+        if filter(self[nid]) and self[nid].expanded:
             level += 1
             for element in queue:
-                self.show(element, level)
+                if filter(self[element]):
+                    self.show(nid=element, level=level, filter=filter)
 
 
     def subtree(self, nid):
