@@ -38,9 +38,8 @@ parent node, children nodes etc., and some public operations on a node.
 (e.g., `a` in the description below):
 
     # To create a new node object.
-    # By default, all params are provied with values.
 
-    a = Node(tag=None, identifier=None, expanded=True)
+    a = Node([tag[, identifier[, expanded]]])
     
     
     # To get the ID of the node
@@ -77,7 +76,7 @@ are also available to make operations on the tree (e.g., `t` in the description 
 
     # To create a new object of tree structure
     
-    t = Tree()   
+    t = Tree()
     
     
     # To give the ID of the root
@@ -87,24 +86,27 @@ are also available to make operations on the tree (e.g., `t` in the description 
     
     # To get the list of all the nodes (in arbitrary order) belonging to the tree
     
-    t.nodes.values()        
+    t.nodes.values()
     
     
     # Add a new node object to the tree and make the parent as the root by default
     
-    t.add_node(node, parent=None)  
+    t.add_node(node[, parent])
     
     
     # To create a new node and add it to the tree
     
-    t.create_node(name, identifier=None, parent=None)  
+    t.create_node(name[,identifier[,parent]])
     
     
     # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH);
-    # NOTE: `nid` refers to the expanding point to start;
-    # `filter` refers to the function of one varible to act on the **node object**.
+    # NOTE:
+    # `nid` refers to the expanding point to start;
+    # `mode` refers to the search mode;
+    # `filter` refers to the function of one varible to act on the **node object**;
+    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     
-    t.expand_tree(nid = None, mode=Tree.DEPTH, filter = None) 
+    t.expand_tree([nid[,mode[,filter[,cmp[,key[,reverse]]]]]]) 
     
     
     # To get the object of the node with ID of nid
@@ -138,15 +140,18 @@ are also available to make operations on the tree (e.g., `t` in the description 
     # To search the tree from `nid` to the root along links reversedly
     # Note: `filter` refers to the function of one varible to act on the **node object**.
     
-    t.rsearch(nid, filter=None) 
+    t.rsearch(nid[,filter]) 
     
     
     # To print the tree structure in hierarchy style;
-    # Note: `nid` refers to the expanding point to start;
+    # Note:
+    # `nid` refers to the expanding point to start;
     # `level` refers to the node level in the tree (root as level 0);
-    # `filter` refers to the function of one varible to act on the **node object**.
+    # `idhidden` refers to hiding the node ID when priting;
+    # `filter` refers to the function of one varible to act on the **node object**;
+    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     
-    t.show(nid = None, level=Tree.ROOT, idhidden=True, filter=None)
+    t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
     
     
     # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here means all the nodes of the subtree are shared between the original tree and it

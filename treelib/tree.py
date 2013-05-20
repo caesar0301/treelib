@@ -52,31 +52,28 @@ class Tree(object):
         return node
 
 
-    def expand_tree(self, nid=None, mode=DEPTH, filter=None):
-        # Python generator. Loosly based on an algorithm from 'Essential LISP' by
-        # John R. Anderson, Albert T. Corbett, and Brian J. Reiser, page 239-241
-        # UPDATE: the @filter function is perform on Node object.
-        if nid is None:
-            nid = self.root
-        else:
-            nid = Node.sanitize_id(nid)
-
-        if filter is None:
-            filter = self._real_true
+    def expand_tree(self, nid=None, mode=DEPTH, filter=None, cmp=None, key=None, reverse=False):
+        """
+        Python generator. Loosly based on an algorithm from 'Essential LISP' by
+        John R. Anderson, Albert T. Corbett, and Brian J. Reiser, page 239-241
+        UPDATE: the @filter function is perform on Node object.
+        UPDATE: the @cmp @key @reverse is present to sort node at each level.
+        """
+        nid = self.root if (nid is None) else Node.sanitize_id(nid)
+        filter = (self._real_true) if (filter is None) else filter
 
         if filter(self[nid]):
             yield nid
-            queue = self[nid].fpointer
+            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+            queue.sort(cmp=cmp, key=key, reverse=reverse)
             while queue:
-                if filter(self[queue[0]]):
-                    yield queue[0]
-                    expansion = self[queue[0]].fpointer
-                    if mode is self.DEPTH:
-                        queue = expansion + queue[1:]  # depth-first
-                    elif mode is self.WIDTH:
-                        queue = queue[1:] + expansion  # width-first
-                else:
-                    queue = queue[1:]
+                yield queue[0].identifier
+                expansion = [self[i] for i in queue[0].fpointer if filter(self[i])]
+                expansion.sort(cmp=cmp, key=key, reverse=reverse)
+                if mode is self.DEPTH:
+                    queue = expansion + queue[1:]  # depth-first
+                elif mode is self.WIDTH:
+                    queue = queue[1:] + expansion  # width-first
 
 
     def get_node(self, nid):
@@ -170,8 +167,7 @@ class Tree(object):
         """
         if nid is None:
             return
-        if filter is None:
-            filter = self._real_true
+        filter = (self._real_true) if (filter is None) else filter
 
         current = Node.sanitize_id(nid)
         while current is not None:
@@ -184,39 +180,30 @@ class Tree(object):
         return True
 
 
-    def show(self, nid=None, level=ROOT, idhidden=True, filter=None):
+    def show(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False):
         """"
-            Another implementation of printing tree using Stack
-            Print tree structure in hierarchy style.
-            For example:
-                Root
-                |___ C01
-                |	 |___ C11
-                |		  |___ C111
-                |		  |___ C112
-                |___ C02
-                |___ C03
-                |	 |___ C31
-            A more elegant way to achieve this function using Stack structure,
-            for constructing the Nodes Stack push and pop nodes with additional level info.
+        Another implementation of printing tree using Stack
+        Print tree structure in hierarchy style.
+        For example:
+            Root
+            |___ C01
+            |	 |___ C11
+            |		  |___ C111
+            |		  |___ C112
+            |___ C02
+            |___ C03
+            |	 |___ C31
+        A more elegant way to achieve this function using Stack structure,
+        for constructing the Nodes Stack push and pop nodes with additional level info.
+        UPDATE: the @cmp @key @reverse is present to sort node at each level.
         """
         leading = ''
         lasting = '|___ '
 
-        if nid is None:
-            nid = self.root
-        else:
-            nid = Node.sanitize_id(nid)
+        nid = self.root if (nid is None) else Node.sanitize_id(nid)
+        label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+        filter = (self._real_true) if (filter is None) else filter
 
-        if idhidden:
-            label = "{0}".format(self[nid].tag)
-        else:
-            label = "{0}[{1}]".format(self[nid].tag, self[nid].identifier)
-
-        if filter is None:
-            filter = self._real_true
-
-        queue = self[nid].fpointer
         if level == self.ROOT:
             print(label)
         else:
@@ -227,10 +214,12 @@ class Tree(object):
             print("{0}{1}{2}".format(leading, lasting, label))
 
         if filter(self[nid]) and self[nid].expanded:
+            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+            key = (lambda x: x) if (key is None) else key
+            queue.sort(cmp=cmp, key=key, reverse=reverse)
             level += 1
             for element in queue:
-                if filter(self[element]):
-                    self.show(nid=element, level=level, filter=filter)
+                self.show(nid=element.identifier, level=level, filter=filter)
 
 
     def subtree(self, nid):
