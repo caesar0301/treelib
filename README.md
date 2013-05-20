@@ -152,6 +152,11 @@ are also available to make operations on the tree (e.g., `t` in the description 
     # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     
     t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
+
+
+    # Save the tree into file for offline analysis.
+
+    t.save2file(filename[,nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
     
     
     # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here means all the nodes of the subtree are shared between the original tree and it
