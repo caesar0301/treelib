@@ -100,45 +100,53 @@ are also available to make operations on the tree (e.g., `t` in the description 
     t.create_node(name, identifier=None, parent=None)  
     
     
-    # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH); `nid` refers to 
-    # the expanding point to start; `filter` refers to the function of one varible to act on the node
+    # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH);
+    # NOTE: `nid` refers to the expanding point to start;
+    # `filter` refers to the function of one varible to act on the **node object**.
     
     t.expand_tree(nid = None, mode=Tree.DEPTH, filter = None) 
     
     
-    # To get the object of the node with ID == nid
+    # To get the object of the node with ID of nid
+    # An alternative way is using '[]' operation on the tree.
+    # But small difference exists between them:
+    # the get_node() will return None if nid is absent, whereas '[]' will raise KeyError.
     
     t.get_node(nid)
     
     
-    # To get the children (only sons) list of the node with ID == nid
+    # To get the children (only sons) list of the node with ID == nid.
     
     t.is_branch(nid)
     
     
-    # To move node (source) from its parent to another parent (destination)
+    # To move node (source) from its parent to another parent (destination).
     
     t.move_node(source, destination)
     
     
-    # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree
+    # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree.
     
     t.paste(nid, new_tree) 
     
     
-    # To remove the node (with all its successor) from the tree
+    # To remove the node (with all its successor) from the tree.
     
     t.remove_node(identifier)
  
  
     # To search the tree from `nid` to the root along links reversedly
+    # Note: `filter` refers to the function of one varible to act on the **node object**.
     
     t.rsearch(nid, filter=None) 
     
     
-    # To print the tree structure in hierarchy style; `nid` refers to the expanding point to start; `level` refers to the node level in the tree (root as level 0)
+    # To print the tree structure in hierarchy style;
+    # Note: `nid` refers to the expanding point to start;
+    # `level` refers to the node level in the tree (root as level 0);
+    # `filter` refers to the function of one varible to act on the **node object**.
     
-    t.show(nid = None, level=Tree.ROOT)
+    t.show(nid = None, level=Tree.ROOT, idhidden=True, filter=None)
     
     
     # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here means all the nodes of the subtree are shared between the original tree and it
@@ -191,7 +199,7 @@ Result:
 
 Example 3: expand tree with filter
 
-    for node in tree.expand_tree(filter = lambda x: x != 'george', mode=Tree.DEPTH):
+    for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
     	print tree[node].name
 
 Result:
