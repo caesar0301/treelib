@@ -176,6 +176,34 @@ class Tree(object):
             current = self[current].bpointer
 
 
+    def save2file(self, filename, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False):
+        """
+        Update 20/05/13: Save tree into file for offline analysis
+        """
+        leading = ''
+        lasting = '|___ '
+        nid = self.root if (nid is None) else Node.sanitize_id(nid)
+        label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+        filter = (self._real_true) if (filter is None) else filter
+
+        if level == self.ROOT:
+            open(filename, 'ab').write(label + '\n')
+        else:
+            if level <= 1:
+                leading += ('|' + ' ' * 4) * (level - 1)
+            else:
+                leading += ('|' + ' ' * 4) + (' ' * 5 * (level - 2))
+            open(filename, 'ab').write("{0}{1}{2}\n".format(leading, lasting, label))
+
+        if filter(self[nid]) and self[nid].expanded:
+            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+            key = (lambda x: x) if (key is None) else key
+            queue.sort(cmp=cmp, key=key, reverse=reverse)
+            level += 1
+            for element in queue:
+                self.save2file(filename, element.identifier, level, idhidden, filter, cmp, key, reverse)
+
+
     def _real_true(self, p):
         return True
 
@@ -219,7 +247,7 @@ class Tree(object):
             queue.sort(cmp=cmp, key=key, reverse=reverse)
             level += 1
             for element in queue:
-                self.show(nid=element.identifier, level=level, filter=filter)
+                self.show(element.identifier, level, idhidden, filter, cmp, key, reverse)
 
 
     def subtree(self, nid):
