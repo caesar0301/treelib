@@ -30,79 +30,121 @@ Add the import declaration to use `treelib` in your project:
 
     from treelib import Node, Tree
 
-This module `treelib` mainly contains two classes: class `Node` and class `Tree`.
+This module `treelib` mainly contains two data structures: `Node` and `Tree`.
 
-The class `Node` defines basic properties and operations of a node like node identifier 
-(the mostly used property as ID which is unique for a node in a specific tree), node name 
-(readable for human), parent node, and children nodes. Some public methods are provided 
-to operate with an exsiting node (e.g., `a` in the description below):
+The structure `Node` defines basic properties such as node identifier 
+(unique ID in the environment of a tree), node name (readable for human), 
+parent node, children nodes etc., and some public operations on a node. 
+(e.g., `a` in the description below):
 
-    # To create a new node object
-    a = Node(name, identifier=None, expanded=True)
+    # To create a new node object.
+    # By default, all params are provied with values.
+
+    a = Node(tag=None, identifier=None, expanded=True)
+    
     
     # To get the ID of the node
+    
     a.identifier
     
+    
     # To get the ID of the parent node
+    
     a.bpointer
     
+    
     # To set parent node ID (value) to a
+    
     a.bpointer=value
     
+    
     # To get the ID list of the children (only sons) of the node
+    
     a.fpointer
     
+    
     # To set the children with a list of node IDs
+    
     a.fpointer=[value]
     
+    
     # Update the children list with different modes
+    
     a.update_fpointer(identifier, mode=[Node.ADD, Node.DELETE, Node.INSERT])
 
 The class `tree` defines the tree-like structure based on the node structure. Public methods
 are also available to make operations on the tree (e.g., `t` in the description below):
 
     # To create a new object of tree structure
+    
     t = Tree()   
     
+    
     # To give the ID of the root
+    
     t.root 
     
-    # To get the list of all the nodes (in the order of being added) belonging to the tree
-    t.nodes        
+    
+    # To get the list of all the nodes (in arbitrary order) belonging to the tree
+    
+    t.nodes.values()        
+    
     
     # Add a new node object to the tree and make the parent as the root by default
+    
     t.add_node(node, parent=None)  
     
+    
     # To create a new node and add it to the tree
+    
     t.create_node(name, identifier=None, parent=None)  
+    
     
     # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH); `nid` refers to 
     # the expanding point to start; `filter` refers to the function of one varible to act on the node
+    
     t.expand_tree(nid = None, mode=Tree.DEPTH, filter = None) 
     
+    
     # To get the object of the node with ID == nid
+    
     t.get_node(nid)
     
+    
     # To get the children (only sons) list of the node with ID == nid
+    
     t.is_branch(nid)
     
+    
     # To move node (source) from its parent to another parent (destination)
+    
     t.move_node(source, destination)
     
+    
     # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree
+    
     t.paste(nid, new_tree) 
     
+    
     # To remove the node (with all its successor) from the tree
+    
     t.remove_node(identifier)
  
+ 
     # To search the tree from `nid` to the root along links reversedly
+    
     t.rsearch(nid, filter=None) 
     
+    
     # To print the tree structure in hierarchy style; `nid` refers to the expanding point to start; `level` refers to the node level in the tree (root as level 0)
+    
     t.show(nid = None, level=Tree.ROOT)
     
+    
     # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here means all the nodes of the subtree are shared between the original tree and it
+    
     t.subtree(nid)
+    
 
 Basic Usage
 =======
