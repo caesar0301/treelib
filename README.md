@@ -1,171 +1,23 @@
-treelib 
-========
-
-(previous pyTree to avoid conflict on PyPI)
+pyTree (treelib on PyPI)
 --------
 
 Tree Implementation in python: simple to use for you.
 
-Contributors
-=======
-
-Brett Alistair Kromkamp - brettkromkamp@gmail.com
-
-Basic framework finished.
-
-Xiaming Chen - chenxm35@gmail.com
-
-For reasearch utility, I finish main parts and make the library freely public.
-
-Holger Bast - holgerbast@gmx.de
-
-Replace list with dict for nodes indexing and improve the performance to a
-large extend.
 
 
-Useful APIs
-=======
+How to install
+---------
 
-Add the import declaration to use `treelib` in your project:
+    sudo pip install -U treelib
+    
+or
 
-    from treelib import Node, Tree
+    sudo easy_install -U treelib
 
-This module `treelib` mainly contains two data structures: `Node` and `Tree`.
-
-The structure `Node` defines basic properties such as node identifier 
-(unique ID in the environment of a tree), node name (readable for human), 
-parent node, children nodes etc., and some public operations on a node. 
-(e.g., `a` in the description below):
-
-    # To create a new node object.
-
-    a = Node([tag[, identifier[, expanded]]])
-    
-    
-    # To get the ID of the node
-    
-    a.identifier
-    
-    
-    # To get the ID of the parent node
-    
-    a.bpointer
-    
-    
-    # To set parent node ID (value) to a
-    
-    a.bpointer=value
-    
-    
-    # To get the ID list of the children (only sons) of the node
-    
-    a.fpointer
-    
-    
-    # To set the children with a list of node IDs
-    
-    a.fpointer=[value]
-    
-    
-    # Update the children list with different modes
-    
-    a.update_fpointer(identifier, mode=[Node.ADD, Node.DELETE, Node.INSERT])
-
-The class `tree` defines the tree-like structure based on the node structure. Public methods
-are also available to make operations on the tree (e.g., `t` in the description below):
-
-    # To create a new object of tree structure
-    
-    t = Tree()
-    
-    
-    # To give the ID of the root
-    
-    t.root 
-    
-    
-    # To get the list of all the nodes (in arbitrary order) belonging to the tree
-    
-    t.nodes.values()
-    
-    
-    # Add a new node object to the tree and make the parent as the root by default
-    
-    t.add_node(node[, parent])
-    
-    
-    # To create a new node and add it to the tree
-    
-    t.create_node(name[,identifier[,parent]])
-    
-    
-    # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH);
-    # NOTE:
-    # `nid` refers to the expanding point to start;
-    # `mode` refers to the search mode;
-    # `filter` refers to the function of one varible to act on the **node object**;
-    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
-    
-    t.expand_tree([nid[,mode[,filter[,cmp[,key[,reverse]]]]]]) 
-    
-    
-    # To get the object of the node with ID of nid
-    # An alternative way is using '[]' operation on the tree.
-    # But small difference exists between them:
-    # the get_node() will return None if nid is absent, whereas '[]' will raise KeyError.
-    
-    t.get_node(nid)
-    
-    
-    # To get the children (only sons) list of the node with ID == nid.
-    
-    t.is_branch(nid)
-    
-    
-    # To move node (source) from its parent to another parent (destination).
-    
-    t.move_node(source, destination)
-    
-    
-    # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree.
-    
-    t.paste(nid, new_tree) 
-    
-    
-    # To remove the node (with all its successor) from the tree.
-    
-    t.remove_node(identifier)
- 
- 
-    # To search the tree from `nid` to the root along links reversedly
-    # Note: `filter` refers to the function of one varible to act on the **node object**.
-    
-    t.rsearch(nid[,filter]) 
-    
-    
-    # To print the tree structure in hierarchy style;
-    # Note:
-    # `nid` refers to the expanding point to start;
-    # `level` refers to the node level in the tree (root as level 0);
-    # `idhidden` refers to hiding the node ID when priting;
-    # `filter` refers to the function of one varible to act on the **node object**;
-    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
-    
-    t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
-
-
-    # Save the tree into file for offline analysis.
-
-    t.save2file(filename[,nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
-    
-    
-    # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here means all the nodes of the subtree are shared between the original tree and it
-    
-    t.subtree(nid)
     
 
 Basic Usage
-=======
+----------
 
 Example 1: Create a tree
 
@@ -280,8 +132,10 @@ Result:
     |___ Jill[jill]
 
 
+
+
 Advanced Usage
-=======
+---------
 
 You can also inherit and modify the behaviors of the tree structure to meet your need easily and conveniently.
 For example, to define a tree structure with data payload for each node, you can program like the way below:
@@ -293,3 +147,144 @@ For example, to define a tree structure with data payload for each node, you can
             self.data = payload
     ...
     new_node = myNode("1234567890")
+    
+  
+  
+  
+  
+  
+Useful APIs
+-----------
+
+Add the import declaration to use `treelib` in your project:
+
+    from treelib import Node, Tree
+
+This module `treelib` mainly contains two data structures: `Node` and `Tree`.
+
+The structure `Node` defines basic properties such as node identifier 
+(unique ID in the environment of a tree), node name (readable for human), 
+parent node, children nodes etc., and some public operations on a node. 
+(e.g., `a` in the description below):
+
+    # To create a new node object.
+    a = Node([tag[, identifier[, expanded]]])
+    
+    
+    # To get the ID of the node
+    a.identifier
+    
+    
+    # To get the ID of the parent node
+    a.bpointer
+    
+    
+    # To set parent node ID (value) to a
+    a.bpointer=value
+    
+    
+    # To get the ID list of the children (only sons) of the node
+    a.fpointer
+    
+    
+    # To set the children with a list of node IDs
+    a.fpointer=[value]
+    
+    
+    # Update the children list with different modes
+    a.update_fpointer(identifier, mode=[Node.ADD, Node.DELETE, Node.INSERT])
+
+The class `tree` defines the tree-like structure based on the node structure. Public methods
+are also available to make operations on the tree (e.g., `t` in the description below):
+
+    # To create a new object of tree structure
+    t = Tree()
+    
+    
+    # To give the ID of the root
+    t.root 
+    
+    
+    # To get the list of all the nodes (in arbitrary order) belonging to the tree
+    t.nodes.values()
+    
+    
+    # Add a new node object to the tree and make the parent as the root by default
+    
+    t.add_node(node[, parent])
+    
+    
+    # To create a new node and add it to the tree
+    t.create_node(name[,identifier[,parent]])
+    
+    
+    # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH);
+    # NOTE:
+    # `nid` refers to the expanding point to start;
+    # `mode` refers to the search mode;
+    # `filter` refers to the function of one varible to act on the **node object**;
+    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
+    t.expand_tree([nid[,mode[,filter[,cmp[,key[,reverse]]]]]]) 
+    
+    
+    # To get the object of the node with ID of nid
+    # An alternative way is using '[]' operation on the tree.
+    # But small difference exists between them:
+    # the get_node() will return None if nid is absent, whereas '[]' will raise KeyError.
+    t.get_node(nid)
+    
+    
+    # To get the children (only sons) list of the node with ID == nid.
+    t.is_branch(nid)
+    
+    
+    # To move node (source) from its parent to another parent (destination).
+    t.move_node(source, destination)
+    
+    
+    # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree.
+    t.paste(nid, new_tree) 
+    
+    
+    # To remove the node (with all its successor) from the tree.
+    t.remove_node(identifier)
+ 
+ 
+    # To search the tree from `nid` to the root along links reversedly
+    # Note: `filter` refers to the function of one varible to act on the **node object**.
+    t.rsearch(nid[,filter]) 
+    
+    
+    # To print the tree structure in hierarchy style;
+    # Note:
+    # `nid` refers to the expanding point to start;
+    # `level` refers to the node level in the tree (root as level 0);
+    # `idhidden` refers to hiding the node ID when priting;
+    # `filter` refers to the function of one varible to act on the **node object**;
+    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
+    t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
+
+
+    # Save the tree into file for offline analysis.
+    t.save2file(filename[,nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
+    
+    
+    # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here 
+    # means all the nodes of the subtree are shared between the original tree and it
+    t.subtree(nid)
+    
+    
+    
+    
+Contributors
+---------
+
+* Brett Alistair Kromkamp (brettkromkamp@gmail.com): 
+  Basic framework finished.
+
+* Xiaming Chen (chenxm35@gmail.com): For reasearch utility, 
+I finish main parts and make the library freely public.
+
+* Holger Bast (holgerbast@gmx.de): Replaces list with dict 
+for nodes indexing and improves the performance to a
+large extend.
