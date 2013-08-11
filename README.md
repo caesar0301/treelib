@@ -46,7 +46,7 @@ Result:
 Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
 
     for node in tree.expand_tree(mode=Tree.DEPTH):
-	print tree[node].name
+        print tree[node].name
 
 Result:
 
@@ -59,10 +59,27 @@ Result:
     Mark
     Bill
 
+Example 2a: expand a tree with mode being Tree.ZIGZAG
+            (WIDTH-first, level by level, first level left-to-right, second - right-to-left and so on)
+
+    for node in tree.expand_tree(mode=Tree.ZIGZAG):
+        print tree[node].identifier
+
+Result:
+
+    harry
+    bill
+    jane
+    diane
+    mark
+    mary
+    george
+    jill
+
 Example 3: expand tree with filter
 
     for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
-    	print tree[node].name
+        print tree[node].name
 
 Result:
 
@@ -119,7 +136,7 @@ Example 7: Move a node
 
     tree.move_node('jill', 'harry')
     tree.show()
-	
+
 Result:
 
     Harry[harry]
@@ -288,3 +305,6 @@ I finish main parts and make the library freely public.
 * Holger Bast (holgerbast@gmx.de): Replaces list with dict 
 for nodes indexing and improves the performance to a
 large extend.
+
+* Ilya Kuprik (ilya-spy@ynadex.ru): Added ZIGZAG tree-walk mode to
+function tree_expand()
