@@ -11,7 +11,7 @@ class DuplicatedNodeIdError(Exception):
 
 class Tree(object):
 
-    (ROOT, DEPTH, WIDTH) = range(3)
+    (ROOT, DEPTH, WIDTH, ZIGZAG) = range(4)
 
 
     def __init__(self):
@@ -60,21 +60,41 @@ class Tree(object):
         UPDATE: the @cmp @key @reverse is present to sort node at each level.
         """
         nid = self.root if (nid is None) else Node.sanitize_id(nid)
-        filter = (self._real_true) if (filter is None) else filter
+        filter = self._real_true if (filter is None) else filter
 
         if filter(self[nid]):
             yield nid
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
-            queue.sort(cmp=cmp, key=key, reverse=reverse)
-            while queue:
-                yield queue[0].identifier
-                expansion = [self[i] for i in queue[0].fpointer if filter(self[i])]
-                expansion.sort(cmp=cmp, key=key, reverse=reverse)
-                if mode is self.DEPTH:
-                    queue = expansion + queue[1:]  # depth-first
-                elif mode is self.WIDTH:
-                    queue = queue[1:] + expansion  # width-first
-
+            if mode is self.DEPTH or mode is self.WIDTH:
+                queue.sort(cmp=cmp, key=key, reverse=reverse)
+            if mode is self.ZIGZAG:
+                stack_fw = []
+                queue.reverse()
+                stack = stack_bw = queue
+                direction = False
+                
+            if mode is self.DEPTH or mode is self.WIDTH:
+                while queue:
+                    yield queue[0].identifier
+                    expansion = [self[i] for i in queue[0].fpointer if filter(self[i])]
+                    expansion.sort(cmp=cmp, key=key, reverse=reverse)
+                    if mode is self.DEPTH:
+                        queue = expansion + queue[1:]  # depth-first
+                    elif mode is self.WIDTH:
+                        queue = queue[1:] + expansion  # width-first
+            
+            if mode is self.ZIGZAG:
+                while stack:
+                    expansion = [self[i] for i in stack[0].fpointer if filter(self[i])]
+                    yield stack.pop(0).identifier
+                    if direction:
+                        expansion.reverse()
+                        stack_bw = expansion + stack_bw
+                    else:
+                        stack_fw = expansion + stack_fw
+                    if not stack:
+                        direction = not direction
+                        stack = stack_fw if direction else stack_bw
 
     def get_node(self, nid):
         """
@@ -215,12 +235,12 @@ class Tree(object):
         For example:
             Root
             |___ C01
-            |	 |___ C11
-            |		  |___ C111
-            |		  |___ C112
+            |    |___ C11
+            |         |___ C111
+            |         |___ C112
             |___ C02
             |___ C03
-            |	 |___ C31
+            |    |___ C31
         A more elegant way to achieve this function using Stack structure,
         for constructing the Nodes Stack push and pop nodes with additional level info.
         UPDATE: the @cmp @key @reverse is present to sort node at each level.
