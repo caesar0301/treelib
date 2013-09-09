@@ -79,11 +79,11 @@ Result:
 Example 3: expand tree with filter
 
     for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
-        print tree[node].name
+		print tree[node].name
 
 Result:
 
-    Harry
+	Harry
     Jane
     Mark
     Bill

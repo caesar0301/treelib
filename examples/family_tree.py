@@ -26,7 +26,7 @@ print('\n')
 
 
 print("#"*4 + "All family members in DEPTH mode")
-for node in tree.expand_tree(mode=Tree.DEPTH):
+for node in tree.expand_tree(mode=Tree.ZIGZAG):
     print tree[node].tag
 print('\n') 
 

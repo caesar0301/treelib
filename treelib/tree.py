@@ -65,15 +65,8 @@ class Tree(object):
         if filter(self[nid]):
             yield nid
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
-            if mode is self.DEPTH or mode is self.WIDTH:
+            if mode in [self.DEPTH, self.WIDTH]:
                 queue.sort(cmp=cmp, key=key, reverse=reverse)
-            if mode is self.ZIGZAG:
-                stack_fw = []
-                queue.reverse()
-                stack = stack_bw = queue
-                direction = False
-                
-            if mode is self.DEPTH or mode is self.WIDTH:
                 while queue:
                     yield queue[0].identifier
                     expansion = [self[i] for i in queue[0].fpointer if filter(self[i])]
@@ -82,8 +75,12 @@ class Tree(object):
                         queue = expansion + queue[1:]  # depth-first
                     elif mode is self.WIDTH:
                         queue = queue[1:] + expansion  # width-first
-            
-            if mode is self.ZIGZAG:
+            elif mode is self.ZIGZAG:
+                ## Suggested by Ilya Kuprik (ilya-spy@ynadex.ru).
+                stack_fw = []
+                queue.reverse()
+                stack = stack_bw = queue
+                direction = False
                 while stack:
                     expansion = [self[i] for i in stack[0].fpointer if filter(self[i])]
                     yield stack.pop(0).identifier
