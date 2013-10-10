@@ -306,7 +306,7 @@ class Tree(object):
         if nid is None:
             return
         else:
-            self[nid].update_bpointer(identifier)
+            self[nid].update_bpointer(identifier, mode)
 
 
     def __update_fpointer(self, nid, identifier, mode):
