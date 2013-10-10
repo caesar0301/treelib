@@ -3,8 +3,8 @@ from node import Node
 
 class MultipleRootError(Exception):
     pass
-    
-    
+
+
 class DuplicatedNodeIdError(Exception):
     pass
 
@@ -26,9 +26,11 @@ class Tree(object):
         """
         if not isinstance(node, Node):
             raise OSError("First parameter must be object of Class::Node.")
-            
+
         if node.identifier in self.nodes:
-            raise DuplicatedNodeIdError("Can't create node with ID '%s'" % node.identifier)
+            node = self.get_node(node.identifier)
+        else:
+            self.nodes.update({node.identifier : node})
 
         if parent is None:
             if self.root is not None:
@@ -38,9 +40,8 @@ class Tree(object):
         else:
             parent = Node.sanitize_id(parent)
 
-        self.nodes.update({node.identifier : node})
         self.__update_fpointer(parent, node.identifier, Node.ADD)
-        node.bpointer = parent
+        self.__update_bpointer(parent, node.identifier, Node.ADD)
 
 
     def create_node(self, tag, identifier=None, parent=None):
@@ -128,10 +129,12 @@ class Tree(object):
         """
         source = Node.sanitize_id(source)
         destination = Node.sanitize_id(destination)
-        parent = self[source].bpointer
-        self.__update_fpointer(parent, source, Node.DELETE)
+        parents = self[source].bpointer
+        for parent in parents:
+            self.__update_fpointer(parent, source, Node.DELETE)
+            self.__update_bpointer(source, parent, Node.DELETE)
         self.__update_fpointer(destination, source, Node.ADD)
-        self.__update_bpointer(source, destination)
+        self.__update_bpointer(source, destination, Node.ADD)
 
 
     def paste(self, nid, new_tree):
@@ -143,14 +146,14 @@ class Tree(object):
 
         if nid is None:
             raise OSError("First parameter can't be None")
-            
+
         nid = Node.sanitize_id(nid)
 
         set_joint = set(new_tree.nodes) & set(self.nodes)
         if set_joint:
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
-        new_tree[new_tree.root].bpointer = nid
+        self.__update_bpointer(new_tree[new_tree.root].identifier, nid, Node.ADD)
         self.__update_fpointer(nid, new_tree.root, Node.ADD)
         self.nodes.update(new_tree.nodes)
 
@@ -163,7 +166,7 @@ class Tree(object):
             return
 
         identifier = Node.sanitize_id(identifier)
-        parent = self[identifier].bpointer
+        parents = self[identifier].bpointer
         remove = []
         for id in self.expand_tree(identifier):
             # TODO: implementing this function as a recursive function:
@@ -175,7 +178,8 @@ class Tree(object):
         for id in remove:
             del(self.nodes[id])
 
-        self.__update_fpointer(parent, identifier, Node.DELETE)
+        for parent in parents:
+            self.__update_fpointer(parent, identifier, Node.DELETE)
 
 
     def rsearch(self, nid, filter=None):
@@ -298,8 +302,11 @@ class Tree(object):
         self.nodes.update({key: item})
 
 
-    def __update_bpointer(self, nid, identifier):
-        self[nid].bpointer = identifier
+    def __update_bpointer(self, nid, identifier, mode):
+        if nid is None:
+            return
+        else:
+            self[nid].update_bpointer(identifier)
 
 
     def __update_fpointer(self, nid, identifier, mode):

@@ -10,7 +10,7 @@ class Node(object):
         self.tag = tag
         self._identifier = self.set_identifier(identifier)
         self.expanded = expanded
-        self._bpointer = None
+        self._bpointer = []
         self._fpointer = []
 
     @classmethod
@@ -37,8 +37,8 @@ class Node(object):
 
     @bpointer.setter
     def bpointer(self, value):
-        if value is not None:
-            self._bpointer = self.sanitize_id(value)
+        if value is not None and isinstance(value, list):
+            self._bpointer = value
 
 
     @property
@@ -54,8 +54,19 @@ class Node(object):
 
     def update_fpointer(self, identifier, mode=ADD):
         if mode is self.ADD:
-            self._fpointer.append(self.sanitize_id(identifier))
+            if self.sanitize_id(identifier) not in self._fpointer:
+                self._fpointer.append(self.sanitize_id(identifier))
         elif mode is self.DELETE:
             self._fpointer.remove(self.sanitize_id(identifier))
         elif mode is self.INSERT:
             self._fpointer = [self.sanitize_id(identifier)]
+
+
+    def update_bpointer(self, identifier, mode=ADD):
+        if mode is self.ADD:
+            if self.sanitize_id(identifier) not in self._bpointer:
+                self._bpointer.append(self.sanitize_id(identifier))
+        elif mode is self.DELETE:
+            self._bpointer.remove(self.sanitize_id(identifier))
+        elif mode is self.INSERT:
+            self._bpointer = [self.sanitize_id(identifier)]
