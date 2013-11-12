@@ -21,8 +21,8 @@ tree.create_node("Mark", "mark", parent="jane")
 print("#"*4 + "Breakdown of out family")
 tree.show(cmp=lambda x,y: cmp(x.tag, y.tag), key=None, reverse=True)
 #tree.show(key=lambda x: x.tag, reverse=False)
-tree.save2file("/home/chenxm/Desktop/tree.txt", idhidden=False)
-print('\n')
+#tree.save2file("/home/chenxm/Desktop/tree.txt", idhidden=False)
+#print('\n')
 
 
 print("#"*4 + "All family members in DEPTH mode")
