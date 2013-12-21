@@ -219,11 +219,11 @@ are also available to make operations on the tree (e.g., `t` in the description 
     
     
     # To give the ID of the root
-    t.root 
+    t.root()
     
     
     # To get the list of all the nodes (in arbitrary order) belonging to the tree
-    t.nodes.values()
+    t.all_nodes()
     
     
     # Add a new node object to the tree and make the parent as the root by default
