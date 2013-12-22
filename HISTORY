@@ -1,3 +1,7 @@
+Dec 21, 2013
+Add root() routine to Tree class.
+Add all_nodes() routine to Tree class.
+
 May 1, 2013
 Pulish the module on PyPI with version 1.2 under GNU General Pulic License
 version 3.  

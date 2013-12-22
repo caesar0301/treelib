@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Example usage of treelib
 #
 # Author: chenxm

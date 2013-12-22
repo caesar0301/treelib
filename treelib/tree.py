@@ -15,8 +15,20 @@ class Tree(object):
 
 
     def __init__(self):
-        self.nodes = {}
+        self._nodes = {}
         self.root = None
+
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+
+    def all_nodes(self):
+        """
+        Return all nodes in a list
+        """
+        return self._nodes.values()
 
 
     def add_node(self, node, parent=None):
@@ -27,7 +39,7 @@ class Tree(object):
         if not isinstance(node, Node):
             raise OSError("First parameter must be object of Class::Node.")
             
-        if node.identifier in self.nodes:
+        if node.identifier in self._nodes:
             raise DuplicatedNodeIdError("Can't create node with ID '%s'" % node.identifier)
 
         if parent is None:
@@ -38,7 +50,7 @@ class Tree(object):
         else:
             parent = Node.sanitize_id(parent)
 
-        self.nodes.update({node.identifier : node})
+        self._nodes.update({node.identifier : node})
         self.__update_fpointer(parent, node.identifier, Node.ADD)
         node.bpointer = parent
 
@@ -101,7 +113,7 @@ class Tree(object):
         if nid is not None:
             nid = Node.sanitize_id(nid)
         try:
-            node = self.nodes[nid]
+            node = self._nodes[nid]
         except KeyError:
             node = None
         return node
@@ -146,13 +158,13 @@ class Tree(object):
             
         nid = Node.sanitize_id(nid)
 
-        set_joint = set(new_tree.nodes) & set(self.nodes)
+        set_joint = set(new_tree._nodes) & set(self._nodes)
         if set_joint:
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
         new_tree[new_tree.root].bpointer = nid
         self.__update_fpointer(nid, new_tree.root, Node.ADD)
-        self.nodes.update(new_tree.nodes)
+        self._nodes.update(new_tree._nodes)
 
 
     def remove_node(self, identifier):
@@ -173,7 +185,7 @@ class Tree(object):
             remove.append(id)
 
         for id in remove:
-            del(self.nodes[id])
+            del(self._nodes[id])
 
         self.__update_fpointer(parent, identifier, Node.DELETE)
 
@@ -277,29 +289,29 @@ class Tree(object):
             return st
         st.root = Node.sanitize_id(nid)
         for node_n in self.expand_tree(nid):
-            st.nodes.update({self[node_n].identifier : self[node_n]})
+            st._nodes.update({self[node_n].identifier : self[node_n]})
         return st
 
 
     def __contains__(self, identifier):
-        return [node.identifier for node in self.nodes
+        return [node.identifier for node in self._nodes
                 if node.identifier is identifier]
 
 
     def __getitem__(self, key):
-        return self.nodes[key]
+        return self._nodes[key]
 
 
     def __len__(self):
-        return len(self.nodes)
+        return len(self._nodes)
 
 
     def __setitem__(self, key, item):
-        self.nodes.update({key: item})
+        self._nodes.update({key: item})
 
 
     def __update_bpointer(self, nid, identifier):
-        self[nid].bpointer = identifier
+        self[nid].update_bpointer(identifier)
 
 
     def __update_fpointer(self, nid, identifier, mode):

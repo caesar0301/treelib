@@ -19,7 +19,7 @@ or
 Basic Usage
 ----------
 
-Example 1: Create a tree
+* Example 1: Create a tree
 
     tree = Tree()
     tree.create_node("Harry", "harry")  # root node
@@ -43,7 +43,7 @@ Result:
     |    |___ Mark[mark]
     |___ Bill[bill]
 
-Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
+* Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
 
     for node in tree.expand_tree(mode=Tree.DEPTH):
         print tree[node].name
@@ -59,7 +59,7 @@ Result:
     Mark
     Bill
 
-Example 2a: expand a tree with mode being Tree.ZIGZAG
+* Example 2a: expand a tree with mode being Tree.ZIGZAG
             (WIDTH-first, level by level, first level left-to-right, second - right-to-left and so on)
 
     for node in tree.expand_tree(mode=Tree.ZIGZAG):
@@ -76,7 +76,7 @@ Result:
     george
     jill
 
-Example 3: expand tree with filter
+* Example 3: expand tree with filter
 
     for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
 		print tree[node].name
@@ -88,7 +88,7 @@ Result:
     Mark
     Bill
 
-Example 4: get a subtree
+* Example 4: get a subtree
 
     sub_t = tree.subtree('diane')
     sub_t.show()
@@ -100,7 +100,7 @@ Result:
     |    |___ Jill[jill]
     |___ Mary[mary]
 
-Example 5: paste a new tree to original one
+* Example 5: paste a new tree to original one
 
     new_tree = Tree()
     new_tree.create_node("n1", "1")  # root node
@@ -123,7 +123,7 @@ Result:
     |    |___ Mark[mark]
     |___ Bill[bill]
 
-Example 6: remove the existing node from the tree
+* Example 6: remove the existing node from the tree
 
     tree.remove_node('1')
     tree.show()
@@ -132,7 +132,7 @@ Result:
 
     As the result of example 1
 
-Example 7: Move a node
+* Example 7: Move a node
 
     tree.move_node('jill', 'harry')
     tree.show()
@@ -187,62 +187,47 @@ parent node, children nodes etc., and some public operations on a node.
     # To create a new node object.
     a = Node([tag[, identifier[, expanded]]])
     
+    # To get or set the ID of the node
+    a.identifier [=nid]
     
-    # To get the ID of the node
-    a.identifier
+    # To get or set the ID of a's parent node
+    a.bpointer [=value]
+    a.update_bpointer(nid) # for set only
     
-    
-    # To get the ID of the parent node
-    a.bpointer
-    
-    
-    # To set parent node ID (value) to a
-    a.bpointer=value
-    
-    
-    # To get the ID list of the children (only sons) of the node
-    a.fpointer
-    
-    
-    # To set the children with a list of node IDs
-    a.fpointer=[value]
-    
-    
+    # As a getting operator, ID list of a's SON nodes is obtained.
+    # As a setting operator, the value can be list, set, or dict.
+    # For list or set, it is converted to a list type by the packeage;
+    # For dict, the keys are treated as the node IDs
+    a.fpointer [=value]
+
     # Update the children list with different modes
     a.update_fpointer(identifier, mode=[Node.ADD, Node.DELETE, Node.INSERT])
 
-The class `tree` defines the tree-like structure based on the node structure. Public methods
-are also available to make operations on the tree (e.g., `t` in the description below):
+
+The class `Tree` defines the tree-like structure based on the node structure.
+Public methods are also available to make operations on the tree, e.g. a Tree object `t`:
 
     # To create a new object of tree structure
     t = Tree()
     
+    # To get or set the ID of the root
+    t.root [=nid]
     
-    # To give the ID of the root
-    t.root()
-    
-    
-    # To get the list of all the nodes (in arbitrary order) belonging to the tree
+    # To get the list of all the nodes randomly belonging to this tree
     t.all_nodes()
     
-    
     # Add a new node object to the tree and make the parent as the root by default
-    
     t.add_node(node[, parent])
     
-    
-    # To create a new node and add it to the tree
+    # To create a new node and add it to this tree
     t.create_node(name[,identifier[,parent]])
     
-    
-    # To traverse the tree nodes with different modes (Tree.DEPTH, Tree.WIDTH);
-    # NOTE:
+    # To traverse the tree nodes with different modes; NOTE:
     # `nid` refers to the expanding point to start;
-    # `mode` refers to the search mode;
+    # `mode` refers to the search mode (Tree.DEPTH, Tree.WIDTH);
     # `filter` refers to the function of one varible to act on the **node object**;
     # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     t.expand_tree([nid[,mode[,filter[,cmp[,key[,reverse]]]]]]) 
-    
     
     # To get the object of the node with ID of nid
     # An alternative way is using '[]' operation on the tree.
@@ -250,27 +235,21 @@ are also available to make operations on the tree (e.g., `t` in the description 
     # the get_node() will return None if nid is absent, whereas '[]' will raise KeyError.
     t.get_node(nid)
     
-    
     # To get the children (only sons) list of the node with ID == nid.
     t.is_branch(nid)
-    
     
     # To move node (source) from its parent to another parent (destination).
     t.move_node(source, destination)
     
-    
     # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree.
     t.paste(nid, new_tree) 
     
-    
-    # To remove the node (with all its successor) from the tree.
+    # To remove the node and free the memory along with its successors.
     t.remove_node(identifier)
- 
  
     # To search the tree from `nid` to the root along links reversedly
     # Note: `filter` refers to the function of one varible to act on the **node object**.
     t.rsearch(nid[,filter]) 
-    
     
     # To print the tree structure in hierarchy style;
     # Note:
@@ -281,15 +260,12 @@ are also available to make operations on the tree (e.g., `t` in the description 
     # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
 
+    # To return a soft copy of the subtree with `nid` being the root; The softness 
+    # means all the nodes are shared between subtree and the original.
+    t.subtree(nid)
 
     # Save the tree into file for offline analysis.
     t.save2file(filename[,nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
-    
-    
-    # To return a shaddow copy of the subtree with `nid` being the root; "shaddow" here 
-    # means all the nodes of the subtree are shared between the original tree and it
-    t.subtree(nid)
-    
     
     
     

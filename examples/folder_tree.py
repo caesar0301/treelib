@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # A file folder scanner contributed by @holger 
 #
 # You can spicify the scanned folder and file pattern by changing rootPath

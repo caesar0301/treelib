@@ -7,27 +7,49 @@ class Node(object):
 
 
     def __init__(self, tag=None, identifier=None, expanded=True):
-        self.tag = tag
-        self._identifier = self.set_identifier(identifier)
+        self._identifier = None
+        self._set_identifier(identifier)
+        if tag is None:
+            self._tag = str(self._identifier)
+        else:
+            self._tag = str(tag)
         self.expanded = expanded
         self._bpointer = None
-        self._fpointer = []
+        self._fpointer = list()
 
     @classmethod
     def sanitize_id(cls, identifier):
         return str(identifier).strip().replace(" ", "_")
 
 
-    def set_identifier(self, identifier):
+    def _set_identifier(self, identifier):
         if identifier is None:
-            return str(uuid.uuid1())
+            self._identifier = str(uuid.uuid1())
         else:
-            return self.sanitize_id(identifier)
+            self._identifier = self.sanitize_id(identifier)
+
+
+    @property
+    def tag(self):
+        return self._tag
+
+
+    @tag.setter
+    def tag(self, value):
+        self._tag = str(value) if value is not None else None
 
 
     @property
     def identifier(self):
         return self._identifier
+
+
+    @identifier.setter
+    def identifier(self, value):
+        if value is None:
+            print("WARNNING: node ID can not be None")
+        else:
+            self._set_identifier(value)
 
 
     @property
@@ -36,9 +58,12 @@ class Node(object):
 
 
     @bpointer.setter
-    def bpointer(self, value):
-        if value is not None:
-            self._bpointer = self.sanitize_id(value)
+    def bpointer(self, identifier):
+        if identifier is not None:
+            self._bpointer = self.sanitize_id(identifier)
+        else:
+            print("WARNNING: the bpointer of node %s is set to None" % self._identifier)
+            self._bpointer = None
 
 
     @property
@@ -48,14 +73,53 @@ class Node(object):
 
     @fpointer.setter
     def fpointer(self, value):
-        if value is not None and isinstance(value, list):
+        if value is None:
+            self._fpointer = list()
+        elif isinstance(value, list):
             self._fpointer = value
+        elif isinstance(value, dict):
+            self._fpointer = list(value.keys())
+        elif isinstance(value, set):
+            self._fpointer = list(value)
+        else: #TODO: add deprecated routine
+            pass
+
+
+    def update_bpointer(self, identifier):
+        self.bpointer = identifier
 
 
     def update_fpointer(self, identifier, mode=ADD):
+        if identifier is None:
+            return
         if mode is self.ADD:
             self._fpointer.append(self.sanitize_id(identifier))
         elif mode is self.DELETE:
-            self._fpointer.remove(self.sanitize_id(identifier))
-        elif mode is self.INSERT:
-            self._fpointer = [self.sanitize_id(identifier)]
+            if identifier in self._fpointer:
+                self._fpointer.remove(self.sanitize_id(identifier))
+        elif mode is self.INSERT: # deprecate to ADD mode
+            print("WARNNING: INSERT is deprecated to ADD mode")
+            self.update_fpointer(identifier)
+
+
+if __name__ == '__main__':
+    new_node = Node()
+    print new_node.tag
+    new_node.tag = "new node"
+    print new_node.tag
+
+    print new_node.identifier
+    new_node.identifier = "my first node"
+    print new_node.identifier
+
+    print new_node.bpointer
+    new_node.bpointer = "bpointer node"
+    print new_node.bpointer
+    new_node.update_bpointer(None)
+
+    print new_node.fpointer
+    new_node.update_fpointer("123", mode=Node.ADD)
+    new_node.update_fpointer("124", mode=Node.DELETE)
+    new_node.update_fpointer("124", mode=Node.INSERT)
+    new_node.fpointer = {1:1,2:2}
+    print new_node.fpointer
