@@ -72,7 +72,7 @@ class Node(object):
         if identifier is not None:
             self._bpointer = self.sanitize_id(identifier)
         else:
-            print("WARNNING: the bpointer of node %s is set to None" % self._identifier)
+            #print("WARNNING: the bpointer of node %s is set to None" % self._identifier)
             self._bpointer = None
 
 
