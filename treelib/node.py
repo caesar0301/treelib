@@ -1,6 +1,9 @@
 import uuid
 
 
+class NodeIDTypeException(Exception):
+    pass
+
 class Node(object):
 
     (ADD, DELETE, INSERT) = range(3)
@@ -17,16 +20,23 @@ class Node(object):
         self._bpointer = None
         self._fpointer = list()
 
-    @classmethod
-    def sanitize_id(cls, identifier):
-        return str(identifier).strip().replace(" ", "_")
-
 
     def _set_identifier(self, identifier):
         if identifier is None:
             self._identifier = str(uuid.uuid1())
         else:
             self._identifier = self.sanitize_id(identifier)
+
+
+    @classmethod
+    def sanitize_id(cls, identifier):
+        if isinstance(identifier, str):
+            #return identifier.strip().replace(" ", "_")
+            return identifier
+        elif isinstance(identifier, int):
+            return identifier
+        else:
+            raise NodeIDTypeException("Only string and integer types are supported currently")
 
 
     @property
