@@ -19,16 +19,19 @@ class Tree(object):
     (ROOT, DEPTH, WIDTH, ZIGZAG) = range(4)
 
 
-    def __init__(self, tree=None):
+    def __init__(self, tree=None, deep=False):
         """
-        Initiate a new tree or copy another tree with a deepcopy
+        Initiate a new tree or copy another tree with a shallow or deep copy.
         """
         self._nodes = {}
         self.root = None
         if tree is not None:
-            for nid in tree._nodes:
-                self._nodes[nid] = deepcopy(tree._nodes[nid])
             self.root = tree.root
+            if deep:
+                for nid in tree._nodes:
+                    self._nodes[nid] = deepcopy(tree._nodes[nid])
+            else:
+                self._nodes = tree._nodes
 
 
     @property
@@ -77,7 +80,7 @@ class Tree(object):
         return True if nid in self._nodes else False
 
 
-    def is_parent(self, nid):
+    def parent(self, nid):
         """
         Get parent node object of given id
         """
@@ -357,6 +360,10 @@ class Tree(object):
         """
         Return a shallow COPY of subtree with nid being the new root.
         If nid is None, return an empty tree.
+        If you are looking for a deepcopy, please create a new tree with this shallow copy,
+        e.g.
+            new_t = Tree(t.subtree(t.root), deepcopy=True)
+        This line creates a deep copy of the entire tree.
         """
         st = Tree()
         if nid is None:
@@ -368,6 +375,37 @@ class Tree(object):
         st.root = nid
         for node_n in self.expand_tree(nid):
             st._nodes.update({self[node_n].identifier : self[node_n]})
+        return st
+
+
+    def remove_subtree(self, nid):
+        """
+        Return a subtree deleted from this tree.
+        If nid is None, an empty tree is returned.
+        For the original tree, this method is similar to remove_node(self,nid), because given node and
+        its children are removed from the original tree in both methods.
+        For the returned value and performance, these two methods are different;
+        remove_node returns the number of deleted nodes;
+        remove_subtree returns a subtree of deleted nodes.
+        You are always suggested to use remove_node if your only to delete nodes from a tree, as the other
+        one need memory allocation to store the new tree.
+        """
+        st = Tree()
+        if nid is None: return st
+
+        if not self.contains(nid):
+            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
+        st.root = nid
+
+        parent = self[nid].bpointer
+        self[nid].bpointer = None # reset root parent for the new tree
+        removed = []
+        for id in self.expand_tree(nid):
+            removed.append(id)
+        for id in removed:
+            st._nodes.update({id: self._nodes.pop(id)})
+        # Update its parent info
+        self.__update_fpointer(parent, nid, Node.DELETE)
         return st
 
 
@@ -401,4 +439,29 @@ class Tree(object):
 
 
 if __name__ == '__main__':
-    pass
+    tree = Tree()
+    tree.create_node('n1', 1)
+    tree.create_node('n2', 2, parent=1)
+    node = Node('n3', 3)
+    tree.add_node(node, parent=2)
+    tree.size()
+    tree.nodes
+    tree.all_nodes()
+    tree.depth()
+    tree.get_node(1)
+    tree.parent(1)
+    tree.is_branch(1)
+    tree.leaves()
+    tree.expand_tree(mode=Tree.ZIGZAG)
+    tree.move_node(3,1)
+    tree.move_node(3,2)
+    tree.rsearch(3)
+    dst = Tree(tree.subtree(2), True) # deep copy
+    tree[2].tag = 'node2'
+    dst.show()
+    sst = tree.subtree(2) # shallow copy
+    tree[2].tag = 'node2'
+    sst.show()
+    rst = tree.remove_subtree(2) # removed copy
+    print rst.parent(rst.root)
+    tree.show()
