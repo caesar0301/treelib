@@ -111,6 +111,11 @@ class Node(object):
             print("WARNNING: INSERT is deprecated to ADD mode")
             self.update_fpointer(identifier)
 
+    def is_leaf(self):
+        if len(self.fpointer) == 0:
+            return True
+        else:
+            return False
 
 if __name__ == '__main__':
     new_node = Node()

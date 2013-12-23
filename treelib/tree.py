@@ -9,8 +9,11 @@ class NodeIDAbsentError(Exception):
 
 class MultipleRootError(Exception):
     pass
-    
+
 class DuplicatedNodeIdError(Exception):
+    pass
+
+class LinkPastRootNodeError(Exception):
     pass
 
 
@@ -113,7 +116,31 @@ class Tree(object):
         """
         Get leaves of the whole tree of a subtree.
         """
-        pass
+        leaves = []
+        for node in self.expand_tree(root):
+            if self[node].is_leaf():
+                leaves.append(node)
+        return leaves
+
+
+    def link_past_node(self, nid):
+        """
+        Delete a node by linking past it.
+        For example, if we have a -> b -> c
+        and delete node b, we are left with a -> c
+        """
+        if self.root == nid:
+            raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
+        #Get the parent of the node we are linking past
+        parent = self[self[nid].bpointer]
+        #Set the children of the node to the parent
+        for child in self[nid].fpointer:
+            self[child].update_bpointer(parent.identifier)
+        #Link the children to the parent
+        parent.fpointer += self[nid].fpointer
+        #Delete the node
+        parent.update_fpointer(nid, mode=parent.DELETE)
+        del(self._nodes[nid])
 
 
     def add_node(self, node, parent=None):
@@ -123,7 +150,7 @@ class Tree(object):
         """
         if not isinstance(node, Node):
             raise OSError("First parameter must be object of Class::Node.")
-            
+
         if node.identifier in self._nodes:
             raise DuplicatedNodeIdError("Can't create node with ID '%s'" % node.identifier)
 
@@ -222,7 +249,7 @@ class Tree(object):
 
         set_joint = set(new_tree._nodes) & set(self._nodes) # joint keys
         if set_joint:
-            # TODO: a deprecated routine is needed to avoid exception 
+            # TODO: a deprecated routine is needed to avoid exception
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
         if deepcopy:
