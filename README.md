@@ -203,55 +203,74 @@ parent node, children nodes etc., and some public operations on a node.
     # Update the children list with different modes
     a.update_fpointer(identifier, mode=[Node.ADD, Node.DELETE, Node.INSERT])
 
+    # Check if it's a leaf node
+    a.is_leaf()
+
 
 The class `Tree` defines the tree-like structure based on the node structure.
 Public methods are also available to make operations on the tree, e.g. a Tree object `t`:
 
-    # To create a new object of tree structure
+    # Create a new object of tree structure
     t = Tree()
     
-    # To get or set the ID of the root
+    # Get or set the ID of the root
     t.root [=nid]
+
+    # Get the number of nodes in this tree
+    t.size()
+
+    # Check if the tree contains given node
+    t.contains(nid)
+
+    # Obtain node's parent (Node instance)
+    # Return None if the parent is None or does not exist in the tree
+    t.parent(nid)
     
-    # To get the list of all the nodes randomly belonging to this tree
+    # Get the list of all the nodes randomly belonging to this tree
     t.all_nodes()
-    
+
+    # Get leaves of give root
+    t.leaves([nid])
+
     # Add a new node object to the tree and make the parent as the root by default
     t.add_node(node[, parent])
     
-    # To create a new node and add it to this tree
+    # Create a new node and add it to this tree
     t.create_node(name[,identifier[,parent]])
     
-    # To traverse the tree nodes with different modes; NOTE:
+    # Traverse the tree nodes with different modes; NOTE:
     # `nid` refers to the expanding point to start;
     # `mode` refers to the search mode (Tree.DEPTH, Tree.WIDTH);
     # `filter` refers to the function of one varible to act on the **node object**;
     # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     t.expand_tree([nid[,mode[,filter[,cmp[,key[,reverse]]]]]]) 
     
-    # To get the object of the node with ID of nid
+    # Get the object of the node with ID of nid
     # An alternative way is using '[]' operation on the tree.
     # But small difference exists between them:
     # the get_node() will return None if nid is absent, whereas '[]' will raise KeyError.
     t.get_node(nid)
     
-    # To get the children (only sons) list of the node with ID == nid.
+    # Get the children (only sons) list of the node with ID == nid.
     t.is_branch(nid)
     
-    # To move node (source) from its parent to another parent (destination).
+    # Move node (source) from its parent to another parent (destination).
     t.move_node(source, destination)
     
-    # To paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree.
+    # Paste a new tree to an existing tree, with `nid` becoming the parent of the root of this new tree.
     t.paste(nid, new_tree) 
     
-    # To remove the node and free the memory along with its successors.
-    t.remove_node(identifier)
+    # Remove a node and free the memory along with its successors.
+    t.remove_node(nid)
+
+    # Remove a node link its children to its parent (root is not allowd)
+    r.link_past_node(nid)
  
-    # To search the tree from `nid` to the root along links reversedly
+    # Search the tree from `nid` to the root along links reversedly
     # Note: `filter` refers to the function of one varible to act on the **node object**.
     t.rsearch(nid[,filter]) 
     
-    # To print the tree structure in hierarchy style;
+    # Print the tree structure in hierarchy style;
     # Note:
     # `nid` refers to the expanding point to start;
     # `level` refers to the node level in the tree (root as level 0);
@@ -260,9 +279,13 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
     t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
 
-    # To return a soft copy of the subtree with `nid` being the root; The softness 
+    # Return a soft copy of the subtree with `nid` being the root; The softness 
     # means all the nodes are shared between subtree and the original.
     t.subtree(nid)
+
+    # Return a subtree with `nid` being the root, and
+    # remove all nodes in the subtree from the original one
+    t.remove_subtree(nid)
 
     # Save the tree into file for offline analysis.
     t.save2file(filename[,nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])

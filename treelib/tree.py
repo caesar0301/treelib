@@ -117,9 +117,14 @@ class Tree(object):
         Get leaves of the whole tree of a subtree.
         """
         leaves = []
-        for node in self.expand_tree(root):
-            if self[node].is_leaf():
-                leaves.append(node)
+        if root is None:
+            for node in self._nodes.values():
+                if node.is_leaf():
+                    leaves.append(node)
+        else:
+            for node in self.expand_tree(root):
+                if self[node].is_leaf():
+                    leaves.append(node)
         return leaves
 
 
@@ -129,6 +134,8 @@ class Tree(object):
         For example, if we have a -> b -> c
         and delete node b, we are left with a -> c
         """
+        if not self.contains(nid):
+            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
         if self.root == nid:
             raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
         #Get the parent of the node we are linking past
@@ -483,12 +490,15 @@ if __name__ == '__main__':
     tree.move_node(3,1)
     tree.move_node(3,2)
     tree.rsearch(3)
+    tree.leaves(1)
+    tree.link_past_node(3)
+    tree.show()
+    # Different copies
     dst = Tree(tree.subtree(2), True) # deep copy
-    tree[2].tag = 'node2'
-    dst.show()
+    dst[dst.root].tag = 'node2'
+    tree.show()
     sst = tree.subtree(2) # shallow copy
-    tree[2].tag = 'node2'
-    sst.show()
+    sst[sst.root].tag = 'node2'
+    tree.show()
     rst = tree.remove_subtree(2) # removed copy
-    print rst.parent(rst.root)
     tree.show()
