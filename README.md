@@ -21,7 +21,7 @@ or
 Basic Usage
 ----------
 
-* Example 1: Create a tree
+Example 1: Create a tree
 
     tree = Tree()
     tree.create_node("Harry", "harry")  # root node
@@ -45,7 +45,7 @@ Result:
     |    |___ Mark[mark]
     |___ Bill[bill]
 
-* Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
+Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
 
     for node in tree.expand_tree(mode=Tree.DEPTH):
         print tree[node].name
@@ -61,7 +61,7 @@ Result:
     Mark
     Bill
 
-* Example 2a: expand a tree with mode being Tree.ZIGZAG
+Example 2a: expand a tree with mode being Tree.ZIGZAG
             (WIDTH-first, level by level, first level left-to-right, second - right-to-left and so on)
 
     for node in tree.expand_tree(mode=Tree.ZIGZAG):
@@ -78,19 +78,19 @@ Result:
     george
     jill
 
-* Example 3: expand tree with filter
+Example 3: expand tree with filter
 
     for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
 		print tree[node].name
 
 Result:
 
-	Harry
+    Harry
     Jane
     Mark
     Bill
 
-* Example 4: get a subtree
+Example 4: get a subtree
 
     sub_t = tree.subtree('diane')
     sub_t.show()
@@ -102,7 +102,7 @@ Result:
     |    |___ Jill[jill]
     |___ Mary[mary]
 
-* Example 5: paste a new tree to original one
+Example 5: paste a new tree to original one
 
     new_tree = Tree()
     new_tree.create_node("n1", "1")  # root node
@@ -125,7 +125,7 @@ Result:
     |    |___ Mark[mark]
     |___ Bill[bill]
 
-* Example 6: remove the existing node from the tree
+Example 6: remove the existing node from the tree
 
     tree.remove_node('1')
     tree.show()
@@ -134,7 +134,7 @@ Result:
 
     As the result of example 1
 
-* Example 7: Move a node
+Example 7: Move a node
 
     tree.move_node('jill', 'harry')
     tree.show()
