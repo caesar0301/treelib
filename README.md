@@ -263,8 +263,8 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # Remove a node and free the memory along with its successors.
     t.remove_node(nid)
 
-    # Remove a node link its children to its parent (root is not allowd)
-    r.link_past_node(nid)
+    # Remove a node link its children to its parent (root is not allowed)
+    t.link_past_node(nid)
  
     # Search the tree from `nid` to the root along links reversedly
     # Note: `filter` refers to the function of one varible to act on the **node object**.
