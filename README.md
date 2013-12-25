@@ -3,6 +3,8 @@ pyTree (treelib on PyPI)
 
 Tree Implementation in python: simple to use for you.
 
+[![Build Status](https://travis-ci.org/caesar0301/pyTree.png?branch=master)](https://travis-ci.org/caesar0301/pyTree)
+
 
 
 How to install
