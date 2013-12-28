@@ -1,4 +1,4 @@
-from node import Node
+from .node import Node
 from copy import deepcopy
 
 __author__ = 'chenxm'
