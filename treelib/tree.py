@@ -1,5 +1,9 @@
-from .node import Node
+#!/usr/bin/env python
 from copy import deepcopy
+try:
+    from .node import Node
+except:
+    from node import Node 
 
 __author__ = 'chenxm'
 

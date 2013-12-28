@@ -12,6 +12,7 @@ from treelib import tree
 import fnmatch
 import os
 import zlib
+import argparse
 
 DEBUG = 0
 FILECOUNT = 0
@@ -32,10 +33,15 @@ if PROFILING == 2:
     import cProfile
 
 
-rootPath = '/home/'  # path must be absolute!!
-pattern = '*.pdf'  # *.mp3
-folder_blacklist = []
+parser = argparse.ArgumentParser(description='Scan the given folder and print its structure in a tree.')
+parser.add_argument('abspath', type=str, help= 'An absolute path to be scanned.')
+parser.add_argument('pattern', type=str, help= 'File name pattern to filtered, e.g. *.pdf')
 
+args = parser.parse_args()
+rootPath = args.abspath
+pattern = args.pattern
+
+folder_blacklist = []
 
 dir_tree = tree.Tree()
 dir_tree.create_node('Root', rootPath)  # root node
