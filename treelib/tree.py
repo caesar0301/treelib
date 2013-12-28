@@ -19,7 +19,7 @@ class LinkPastRootNodeError(Exception):
 
 class Tree(object):
 
-    (ROOT, DEPTH, WIDTH, ZIGZAG) = range(4)
+    (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
 
 
     def __init__(self, tree=None, deep=False):
@@ -49,7 +49,7 @@ class Tree(object):
         """
         Return all nodes in a list
         """
-        return self._nodes.values()
+        return list(self._nodes.values())
 
 
     def size(self, level=None):
@@ -183,12 +183,12 @@ class Tree(object):
         return node
 
 
-    def expand_tree(self, nid=None, mode=DEPTH, filter=None, cmp=None, key=None, reverse=False):
+    def expand_tree(self, nid=None, mode=DEPTH, filter=None, key=None, reverse=False):
         """
         Python generator. Loosly based on an algorithm from 'Essential LISP' by
         John R. Anderson, Albert T. Corbett, and Brian J. Reiser, page 239-241
         UPDATE: the @filter function is perform on Node object.
-        UPDATE: the @cmp @key @reverse is present to sort node at each level.
+        UPDATE: the @key @reverse is present to sort node at each level.
         """
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
@@ -199,11 +199,11 @@ class Tree(object):
             yield nid
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
             if mode in [self.DEPTH, self.WIDTH]:
-                queue.sort(cmp=cmp, key=key, reverse=reverse)
+                queue.sort(key=key, reverse=reverse)
                 while queue:
                     yield queue[0].identifier
                     expansion = [self[i] for i in queue[0].fpointer if filter(self[i])]
-                    expansion.sort(cmp=cmp, key=key, reverse=reverse)
+                    expansion.sort(key=key, reverse=reverse)
                     if mode is self.DEPTH:
                         queue = expansion + queue[1:]  # depth-first
                     elif mode is self.WIDTH:
@@ -311,7 +311,7 @@ class Tree(object):
             current = self[current].bpointer
 
 
-    def save2file(self, filename, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False):
+    def save2file(self, filename, nid=None, level=ROOT, idhidden=True, filter=None, key=None, reverse=False):
         """
         Update 20/05/13: Save tree into file for offline analysis
         """
@@ -335,17 +335,17 @@ class Tree(object):
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
             key = (lambda x: x) if (key is None) else key
-            queue.sort(cmp=cmp, key=key, reverse=reverse)
+            queue.sort(key=key, reverse=reverse)
             level += 1
             for element in queue:
-                self.save2file(filename, element.identifier, level, idhidden, filter, cmp, key, reverse)
+                self.save2file(filename, element.identifier, level, idhidden, filter, key, reverse)
 
 
     def _real_true(self, p):
         return True
 
 
-    def show(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False):
+    def show(self, nid=None, level=ROOT, idhidden=True, filter=None, key=None, reverse=False):
         """"
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -360,7 +360,7 @@ class Tree(object):
             |    |___ C31
         A more elegant way to achieve this function using Stack structure,
         for constructing the Nodes Stack push and pop nodes with additional level info.
-        UPDATE: the @cmp @key @reverse is present to sort node at each level.
+        UPDATE: the @key @reverse is present to sort node at each level.
         """
         leading = ''
         lasting = '|___ '
@@ -384,10 +384,10 @@ class Tree(object):
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
             key = (lambda x: x) if (key is None) else key
-            queue.sort(cmp=cmp, key=key, reverse=reverse)
+            queue.sort(key=key, reverse=reverse)
             level += 1
             for element in queue:
-                self.show(element.identifier, level, idhidden, filter, cmp, key, reverse)
+                self.show(element.identifier, level, idhidden, filter, key, reverse)
 
 
     def subtree(self, nid):

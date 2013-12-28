@@ -20,7 +20,7 @@ tree.create_node("Mark", "mark", parent="jane")
 
 
 print("#"*4 + "Breakdown of out family")
-tree.show(cmp=lambda x,y: cmp(x.tag, y.tag), key=None, reverse=True)
+tree.show(key=lambda x: x.tag, reverse=True)
 #tree.show(key=lambda x: x.tag, reverse=False)
 #tree.save2file("/home/chenxm/Desktop/tree.txt", idhidden=False)
 #print('\n')
@@ -28,7 +28,7 @@ tree.show(cmp=lambda x,y: cmp(x.tag, y.tag), key=None, reverse=True)
 
 print("#"*4 + "All family members in DEPTH mode")
 for node in tree.expand_tree(mode=Tree.ZIGZAG):
-    print tree[node].tag
+    print(tree[node].tag)
 print('\n') 
 
 
@@ -46,7 +46,7 @@ print('\n')
 
 
 print("#"*4 + "Children of Diane")
-print tree.is_branch('diane')
+print(tree.is_branch('diane'))
 print('\n')
 
 
@@ -74,6 +74,6 @@ print('\n')
 
 print("#"*4 + "A big family for George to talk to Grand-x-father Harry")
 for node in tree.rsearch('george', filter=lambda x: x.identifier != 'harry'):
-    print node
+    print(node)
 print('harry')
 print('\n')

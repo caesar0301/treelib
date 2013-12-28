@@ -6,7 +6,7 @@ class NodeIDTypeException(Exception):
 
 class Node(object):
 
-    (ADD, DELETE, INSERT) = range(3)
+    (ADD, DELETE, INSERT) = list(range(3))
 
 
     def __init__(self, tag=None, identifier=None, expanded=True):
@@ -118,25 +118,28 @@ class Node(object):
         else:
             return False
 
+    def __lt__(self, other):
+        return(self.tag < other.tag)
+
 
 if __name__ == '__main__':
     new_node = Node()
-    print new_node.tag
+    print(new_node.tag)
     new_node.tag = "new node"
-    print new_node.tag
+    print(new_node.tag)
 
-    print new_node.identifier
+    print(new_node.identifier)
     new_node.identifier = "my first node"
-    print new_node.identifier
+    print(new_node.identifier)
 
-    print new_node.bpointer
+    print(new_node.bpointer)
     new_node.bpointer = "bpointer node"
-    print new_node.bpointer
+    print(new_node.bpointer)
     new_node.update_bpointer(None)
 
-    print new_node.fpointer
+    print(new_node.fpointer)
     new_node.update_fpointer("123", mode=Node.ADD)
     new_node.update_fpointer("124", mode=Node.DELETE)
     new_node.update_fpointer("124", mode=Node.INSERT)
     new_node.fpointer = {1:1,2:2}
-    print new_node.fpointer
+    print(new_node.fpointer)

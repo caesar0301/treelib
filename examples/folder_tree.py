@@ -42,11 +42,13 @@ dir_tree.create_node('Root', rootPath)  # root node
 
 
 def crc32(data):
+    data = bytes(data, 'UTF-8')
+
     if DEBUG:
-        print '++++++ CRC32 ++++++'
-        print 'input: ' + data
-        print 'crc32: ' + hex(zlib.crc32(data) & 0xffffffff)
-        print '+++++++++++++++++++'
+        print('++++++ CRC32 ++++++')
+        print('input: ' + str(data))
+        print('crc32: ' + hex(zlib.crc32(data) & 0xffffffff))
+        print('+++++++++++++++++++')
     return hex(zlib.crc32(data) & 0xffffffff)  # crc32 returns a signed value, &-ing it will match py3k
 
 parent = rootPath
@@ -93,11 +95,11 @@ def get_parentid(current_depth, root, dir):
 
 
 def print_node(dir, node_id, parent_id):
-    print '#############################'
-    print 'node created'
-    print '      dir:     ' + dir
-    print '      note_id: ' + node_id
-    print '      parent:  ' + parent_id
+    print('#############################')
+    print('node created')
+    print('      dir:     ' + dir)
+    print('      note_id: ' + node_id)
+    print('      parent:  ' + parent_id)
 
 
 def crawler():
@@ -113,7 +115,7 @@ def crawler():
             current_depth = os.path.join(root, dir).count('/') - start_depth
 
             if DEBUG:
-                print 'current: ' + os.path.join(root, dir)
+                print('current: ' + os.path.join(root, dir))
 
             node_id = get_noteid(current_depth, root, dir)
             parent_id = str(get_parentid(current_depth, root, dir))
@@ -138,7 +140,7 @@ def crawler():
             current_depth = os.path.join(root, filename).count('/') - start_depth
 
             if DEBUG:
-                print 'current: ' + os.path.join(root, filename)
+                print('current: ' + os.path.join(root, filename))
 
             node_id   = get_noteid(current_depth, root, filename)
             parent_id = str(get_parentid(current_depth, root, filename))
@@ -158,29 +160,29 @@ if PROFILING == 0:
     crawler()
 if PROFILING == 1:
     t1 = timeit.Timer("crawler()", "from __main__ import crawler")
-    print 'time:      ' + str(t1.timeit(number=1))
+    print('time:      ' + str(t1.timeit(number=1)))
 if PROFILING == 2:
     cProfile.run("crawler()")
 
 
-print 'filecount: ' + str(FILECOUNT)
-print 'dircount:  ' + str(DIRCOUNT)
+print('filecount: ' + str(FILECOUNT))
+print('dircount:  ' + str(DIRCOUNT))
 
 if DIR_ERRORLIST:
     for item in DIR_ERRORLIST:
-        print item
+        print(item)
 else:
-    print 'no directory errors'
+    print('no directory errors')
 
-print '\n\n\n'
+print('\n\n\n')
 
 if FILE_ERRORLIST:
     for item in FILE_ERRORLIST:
-        print item
+        print(item)
 else:
-    print 'no file errors'
+    print('no file errors')
 
-print 'nodes: ' + str(len(dir_tree.nodes))
+print('nodes: ' + str(len(dir_tree.nodes)))
 
 dir_tree.show()
 
