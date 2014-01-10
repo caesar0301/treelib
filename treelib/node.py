@@ -13,9 +13,9 @@ class Node(object):
         self._identifier = None
         self._set_identifier(identifier)
         if tag is None:
-            self._tag = str(self._identifier)
+            self._tag = self._identifier
         else:
-            self._tag = str(tag)
+            self._tag = tag
         self.expanded = expanded
         self._bpointer = None
         self._fpointer = list()
@@ -46,7 +46,7 @@ class Node(object):
 
     @tag.setter
     def tag(self, value):
-        self._tag = str(value) if value is not None else None
+        self._tag = value if value is not None else None
 
 
     @property
