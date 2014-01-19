@@ -235,10 +235,10 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     t.leaves([nid])
 
     # Add a new node object to the tree and make the parent as the root by default
-    t.add_node(node[, parent])
+    t.add_node(node[,parent])
     
     # Create a new node and add it to this tree
-    t.create_node(name[,identifier[,parent]])
+    t.create_node(tag[,identifier[,parent]])
     
     # Traverse the tree nodes with different modes; NOTE:
     # `nid` refers to the expanding point to start;
