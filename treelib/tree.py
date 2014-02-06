@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 from copy import deepcopy
 try:
     from .node import Node
@@ -474,7 +475,25 @@ class Tree(object):
         else:
             self[nid].update_fpointer(child_id, mode)
 
+    def to_dict(self, nid=None, key=None, reverse=False):
 
+        nid = self.root if (nid is None) else nid
+        tree_dict = {self[nid].tag: {"children": []}}
+
+        if self[nid].expanded:
+            queue = [self[i] for i in self[nid].fpointer]
+            key = (lambda x: x) if (key is None) else key
+            queue.sort(key=key, reverse=reverse)
+
+            for elem in queue:
+                tree_dict[self[nid].tag]["children"].append(
+                    self.to_dict(elem.identifier))
+            if tree_dict[self[nid].tag]["children"] == []:
+                tree_dict = self[nid].tag
+            return tree_dict
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
 if __name__ == '__main__':
     tree = Tree()
