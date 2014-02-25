@@ -48,7 +48,7 @@ Result:
 Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
 
     for node in tree.expand_tree(mode=Tree.DEPTH):
-        print tree[node].name
+        print tree[node].tag
 
 Result:
 
@@ -81,7 +81,7 @@ Result:
 Example 3: expand tree with filter
 
     for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
-		print tree[node].name
+		print tree[node].tag
 
 Result:
 
@@ -182,7 +182,7 @@ Add the import declaration to use `treelib` in your project:
 This module `treelib` mainly contains two data structures: `Node` and `Tree`.
 
 The structure `Node` defines basic properties such as node identifier 
-(unique ID in the environment of a tree), node name (readable for human), 
+(unique ID in the environment of a tree), node tag (readable name for human), 
 parent node, children nodes etc., and some public operations on a node. 
 (e.g., `a` in the description below):
 
