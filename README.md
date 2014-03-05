@@ -152,7 +152,6 @@ Result:
 
 
 
-
 Advanced Usage
 ---------
 
@@ -168,9 +167,30 @@ For example, to define a tree structure with data payload for each node, you can
     new_node = myNode("1234567890")
     
   
-  
-  
-  
+You can also store an object directly on a node.tag:
+
+    class Person(object):
+        def __init__(self, name, job):
+            self.name = name
+            self.job = job
+        def __str__(self):
+            return u'%s (%s)' % (self.name, self.job)
+    
+    
+    hierarchy = Tree()
+    hierarchy.create_node(Person("Harry", "Manager"), "harry")  # root node
+    hierarchy.create_node(Person("Jane'" "Collaborator"), "jane", parent = "harry")
+    hierarchy.create_node(Person("Bill", "Collaborator"), "bill", parent = "harry")
+    
+    hierarchy.show()
+
+Result:
+
+    Harry (Manager)
+    |___ Bill (Collaborator)
+    |___ Jane (Collaborator)
+
+
   
 Useful APIs
 -----------
