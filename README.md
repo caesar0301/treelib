@@ -264,8 +264,8 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # `nid` refers to the expanding point to start;
     # `mode` refers to the search mode (Tree.DEPTH, Tree.WIDTH);
     # `filter` refers to the function of one varible to act on the **node object**;
-    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
-    t.expand_tree([nid[,mode[,filter[,cmp[,key[,reverse]]]]]]) 
+    # `key`, `reverse` are present to sort **node objects** in the same level.
+    t.expand_tree([nid[,mode[,filter[,key[,reverse]]]]]]) 
     
     # Get the object of the node with ID of nid
     # An alternative way is using '[]' operation on the tree.
@@ -298,8 +298,8 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # `level` refers to the node level in the tree (root as level 0);
     # `idhidden` refers to hiding the node ID when priting;
     # `filter` refers to the function of one varible to act on the **node object**;
-    # `cmp`, `key`, `reverse` are present to sort **node objects** in the same level.
-    t.show([nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
+    # `key`, `reverse` are present to sort **node objects** in the same level.
+    t.show([nid[,level[,idhidden[,filter[,key[,reverse]]]]]]])
 
     # Return a soft copy of the subtree with `nid` being the root; The softness 
     # means all the nodes are shared between subtree and the original.
@@ -310,7 +310,7 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     t.remove_subtree(nid)
 
     # Save the tree into file for offline analysis.
-    t.save2file(filename[,nid[,level[,idhidden[,filter[,cmp[,key[,reverse]]]]]]])
+    t.save2file(filename[,nid[,level[,idhidden[,filter[,key[,reverse]]]]]]])
     
     
     
