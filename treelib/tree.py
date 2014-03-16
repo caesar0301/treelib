@@ -64,12 +64,37 @@ class Tree(object):
         return len(self._nodes)
 
 
-    def depth(self):
+    def depth(self, node=None):
         """
-        Get the maximum level of this tree
+        Get the maximum level of this tree or the level of the given node
+        @param node Node
+        @return int
+        @throw OSError, NodeIDAbsentError
         """
-        pass
+        def cal_depth(identifier):
+            ret = 0
+            parent = self.parent(identifier)
+            while parent is not None:
+                parent = self.parent(parent.identifier)
+                ret += 1
+            return ret
 
+        ret = 0
+        if node is None:
+            # Get maximum level of this tree
+            leaves = self.leaves()
+            for leave in leaves:
+                level = cal_depth(leave.identifier)
+                ret = level if level >= ret else ret
+        else:
+            # Get level of the given node
+            if not isinstance(node, Node):
+                raise OSError("Second parameter must be object of Class::Node.")
+            nid = node.identifier
+            if not self.contains(nid):
+                raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
+            ret = cal_depth(node.identifier)
+        return ret
 
     def get_node(self, nid):
         """

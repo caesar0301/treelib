@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import unittest
 from treelib import Tree, Node
+from treelib.tree import NodeIDAbsentError
 
 class NodeCase(unittest.TestCase):
     def setUp(self):
@@ -84,6 +85,47 @@ class TreeCase(unittest.TestCase):
                 self.assertEqual(self.tree.parent(nid), None)
             else:
                 self.assertEqual(self.tree.parent(nid) in self.tree.all_nodes(), True)
+
+    def test_remove_node(self):
+        self.tree.create_node("Jill", "jill", parent = "george")
+        self.tree.create_node("Mark", "mark", parent = "jill")
+        self.assertEqual(self.tree.remove_node("jill"), 2)
+        self.assertEqual(self.tree.get_node("jill") is None, True)
+        self.assertEqual(self.tree.get_node("mark") is None, True)
+
+    def test_depth(self):
+        # Try getting the level of this tree
+        self.assertEqual(self.tree.depth(), 2)
+        self.tree.create_node("Jill", "jill", parent = "george")
+        self.assertEqual(self.tree.depth(), 3)
+        self.tree.create_node("Mark", "mark", parent = "jill")
+        self.assertEqual(self.tree.depth(), 4)
+
+        # Try getting the level of the node
+        """
+        self.tree.show()
+        Harry
+        |___ Bill
+        |    |___ George
+        |         |___ Jill
+        |              |___ Mark
+        |___ Jane
+        |    |___ Diane
+        """
+        self.assertEqual(self.tree.depth(self.tree.get_node("mark")), 4)
+        self.assertEqual(self.tree.depth(self.tree.get_node("jill")), 3)
+        self.assertEqual(self.tree.depth(self.tree.get_node("george")), 2)
+        self.assertEqual(self.tree.depth(self.tree.get_node("jane")), 1)
+        self.assertEqual(self.tree.depth(self.tree.get_node("bill")), 1)
+        self.assertEqual(self.tree.depth(self.tree.get_node("harry")), 0)
+
+        # Try getting Exception
+        self.assertRaises(OSError, self.tree.depth, "raise OSError")
+        node = Node("Test One", "identifier 1")
+        self.assertRaises(NodeIDAbsentError, self.tree.depth, node)
+
+        # Reset the test case
+        self.tree.remove_node("jill")
 
     def tearDown(self):
         pass
