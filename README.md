@@ -150,7 +150,14 @@ Result:
     |___ Bill[bill]
     |___ Jill[jill]
 
+Example 8: Get the height of the tree
+    tree.depth() #3
 
+Example 9: Get the level of a node
+    node = tree.get_node("bill")
+    tree.depth(node) #1
+    node = tree.get_node("mark")
+    tree.depth(node) #2
 
 Advanced Usage
 ---------
