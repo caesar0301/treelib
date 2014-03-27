@@ -127,7 +127,7 @@ class Tree(object):
 
     def is_branch(self, nid):
         """
-        Return the following nodes of nid.
+        Return the children (only sons and daughters) IDs of nid.
         Empty list is returned if nid does not exist
         """
         if nid is None:
@@ -140,6 +140,18 @@ class Tree(object):
         except KeyError:
             fpointer = []
         return fpointer
+
+
+    def siblings(self, nid):
+        """
+        Return the siblings of given @nid.
+        If @nid is root or there are no siblings, an empty list is returned.
+        """
+        siblings = []
+        if nid != self.root:
+            pid = self[nid].bpointer
+            siblings = [i for i in self[pid].fpointer if i != nid]
+        return siblings
 
 
     def leaves(self, root=None):
@@ -204,11 +216,12 @@ class Tree(object):
         self.__update_bpointer(node.identifier, parent)
 
 
-    def create_node(self, tag=None, identifier=None, parent=None):
+    def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """
-        Create a child node for the node indicated by the 'parent' parameter.
+        Create a child node for given @parent node.
         """
-        node = Node(tag, identifier)
+        node = Node(tag=tag, identifier=identifier,data=data)
+        print node.tag, node.identifier
         self.add_node(node, parent)
         return node
 
@@ -217,8 +230,8 @@ class Tree(object):
         """
         Python generator. Loosly based on an algorithm from 'Essential LISP' by
         John R. Anderson, Albert T. Corbett, and Brian J. Reiser, page 239-241
-        UPDATE: the @filter function is perform on Node object.
-        UPDATE: the @key @reverse is present to sort node at each level.
+        UPDATE: the @filter function is performed on Node object during traversing.
+        UPDATE: the @key and @reverse are present to sort nodes at each level.
         """
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
@@ -259,8 +272,7 @@ class Tree(object):
 
     def move_node(self, source, destination):
         """
-        Move a node indicated by the 'source' parameter to the parent node
-        indicated by the 'dest' parameter
+        Move a node indicated by @source parameter to be a child of @destination.
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
@@ -273,9 +285,9 @@ class Tree(object):
 
     def paste(self, nid, new_tree, deepcopy=False):
         """
-        Paste a new tree to the original one by linking the root
+        Paste a @new_tree to the original one by linking the root
         of new tree to given node (nid).
-        Update: add deepcopy of pasted tree.
+        Update: add @deepcopy of pasted tree.
         """
         assert isinstance(new_tree, Tree)
         if nid is None:
@@ -326,7 +338,7 @@ class Tree(object):
 
     def rsearch(self, nid, filter=None):
         """
-        Traverse the tree branch along the border from nid to root.
+        Traverse the tree branch along the branch from nid to its ancestors (until root).
         """
         if nid is None: return
         if not self.contains(nid):
@@ -426,7 +438,7 @@ class Tree(object):
         If nid is None, return an empty tree.
         If you are looking for a deepcopy, please create a new tree with this shallow copy,
         e.g.
-            new_t = Tree(t.subtree(t.root), deepcopy=True)
+            new_tree = Tree(t.subtree(t.root), deep=True)
         This line creates a deep copy of the entire tree.
         """
         st = Tree()
@@ -444,14 +456,13 @@ class Tree(object):
 
     def remove_subtree(self, nid):
         """
-        Return a subtree deleted from this tree.
-        If nid is None, an empty tree is returned.
-        For the original tree, this method is similar to remove_node(self,nid), because given node and
+        Return a subtree deleted from this tree. If nid is None, an empty tree is returned.
+        For the original tree, this method is similar to `remove_node(self,nid)`, because given node and
         its children are removed from the original tree in both methods.
-        For the returned value and performance, these two methods are different;
-        remove_node returns the number of deleted nodes;
-        remove_subtree returns a subtree of deleted nodes.
-        You are always suggested to use remove_node if your only to delete nodes from a tree, as the other
+        For the returned value and performance, these two methods are different:
+            `remove_node` returns the number of deleted nodes;
+            `remove_subtree` returns a subtree of deleted nodes;
+        You are always suggested to use `remove_node` if your only to delete nodes from a tree, as the other
         one need memory allocation to store the new tree.
         """
         st = Tree()
@@ -471,6 +482,28 @@ class Tree(object):
         # Update its parent info
         self.__update_fpointer(parent, nid, Node.DELETE)
         return st
+
+
+    def _to_dict(self, nid=None, key=None, reverse=False):
+
+        nid = self.root if (nid is None) else nid
+        tree_dict = {self[nid].tag: {"children": []}}
+
+        if self[nid].expanded:
+            queue = [self[i] for i in self[nid].fpointer]
+            key = (lambda x: x) if (key is None) else key
+            queue.sort(key=key, reverse=reverse)
+
+            for elem in queue:
+                tree_dict[self[nid].tag]["children"].append(
+                    self._to_dict(elem.identifier))
+            if tree_dict[self[nid].tag]["children"] == []:
+                tree_dict = self[nid].tag
+            return tree_dict
+
+
+    def to_json(self):
+        return json.dumps(self._to_dict())
 
 
     def __contains__(self, identifier):
@@ -500,53 +533,7 @@ class Tree(object):
         else:
             self[nid].update_fpointer(child_id, mode)
 
-    def to_dict(self, nid=None, key=None, reverse=False):
 
-        nid = self.root if (nid is None) else nid
-        tree_dict = {self[nid].tag: {"children": []}}
-
-        if self[nid].expanded:
-            queue = [self[i] for i in self[nid].fpointer]
-            key = (lambda x: x) if (key is None) else key
-            queue.sort(key=key, reverse=reverse)
-
-            for elem in queue:
-                tree_dict[self[nid].tag]["children"].append(
-                    self.to_dict(elem.identifier))
-            if tree_dict[self[nid].tag]["children"] == []:
-                tree_dict = self[nid].tag
-            return tree_dict
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
 if __name__ == '__main__':
-    tree = Tree()
-    tree.create_node('n1', 1)
-    tree.create_node('n2', 2, parent=1)
-    node = Node('n3', 3)
-    tree.add_node(node, parent=2)
-    tree.size()
-    tree.nodes
-    tree.all_nodes()
-    tree.depth()
-    tree.get_node(1)
-    tree.parent(1)
-    tree.is_branch(1)
-    tree.leaves()
-    tree.expand_tree(mode=Tree.ZIGZAG)
-    tree.move_node(3,1)
-    tree.move_node(3,2)
-    tree.rsearch(3)
-    tree.leaves(1)
-    tree.link_past_node(3)
-    tree.show()
-    # Different copies
-    dst = Tree(tree.subtree(2), True) # deep copy
-    dst[dst.root].tag = 'node2'
-    tree.show()
-    sst = tree.subtree(2) # shallow copy
-    sst[sst.root].tag = 'node2'
-    tree.show()
-    rst = tree.remove_subtree(2) # removed copy
-    tree.show()
+    pass

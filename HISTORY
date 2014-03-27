@@ -1,6 +1,8 @@
 Mar 27, 2014 V1.2.6
 Node identifier supports multiple data types beyond int and str.
 Finish depth() and leaves() routines.
+Add siblings() routine.
+Add unit test to the whole module.
 
 
 Dec 21, 2013 V1.2.5

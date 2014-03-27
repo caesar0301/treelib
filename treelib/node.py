@@ -9,7 +9,7 @@ class Node(object):
     (ADD, DELETE, INSERT) = list(range(3))
 
 
-    def __init__(self, tag=None, identifier=None, expanded=True):
+    def __init__(self, tag=None, identifier=None, expanded=True, data=None):
         self._identifier = None
         self._set_identifier(identifier)
         if tag is None:
@@ -19,24 +19,14 @@ class Node(object):
         self.expanded = expanded
         self._bpointer = None
         self._fpointer = list()
+        self.data = data
 
 
-    def _set_identifier(self, identifier):
-        if identifier is None:
+    def _set_identifier(self, nid):
+        if nid is None:
             self._identifier = str(uuid.uuid1())
         else:
-            self._identifier = self.identifier
-
-
-    # @classmethod
-    # def sanitize_id(cls, identifier):
-    #     if isinstance(identifier, str):
-    #         #return identifier.strip().replace(" ", "_")
-    #         return identifier
-    #     elif isinstance(identifier, int):
-    #         return identifier
-    #     else:
-    #         raise NodeIDTypeException("Only string and integer types are supported currently")
+            self._identifier = nid
 
 
     @property
@@ -68,9 +58,9 @@ class Node(object):
 
 
     @bpointer.setter
-    def bpointer(self, identifier):
-        if identifier is not None:
-            self._bpointer = self.identifier
+    def bpointer(self, nid):
+        if nid is not None:
+            self._bpointer = nid
         else:
             #print("WARNNING: the bpointer of node %s is set to None" % self._identifier)
             self._bpointer = None
@@ -95,21 +85,21 @@ class Node(object):
             pass
 
 
-    def update_bpointer(self, identifier):
-        self.bpointer = identifier
+    def update_bpointer(self, nid):
+        self.bpointer = nid
 
 
-    def update_fpointer(self, identifier, mode=ADD):
-        if identifier is None:
+    def update_fpointer(self, nid, mode=ADD):
+        if nid is None:
             return
         if mode is self.ADD:
-            self._fpointer.append(self.identifier)
+            self._fpointer.append(nid)
         elif mode is self.DELETE:
-            if identifier in self._fpointer:
-                self._fpointer.remove(self.identifier)
+            if nid in self._fpointer:
+                self._fpointer.remove(nid)
         elif mode is self.INSERT: # deprecate to ADD mode
             print("WARNNING: INSERT is deprecated to ADD mode")
-            self.update_fpointer(identifier)
+            self.update_fpointer(nid)
 
 
     def is_leaf(self):
@@ -123,23 +113,4 @@ class Node(object):
 
 
 if __name__ == '__main__':
-    new_node = Node()
-    print(new_node.tag)
-    new_node.tag = "new node"
-    print(new_node.tag)
-
-    print(new_node.identifier)
-    new_node.identifier = "my first node"
-    print(new_node.identifier)
-
-    print(new_node.bpointer)
-    new_node.bpointer = "bpointer node"
-    print(new_node.bpointer)
-    new_node.update_bpointer(None)
-
-    print(new_node.fpointer)
-    new_node.update_fpointer("123", mode=Node.ADD)
-    new_node.update_fpointer("124", mode=Node.DELETE)
-    new_node.update_fpointer("124", mode=Node.INSERT)
-    new_node.fpointer = {1:1,2:2}
-    print(new_node.fpointer)
+    pass

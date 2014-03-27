@@ -24,7 +24,7 @@ print(sep + "Tree of the whole family:")
 tree.show(key=lambda x: x.tag, reverse=True)
 
 print(sep + "All family members in DEPTH mode:")
-for node in tree.expand_tree(mode=Tree.ZIGZAG):
+for node in tree.expand_tree(mode=Tree.DEPTH):
     print(tree[node].tag)
 
 print(sep + "All family members without Diane sub-family:")

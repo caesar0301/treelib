@@ -258,6 +258,9 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # Get the list of all the nodes randomly belonging to this tree
     t.all_nodes()
 
+    # Get depth of the tree
+    t.depth()
+
     # Get leaves of give root
     t.leaves([nid])
 
@@ -282,6 +285,9 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     
     # Get the children (only sons) list of the node with ID == nid.
     t.is_branch(nid)
+
+    # Get all the siblings of given nid.
+    t.siblings(nid)
     
     # Move node (source) from its parent to another parent (destination).
     t.move_node(source, destination)
@@ -319,6 +325,8 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # Save the tree into file for offline analysis.
     t.save2file(filename[,nid[,level[,idhidden[,filter[,key[,reverse]]]]]]])
     
+    # To format the tree in a json format.
+    t.to_json()
     
     
 Contributors
