@@ -221,7 +221,6 @@ class Tree(object):
         Create a child node for given @parent node.
         """
         node = Node(tag=tag, identifier=identifier,data=data)
-        print node.tag, node.identifier
         self.add_node(node, parent)
         return node
 
