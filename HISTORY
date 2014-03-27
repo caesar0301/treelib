@@ -1,23 +1,34 @@
-Dec 21, 2013
+Mar 27, 2014 V1.2.6
+Node identifier supports multiple data types beyond int and str.
+Finish depth() and leaves() routines.
+
+
+Dec 21, 2013 V1.2.5
 Add root() routine to Tree class.
 Add all_nodes() routine to Tree class.
+
 
 May 1, 2013
 Pulish the module on PyPI with version 1.2 under GNU General Pulic License
 version 3.  
 
+
 Mar 21, 2013
 Replace the list implementation with dict to improve performance to a
 large extend. Thanks to @aronadaal
 
+
 Dec 30, 2012
 Make a pretty print routine to the tree and give some examples in README
+
 
 Dec 19, 2012
 Little modification and add get_node routine by @pgebhard.
 
+
 Jul 13, 2012
 Add rsearch routines to implement reversed searching from leaf to tree root.
+
 
 Jul 07, 2012
 Initiate the project on GitHub.

@@ -25,18 +25,18 @@ class Node(object):
         if identifier is None:
             self._identifier = str(uuid.uuid1())
         else:
-            self._identifier = self.sanitize_id(identifier)
+            self._identifier = self.identifier
 
 
-    @classmethod
-    def sanitize_id(cls, identifier):
-        if isinstance(identifier, str):
-            #return identifier.strip().replace(" ", "_")
-            return identifier
-        elif isinstance(identifier, int):
-            return identifier
-        else:
-            raise NodeIDTypeException("Only string and integer types are supported currently")
+    # @classmethod
+    # def sanitize_id(cls, identifier):
+    #     if isinstance(identifier, str):
+    #         #return identifier.strip().replace(" ", "_")
+    #         return identifier
+    #     elif isinstance(identifier, int):
+    #         return identifier
+    #     else:
+    #         raise NodeIDTypeException("Only string and integer types are supported currently")
 
 
     @property
@@ -70,7 +70,7 @@ class Node(object):
     @bpointer.setter
     def bpointer(self, identifier):
         if identifier is not None:
-            self._bpointer = self.sanitize_id(identifier)
+            self._bpointer = self.identifier
         else:
             #print("WARNNING: the bpointer of node %s is set to None" % self._identifier)
             self._bpointer = None
@@ -103,10 +103,10 @@ class Node(object):
         if identifier is None:
             return
         if mode is self.ADD:
-            self._fpointer.append(self.sanitize_id(identifier))
+            self._fpointer.append(self.identifier)
         elif mode is self.DELETE:
             if identifier in self._fpointer:
-                self._fpointer.remove(self.sanitize_id(identifier))
+                self._fpointer.remove(self.identifier)
         elif mode is self.INSERT: # deprecate to ADD mode
             print("WARNNING: INSERT is deprecated to ADD mode")
             self.update_fpointer(identifier)
