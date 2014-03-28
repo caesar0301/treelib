@@ -162,40 +162,29 @@ Example 9: Get the level of a node
 Advanced Usage
 ---------
 
-You can also inherit and modify the behaviors of the tree structure to meet your need easily and conveniently.
-For example, to define a tree structure with data payload for each node, you can program like the way below:
+Sometimes, you need trees to store your own data.
+The newsest version of `treelib` supports `.data` variable to store whatever you want.
+For example, to define a flower tree with your own data:
 
-    import treelib
-
-    class myNode(treelib.node):
-        def __init__(self, payload):
-            self.data = payload
-    ...
-    new_node = myNode("1234567890")
+    class Flower(object):
+        def __init__(self, color):
+            self.color = color
+            
+You can create a flower tree now:
     
-  
-You can also store an object directly on a node.tag:
+    ftree = Tree()
+    ftree.create_node("Root", "root")
+    ftree.create_node("F1", "f1", data=Flower("white"))
+    ftree.create_node("F2", "f2", data=Flower("red"))
 
-    class Person(object):
-        def __init__(self, name, job):
-            self.name = name
-            self.job = job
-        def __str__(self):
-            return u'%s (%s)' % (self.name, self.job)
-    
-    
-    hierarchy = Tree()
-    hierarchy.create_node(Person("Harry", "Manager"), "harry")  # root node
-    hierarchy.create_node(Person("Jane'" "Collaborator"), "jane", parent = "harry")
-    hierarchy.create_node(Person("Bill", "Collaborator"), "bill", parent = "harry")
-    
-    hierarchy.show()
+Before version 1.2.5, you should inherit and modify the behaviors of the tree. For flower example,
 
-Result:
+    class FlowerNode(treelib.Node):
+        def __init__(self, color):
+            self.color = color
 
-    Harry (Manager)
-    |___ Bill (Collaborator)
-    |___ Jane (Collaborator)
+    # create a new node
+    fnode = FlowerNode("white")
 
 
   

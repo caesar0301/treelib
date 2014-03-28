@@ -42,6 +42,15 @@ class NodeCase(unittest.TestCase):
         self.assertEqual(self.node1.is_leaf(), False)
         self.assertEqual(self.node2.is_leaf(), True)
 
+    def test_data(self):
+        class Flower(object):
+            def __init__(self, color):
+                self.color = color
+            def __str__(self):
+                return "%s" % self.color
+        self.node1.data = Flower("red")
+        self.assertEqual(self.node1.data.color, "red")
+
     def tearDown(self):
         pass
 
@@ -198,8 +207,17 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(len(self.tree.siblings("harry")) == 0, True)
         self.assertEqual(self.tree.siblings("jane")[0] == "bill", True)
 
+    def test_tree_data(self):
+        class Flower(object):
+            def __init__(self, color):
+                self.color = color
+        self.tree.create_node("Jill", "jill", parent="jane", data=Flower("white"))
+        self.assertEqual(self.tree["jill"].data.color, "white")
+        self.tree.remove_node("jill")
+
     def tearDown(self):
-        pass
+        self.tree = None
+        self.copytree = None
 
 
 def suite():
