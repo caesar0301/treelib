@@ -1,4 +1,4 @@
-pyTree (treelib on PyPI)
+treelib (original pyTree)
 --------
 
 Tree Implementation in python: simple to use for you.
@@ -174,8 +174,8 @@ You can create a flower tree now:
     
     ftree = Tree()
     ftree.create_node("Root", "root")
-    ftree.create_node("F1", "f1", data=Flower("white"))
-    ftree.create_node("F2", "f2", data=Flower("red"))
+    ftree.create_node("F1", "f1", parent='root', data=Flower("white"))
+    ftree.create_node("F2", "f2", parent='root', data=Flower("red"))
 
 Before version 1.2.5, you should inherit and modify the behaviors of the tree. For flower example,
 
