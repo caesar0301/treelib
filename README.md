@@ -151,9 +151,11 @@ Result:
     |___ Jill[jill]
 
 Example 8: Get the height of the tree
+
     tree.depth() #3
 
 Example 9: Get the level of a node
+
     node = tree.get_node("bill")
     tree.depth(node) #1
     node = tree.get_node("mark")
@@ -237,20 +239,30 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # Get the number of nodes in this tree
     t.size()
 
+    # Get node level in this tree
+    t.level(nid)
+
+    # Get depth of the tree
+    t.depth(nid)
+
     # Check if the tree contains given node
     t.contains(nid)
+
+    # Get the list of all the nodes randomly belonging to this tree
+    t.all_nodes()
 
     # Obtain node's parent (Node instance)
     # Return None if the parent is None or does not exist in the tree
     t.parent(nid)
-    
-    # Get the list of all the nodes randomly belonging to this tree
-    t.all_nodes()
 
-    # Get depth of the tree
-    t.depth()
+    # Get the children list of the node (nid).
+    t.children(nid) # return node instances
+    t.is_branch(nid) # return node IDs
 
-    # Get leaves of give root
+    # Get all the siblings of given nid.
+    t.siblings(nid)
+
+    # Get leaves of give root. If `nid` is not given, leaves of the maximum level are returned.
     t.leaves([nid])
 
     # Add a new node object to the tree and make the parent as the root by default
@@ -259,24 +271,11 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # Create a new node and add it to this tree
     t.create_node([tag[,identifier[,parent]]])
     
-    # Traverse the tree nodes with different modes; NOTE:
-    # `nid` refers to the expanding point to start;
-    # `mode` refers to the search mode (Tree.DEPTH, Tree.WIDTH);
-    # `filter` refers to the function of one varible to act on the **node object**;
-    # `key`, `reverse` are present to sort **node objects** in the same level.
-    t.expand_tree([nid[,mode[,filter[,key[,reverse]]]]]]) 
-    
     # Get the object of the node with ID of nid
     # An alternative way is using '[]' operation on the tree.
     # But small difference exists between them:
     # the get_node() will return None if nid is absent, whereas '[]' will raise KeyError.
     t.get_node(nid)
-    
-    # Get the children (only sons) list of the node with ID == nid.
-    t.is_branch(nid)
-
-    # Get all the siblings of given nid.
-    t.siblings(nid)
     
     # Move node (source) from its parent to another parent (destination).
     t.move_node(source, destination)
@@ -289,6 +288,13 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
 
     # Remove a node and link its children to its parent (root is not allowed)
     t.link_past_node(nid)
+
+    # Traverse the tree nodes with different modes; NOTE:
+    # `nid` refers to the expanding point to start;
+    # `mode` refers to the search mode (Tree.DEPTH, Tree.WIDTH);
+    # `filter` refers to the function of one varible to act on the **node object**;
+    # `key`, `reverse` are present to sort **node objects** in the same level.
+    t.expand_tree([nid[,mode[,filter[,key[,reverse]]]]]]) 
  
     # Search the tree from `nid` to the root along links reversedly
     # Note: `filter` refers to the function of one varible to act on the **node object**.

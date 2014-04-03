@@ -143,15 +143,14 @@ class TreeCase(unittest.TestCase):
         |___ Jane
         |    |___ Diane
         """
-        self.assertEqual(self.tree.depth(self.tree.get_node("mark")), 4)
+        self.assertEqual(self.tree.depth(self.tree.get_node("mark")), 4) # get depth via node instance
         self.assertEqual(self.tree.depth(self.tree.get_node("jill")), 3)
         self.assertEqual(self.tree.depth(self.tree.get_node("george")), 2)
-        self.assertEqual(self.tree.depth(self.tree.get_node("jane")), 1)
-        self.assertEqual(self.tree.depth(self.tree.get_node("bill")), 1)
-        self.assertEqual(self.tree.depth(self.tree.get_node("harry")), 0)
+        self.assertEqual(self.tree.depth("jane"), 1) # get depth via node identifier
+        self.assertEqual(self.tree.depth("bill"), 1)
+        self.assertEqual(self.tree.depth("harry"), 0)
 
         # Try getting Exception
-        self.assertRaises(OSError, self.tree.depth, "raise OSError")
         node = Node("Test One", "identifier 1")
         self.assertRaises(NodeIDAbsentError, self.tree.depth, node)
 

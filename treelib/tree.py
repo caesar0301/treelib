@@ -73,9 +73,9 @@ class Tree(object):
     def depth(self, node=None):
         """
         Get the maximum level of this tree or the level of the given node
-        @param node Node
+        @param node Node instance or identifier
         @return int
-        @throw OSError, NodeIDAbsentError
+        @throw NodeIDAbsentError
         """
         def cal_depth(identifier):
             ret = 0
@@ -95,11 +95,12 @@ class Tree(object):
         else:
             # Get level of the given node
             if not isinstance(node, Node):
-                raise OSError("Second parameter must be object of Class::Node.")
-            nid = node.identifier
+                nid = node
+            else:
+                nid = node.identifier
             if not self.contains(nid):
                 raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
-            ret = cal_depth(node.identifier)
+            ret = cal_depth(nid)
         return ret
 
     def get_node(self, nid):
