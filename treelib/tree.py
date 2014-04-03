@@ -9,17 +9,11 @@ except:
 __author__ = 'chenxm'
 
 
-class NodeIDAbsentError(Exception):
-    pass
-
-class MultipleRootError(Exception):
-    pass
-
-class DuplicatedNodeIdError(Exception):
-    pass
-
-class LinkPastRootNodeError(Exception):
-    pass
+class NodeIDAbsentError(Exception): pass
+class MultipleRootError(Exception): pass
+class DuplicatedNodeIdError(Exception): pass
+class LinkPastRootNodeError(Exception): pass
+class InvalidLevelNumber(Exception): pass
 
 
 class Tree(object):
@@ -45,7 +39,7 @@ class Tree(object):
     @property
     def nodes(self):
         '''
-        Return a dict form of nodes in a tree
+        Return a dict form of nodes in a tree: {id: node_instance}
         '''
         return self._nodes
 
@@ -59,9 +53,21 @@ class Tree(object):
 
     def size(self, level=None):
         """
-        Get the number of nodes in this tree
+        Get the number of nodes of the whole tree if @level is not given.
+        Otherwise, the total number of nodes at specific level is returned.
+        @param level The level number in the tree. It must be between [0, tree.depth].
+        Otherwise, InvalidLevelNumber excpetion will be raised.
         """
         return len(self._nodes)
+
+
+    def level(self, nid):
+        """
+        Get the node level in this tree.
+        The level is an integer starting with '0' at the root.
+        In other words, the root lives at level '0';
+        """
+        return len([n for n in self.rsearch(nid)])-1
 
 
     def depth(self, node=None):
@@ -125,9 +131,17 @@ class Tree(object):
         return self[pid]
 
 
+    def children(self, nid):
+        """
+        Return the children (Node) list of nid.
+        Empty list is returned if nid does not exist
+        """
+        return [self[i] for i in self.is_branch(nid)]
+
+
     def is_branch(self, nid):
         """
-        Return the children (only sons and daughters) IDs of nid.
+        Return the children (ID) list of nid.
         Empty list is returned if nid does not exist
         """
         if nid is None:
@@ -150,7 +164,7 @@ class Tree(object):
         siblings = []
         if nid != self.root:
             pid = self[nid].bpointer
-            siblings = [i for i in self[pid].fpointer if i != nid]
+            siblings = [self[i] for i in self[pid].fpointer if i != nid]
         return siblings
 
 
@@ -511,7 +525,10 @@ class Tree(object):
 
 
     def __getitem__(self, key):
-        return self._nodes[key]
+        try:
+            return self._nodes[key]
+        except KeyError:
+            raise NodeIDAbsentError("Node '%s' is not in the tree" % key)
 
 
     def __len__(self):

@@ -86,11 +86,11 @@ class TreeCase(unittest.TestCase):
         for node_id in self.tree.nodes:
             try:
                 self.tree[node_id]
-            except KeyError:
+            except NodeIDAbsentError:
                 self.fail('Node access should be possible via getitem.')
         try:
             self.tree['root']
-        except KeyError:
+        except NodeIDAbsentError:
             pass
         else:
             self.fail('There should be no default fallback value for getitem.')
@@ -102,11 +102,14 @@ class TreeCase(unittest.TestCase):
             else:
                 self.assertEqual(self.tree.parent(nid) in self.tree.all_nodes(), True)
 
-    def test_is_branch(self):
+    def test_children(self):
         for nid in self.tree.nodes:
             children = self.tree.is_branch(nid)
             for child in children:
                 self.assertEqual(self.tree[child] in self.tree.all_nodes(), True)
+            children = self.tree.children(nid)
+            for child in children:
+                self.assertEqual(child in self.tree.all_nodes(), True)
         try:
             self.tree.is_branch("alien")
         except NodeIDAbsentError:
@@ -205,7 +208,7 @@ class TreeCase(unittest.TestCase):
 
     def test_siblings(self):
         self.assertEqual(len(self.tree.siblings("harry")) == 0, True)
-        self.assertEqual(self.tree.siblings("jane")[0] == "bill", True)
+        self.assertEqual(self.tree.siblings("jane")[0].identifier == "bill", True)
 
     def test_tree_data(self):
         class Flower(object):
@@ -214,6 +217,10 @@ class TreeCase(unittest.TestCase):
         self.tree.create_node("Jill", "jill", parent="jane", data=Flower("white"))
         self.assertEqual(self.tree["jill"].data.color, "white")
         self.tree.remove_node("jill")
+
+    def test_level(self):
+        self.assertEqual(self.tree.level('harry'),  0)
+        self.assertEqual(self.tree.level('diane'),  self.tree.depth())
 
     def tearDown(self):
         self.tree = None
