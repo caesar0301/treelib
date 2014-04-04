@@ -219,7 +219,9 @@ class TreeCase(unittest.TestCase):
 
     def test_level(self):
         self.assertEqual(self.tree.level('harry'),  0)
-        self.assertEqual(self.tree.level('diane'),  self.tree.depth())
+        depth = self.tree.depth()
+        self.assertEqual(self.tree.level('diane'),  depth)
+        self.assertEqual(self.tree.level('diane', lambda x:x.identifier!='jane'),depth-1)
 
     def tearDown(self):
         self.tree = None

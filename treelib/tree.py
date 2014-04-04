@@ -61,13 +61,14 @@ class Tree(object):
         return len(self._nodes)
 
 
-    def level(self, nid):
+    def level(self, nid, filter=None):
         """
         Get the node level in this tree.
         The level is an integer starting with '0' at the root.
         In other words, the root lives at level '0';
+        Update: @filter params is added to calculate level passing exclusive nodes.
         """
-        return len([n for n in self.rsearch(nid)])-1
+        return len([n for n in self.rsearch(nid, filter)])-1
 
 
     def depth(self, node=None):
@@ -77,20 +78,12 @@ class Tree(object):
         @return int
         @throw NodeIDAbsentError
         """
-        def cal_depth(identifier):
-            ret = 0
-            parent = self.parent(identifier)
-            while parent is not None:
-                parent = self.parent(parent.identifier)
-                ret += 1
-            return ret
-
         ret = 0
         if node is None:
             # Get maximum level of this tree
             leaves = self.leaves()
             for leave in leaves:
-                level = cal_depth(leave.identifier)
+                level = self.level(leave.identifier)
                 ret = level if level >= ret else ret
         else:
             # Get level of the given node
@@ -100,8 +93,9 @@ class Tree(object):
                 nid = node.identifier
             if not self.contains(nid):
                 raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
-            ret = cal_depth(nid)
+            ret = self.level(nid)
         return ret
+
 
     def get_node(self, nid):
         """

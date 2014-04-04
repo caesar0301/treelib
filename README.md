@@ -239,11 +239,12 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # Get the number of nodes in this tree
     t.size()
 
-    # Get node level in this tree
-    t.level(nid)
+    # Get node level in this tree.
+    # More advancedly, you can calculate the level by skiping some unwanted nodes.
+    t.level(nid[,filter])
 
-    # Get depth of the tree
-    t.depth(nid)
+    # Get maximum depth of the tree, which equals to `t.level(t.root)`.
+    t.depth()
 
     # Check if the tree contains given node
     t.contains(nid)
