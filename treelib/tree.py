@@ -1,43 +1,9 @@
 #!/usr/bin/env python
-#===============================================================================
-# Copyright (C) 2011    Brett Alistair Kromkamp - brettkromkamp@gmail.com
-# Copyright (C) 2012,2013   Xiaming Chen - chenxm35@gmail.com
-# Copyright (C) 2013    Holger Bast - holgerbast@gmx.de
-# All rights reserved.
-#
-# This file is part of project treelib.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Neither the name of the copyright holder nor the names of the contributors
-# may be used to endorse or promote products derived from this software without
-# specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#===============================================================================
-# treelib - Simple to use for you.
-# Python 2/3 Tree Implementation
 """
+
+  treelib - Simple to use for you.
+  Python 2/3 Tree Implementation
+
         tree.py
 
         o       NodeIDAbsentError class
@@ -45,7 +11,7 @@
         o       DuplicatedNodeIdError class
         o       LinkPastRootNodeError class
         o       InvalidLevelNumber class
-        
+
         o       Tree class
 """
 
@@ -58,8 +24,7 @@ except:
 
 __author__ = 'chenxm'
 
-#///////////////////////////////////////////////////////////////////////////////
-# error classes :
+
 class NodeIDAbsentError(Exception):
     """
         NodeIDAbsentError class
@@ -67,6 +32,7 @@ class NodeIDAbsentError(Exception):
         Exception throwed if a node's identifier is unknown
     """
     pass
+
 
 class MultipleRootError(Exception):
     """
@@ -76,6 +42,7 @@ class MultipleRootError(Exception):
     """
     pass
 
+
 class DuplicatedNodeIdError(Exception):
     """
         DuplicatedNodeIdError class
@@ -83,6 +50,7 @@ class DuplicatedNodeIdError(Exception):
         Exception throwed if an identifier already exists in a tree.
     """
     pass
+
 
 class LinkPastRootNodeError(Exception):
     """
@@ -93,13 +61,14 @@ class LinkPastRootNodeError(Exception):
     """
     pass
 
+
 class InvalidLevelNumber(Exception):
     """
         InvalidLevelNumber class
     """
     pass
 
-#///////////////////////////////////////////////////////////////////////////////
+
 class Tree(object):
     """
         Tree class
@@ -161,7 +130,6 @@ class Tree(object):
     # ROOT, DEPTH, WIDTH, ZIGZAG constants :
     (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
 
-    #///////////////////////////////////////////////////////////////////////////
     def __contains__(self, identifier):
         """
                 Tree.__contains__()
@@ -169,10 +137,7 @@ class Tree(object):
         return [node.identifier for node in self._nodes
                 if node.identifier is identifier]
 
-    #///////////////////////////////////////////////////////////////////////////
-    def __init__(self,
-                 tree=None,
-                 deep=False):
+    def __init__(self, tree=None, deep=False):
         """
                 Tree.__init__()
 
@@ -197,7 +162,6 @@ class Tree(object):
             else:
                 self._nodes = tree._nodes
 
-    #///////////////////////////////////////////////////////////////////////////
     def __getitem__(self, key):
         """
                 Tree.__getitem__()
@@ -207,28 +171,24 @@ class Tree(object):
         except KeyError:
             raise NodeIDAbsentError("Node '%s' is not in the tree" % key)
 
-    #///////////////////////////////////////////////////////////////////////////
     def __len__(self):
         """
                 Tree.__len__()
         """
         return len(self._nodes)
 
-    #///////////////////////////////////////////////////////////////////////////
     def __setitem__(self, key, item):
         """
                 Tree.__setitem__()
         """
         self._nodes.update({key: item})
 
-    #///////////////////////////////////////////////////////////////////////////
     def __update_bpointer(self, nid, parent_id):
         """
                 Tree.__update_bpointer()
         """
         self[nid].update_bpointer(parent_id)
 
-    #///////////////////////////////////////////////////////////////////////////
     def __update_fpointer(self, nid, child_id, mode):
         """
                 Tree.__update_fpointer()
@@ -238,18 +198,13 @@ class Tree(object):
         else:
             self[nid].update_fpointer(child_id, mode)
 
-    #///////////////////////////////////////////////////////////////////////////
     def _real_true(self, p):
         """
                 Tree._real_true()
         """
         return True
 
-    #///////////////////////////////////////////////////////////////////////////
-    def _to_dict(self,
-                 nid=None,
-                 key=None,
-                 reverse=False):
+    def _to_dict(self, nid=None, key=None, reverse=False):
         """
                 Tree._to_dict()
         """
@@ -269,7 +224,6 @@ class Tree(object):
                 tree_dict = self[nid].tag
             return tree_dict
 
-    #///////////////////////////////////////////////////////////////////////////
     def add_node(self, node, parent=None):
         """
                 Tree.add_node()
@@ -281,7 +235,7 @@ class Tree(object):
             raise OSError("First parameter must be object of Class::Node.")
 
         if node.identifier in self._nodes:
-            raise DuplicatedNodeIdError("Can't create node " \
+            raise DuplicatedNodeIdError("Can't create node "
                                         "with ID '%s'" % node.identifier)
 
         if parent is None:
@@ -290,14 +244,13 @@ class Tree(object):
             else:
                 self.root = node.identifier
         elif not self.contains(parent):
-            raise NodeIDAbsentError("Parent node '%s' " \
+            raise NodeIDAbsentError("Parent node '%s' "
                                     "is not in the tree" % parent)
 
-        self._nodes.update({node.identifier : node})
+        self._nodes.update({node.identifier: node})
         self.__update_fpointer(parent, node.identifier, Node.ADD)
         self.__update_bpointer(node.identifier, parent)
 
-    #///////////////////////////////////////////////////////////////////////////
     def all_nodes(self):
         """
                 Tree.all_nodes()
@@ -306,7 +259,6 @@ class Tree(object):
         """
         return list(self._nodes.values())
 
-    #///////////////////////////////////////////////////////////////////////////
     def children(self, nid):
         """
                 Tree.children()
@@ -316,7 +268,6 @@ class Tree(object):
         """
         return [self[i] for i in self.is_branch(nid)]
 
-    #///////////////////////////////////////////////////////////////////////////
     def contains(self, nid):
         """
                 Tree.contains()
@@ -328,12 +279,7 @@ class Tree(object):
         """
         return True if nid in self._nodes else False
 
-    #///////////////////////////////////////////////////////////////////////////
-    def create_node(self,
-                    tag=None,
-                    identifier=None,
-                    parent=None,
-                    data=None):
+    def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """
                 Tree.create_node()
 
@@ -343,7 +289,6 @@ class Tree(object):
         self.add_node(node, parent)
         return node
 
-    #///////////////////////////////////////////////////////////////////////////
     def depth(self, node=None):
         """
                 Tree.depth()
@@ -373,13 +318,7 @@ class Tree(object):
             ret = self.level(nid)
         return ret
 
-
-    #///////////////////////////////////////////////////////////////////////////
-    def expand_tree(self,
-                    nid=None,
-                    mode=DEPTH,
-                    filter=None,
-                    key=None,
+    def expand_tree(self, nid=None, mode=DEPTH, filter=None, key=None,
                     reverse=False):
         """
                 Tree.expand_tree()
@@ -405,7 +344,7 @@ class Tree(object):
                 queue.sort(key=key, reverse=reverse)
                 while queue:
                     yield queue[0].identifier
-                    expansion = [self[i] for i in queue[0].fpointer \
+                    expansion = [self[i] for i in queue[0].fpointer
                                  if filter(self[i])]
                     expansion.sort(key=key, reverse=reverse)
                     if mode is self.DEPTH:
@@ -414,13 +353,13 @@ class Tree(object):
                         queue = queue[1:] + expansion  # width-first
 
             elif mode is self.ZIGZAG:
-                ## Suggested by Ilya Kuprik (ilya-spy@ynadex.ru).
+                # Suggested by Ilya Kuprik (ilya-spy@ynadex.ru).
                 stack_fw = []
                 queue.reverse()
                 stack = stack_bw = queue
                 direction = False
                 while stack:
-                    expansion = [self[i] for i in stack[0].fpointer \
+                    expansion = [self[i] for i in stack[0].fpointer
                                  if filter(self[i])]
                     yield stack.pop(0).identifier
                     if direction:
@@ -432,7 +371,6 @@ class Tree(object):
                         direction = not direction
                         stack = stack_fw if direction else stack_bw
 
-    #///////////////////////////////////////////////////////////////////////////
     def get_node(self, nid):
         """
                 Tree.get_node()
@@ -444,7 +382,6 @@ class Tree(object):
             return None
         return self._nodes[nid]
 
-    #///////////////////////////////////////////////////////////////////////////
     def is_branch(self, nid):
         """
                 Tree.is_branch()
@@ -463,7 +400,6 @@ class Tree(object):
             fpointer = []
         return fpointer
 
-    #///////////////////////////////////////////////////////////////////////////
     def leaves(self, root=None):
         """
                 Tree.leaves()
@@ -481,7 +417,6 @@ class Tree(object):
                     leaves.append(node)
         return leaves
 
-    #///////////////////////////////////////////////////////////////////////////
     def level(self, nid, filter=None):
         """
                 Tree.level()
@@ -495,7 +430,6 @@ class Tree(object):
         """
         return len([n for n in self.rsearch(nid, filter)])-1
 
-    #///////////////////////////////////////////////////////////////////////////
     def link_past_node(self, nid):
         """
                 Tree.link_past_node()
@@ -507,20 +441,19 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
         if self.root == nid:
-            raise LinkPastRootNodeError("Cannot link past the root node, " \
+            raise LinkPastRootNodeError("Cannot link past the root node, "
                                         "delete it with remove_node()")
-        #Get the parent of the node we are linking past
+        # Get the parent of the node we are linking past
         parent = self[self[nid].bpointer]
-        #Set the children of the node to the parent
+        # Set the children of the node to the parent
         for child in self[nid].fpointer:
             self[child].update_bpointer(parent.identifier)
-        #Link the children to the parent
+        # Link the children to the parent
         parent.fpointer += self[nid].fpointer
-        #Delete the node
+        # Delete the node
         parent.update_fpointer(nid, mode=parent.DELETE)
         del self._nodes[nid]
 
-    #///////////////////////////////////////////////////////////////////////////
     @property
     def nodes(self):
         """
@@ -530,7 +463,6 @@ class Tree(object):
         """
         return self._nodes
 
-    #///////////////////////////////////////////////////////////////////////////
     def parent(self, nid):
         """
                 Tree.parent()
@@ -546,7 +478,6 @@ class Tree(object):
 
         return self[pid]
 
-    #///////////////////////////////////////////////////////////////////////////
     def siblings(self, nid):
         """
                 Tree.siblings()
@@ -564,14 +495,13 @@ class Tree(object):
 
         return siblings
 
-    #///////////////////////////////////////////////////////////////////////////
     def size(self, level=None):
         """
                 Tree.size()
 
                 Get the number of nodes of the whole tree if @level is not
-                given. Otherwise, the total number of nodes at specific level is
-                returned.
+                given. Otherwise, the total number of nodes at specific level
+                is returned.
 
                 @param level The level number in the tree. It must be between
                 [0, tree.depth].
@@ -580,7 +510,6 @@ class Tree(object):
         """
         return len(self._nodes)
 
-    #///////////////////////////////////////////////////////////////////////////
     def move_node(self, source, destination):
         """
                 Tree.move_node()
@@ -596,11 +525,7 @@ class Tree(object):
         self.__update_fpointer(destination, source, Node.ADD)
         self.__update_bpointer(source, destination)
 
-    #///////////////////////////////////////////////////////////////////////////
-    def paste(self,
-              nid,
-              new_tree,
-              deepcopy=False):
+    def paste(self, nid, new_tree, deepcopy=False):
         """
                 Tree.paste
 
@@ -616,7 +541,7 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        set_joint = set(new_tree._nodes) & set(self._nodes) # joint keys
+        set_joint = set(new_tree._nodes) & set(self._nodes)  # joint keys
         if set_joint:
             # TODO: a deprecated routine is needed to avoid exception
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
@@ -629,7 +554,6 @@ class Tree(object):
         self.__update_fpointer(nid, new_tree.root, Node.ADD)
         self.__update_bpointer(new_tree.root, nid)
 
-    #///////////////////////////////////////////////////////////////////////////
     def remove_node(self, identifier):
         """
                 Tree.remove_node()
@@ -642,10 +566,12 @@ class Tree(object):
                 RETURN VALUE : the (int)number of removed nodes.
         """
         removed = []
-        if identifier is None: return 0
+        if identifier is None:
+            return 0
 
         if not self.contains(identifier):
-            raise NodeIDAbsentError("Node '%s' is not in the tree" % identifier)
+            raise NodeIDAbsentError("Node '%s' "
+                                    "is not in the tree" % identifier)
 
         parent = self[identifier].bpointer
         for id in self.expand_tree(identifier):
@@ -661,7 +587,6 @@ class Tree(object):
         self.__update_fpointer(parent, identifier, Node.DELETE)
         return cnt
 
-    #///////////////////////////////////////////////////////////////////////////
     def remove_subtree(self, nid):
         """
                 Tree.remove_subtree()
@@ -682,14 +607,15 @@ class Tree(object):
                 allocation to store the new tree.
         """
         st = Tree()
-        if nid is None: return st
+        if nid is None:
+            return st
 
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
         st.root = nid
 
         parent = self[nid].bpointer
-        self[nid].bpointer = None # reset root parent for the new tree
+        self[nid].bpointer = None  # reset root parent for the new tree
         removed = []
         for id in self.expand_tree(nid):
             removed.append(id)
@@ -699,7 +625,6 @@ class Tree(object):
         self.__update_fpointer(parent, nid, Node.DELETE)
         return st
 
-    #///////////////////////////////////////////////////////////////////////////
     def rsearch(self, nid, filter=None):
         """
                 Tree.rsearch()
@@ -710,7 +635,9 @@ class Tree(object):
                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 RETURN VALUE : As a generator, rsearch() yields $$$
         """
-        if nid is None: return
+        if nid is None:
+            return
+
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
@@ -722,15 +649,8 @@ class Tree(object):
                 yield current
             current = self[current].bpointer
 
-    #///////////////////////////////////////////////////////////////////////////
-    def save2file(self,
-                  filename,
-                  nid=None,
-                  level=ROOT,
-                  idhidden=True,
-                  filter=None,
-                  key=None,
-                  reverse=False):
+    def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
+                  filter=None, key=None, reverse=False):
         """
                 Tree.save2file
 
@@ -771,14 +691,8 @@ class Tree(object):
                                key,
                                reverse)
 
-    #///////////////////////////////////////////////////////////////////////////
-    def show(self,
-             nid=None,
-             level=ROOT,
-             idhidden=True,
-             filter=None,
-             key=None,
-             reverse=False):
+    def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
+             key=None, reverse=False):
         """
                 Tree.show()
 
@@ -799,7 +713,8 @@ class Tree(object):
                 structure, for constructing the Nodes Stack push and pop nodes
                 with additional level info.
 
-                UPDATE: the @key @reverse is present to sort node at each level.
+                UPDATE: the @key @reverse is present to sort node at each
+                level.
         """
         leading = ''
         lasting = '|___ '
@@ -811,6 +726,7 @@ class Tree(object):
         label = ("{0}".format(self[nid].tag)) \
                  if idhidden else ("{0}[{1}]".format(self[nid].tag,
                                                      self[nid].identifier))
+
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
@@ -835,15 +751,14 @@ class Tree(object):
                           key,
                           reverse)
 
-    #///////////////////////////////////////////////////////////////////////////
     def subtree(self, nid):
         """
                 Tree.subtree()
 
                 Return a shallow COPY of subtree with nid being the new root.
                 If nid is None, return an empty tree.
-                If you are looking for a deepcopy, please create a new tree with
-                this shallow copy,
+                If you are looking for a deepcopy, please create a new tree
+                with this shallow copy,
 
                 e.g.
                     new_tree = Tree(t.subtree(t.root), deep=True)
@@ -862,10 +777,9 @@ class Tree(object):
 
         st.root = nid
         for node_n in self.expand_tree(nid):
-            st._nodes.update({self[node_n].identifier : self[node_n]})
+            st._nodes.update({self[node_n].identifier: self[node_n]})
         return st
 
-    #///////////////////////////////////////////////////////////////////////////
     def to_json(self):
         """
                 Tree.to_json()
