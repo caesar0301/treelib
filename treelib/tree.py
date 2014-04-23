@@ -1,18 +1,7 @@
 #!/usr/bin/env python
-"""
+"""treelib - Simple to use for you.
 
-  treelib - Simple to use for you.
-  Python 2/3 Tree Implementation
-
-        tree.py
-
-        o       NodeIDAbsentError class
-        o       MultipleRootError class
-        o       DuplicatedNodeIdError class
-        o       LinkPastRootNodeError class
-        o       InvalidLevelNumber class
-
-        o       Tree class
+   Python 2/3 Tree Implementation
 """
 
 import json
@@ -27,8 +16,6 @@ __author__ = 'chenxm'
 
 class NodeIDAbsentError(Exception):
     """
-        NodeIDAbsentError class
-
         Exception throwed if a node's identifier is unknown
     """
     pass
@@ -36,8 +23,6 @@ class NodeIDAbsentError(Exception):
 
 class MultipleRootError(Exception):
     """
-        MultipleRootError class
-
         Exception throwed if more than one root exists in a tree.
     """
     pass
@@ -45,8 +30,6 @@ class MultipleRootError(Exception):
 
 class DuplicatedNodeIdError(Exception):
     """
-        DuplicatedNodeIdError class
-
         Exception throwed if an identifier already exists in a tree.
     """
     pass
@@ -54,8 +37,6 @@ class DuplicatedNodeIdError(Exception):
 
 class LinkPastRootNodeError(Exception):
     """
-        LinkPastRootNodeError class
-
         Exception throwed in Tree.link_past_node() if one attempts
         to "link past" the root node of a tree.
     """
@@ -63,94 +44,27 @@ class LinkPastRootNodeError(Exception):
 
 
 class InvalidLevelNumber(Exception):
-    """
-        InvalidLevelNumber class
-    """
     pass
 
 
 class Tree(object):
-    """
-        Tree class
+    """Tree objects are made of Node(s) stored in _nodes dictionary."""
 
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        CLASS ATTRIBUTES :
-
-        o ROOT
-        o DEPTH
-        o WIDTH
-
-        ATTRIBUTES :
-
-        o _nodes (dictionary, identifier:Node object)
-        o root (str, identifier of the root's node)
-
-        METHODS :
-
-        o __contains__(self, identifier)
-        o __init__(self, tree=None, deep=False)
-        o __getitem__(self, key)
-        o __len__(self)
-        o __setitem__(self, key, item)
-        o __update_bpointer(self, nid, parent_id)
-        o __update_fpointer(self, nid, child_id, mode)
-        o _real_true(self, p)
-        o _to_dict(self, nid=None, key=None, reverse=False)
-        o add_node(self, node, parent=None)
-        o all_nodes(self)
-        o children(self, nid)
-        o contains(self, nid)
-        o create_node(self, tag=None, identifier=None, parent=None, data=None)
-        o depth(self, node=None)
-        o expand_tree(self, nid=None, mode=DEPTH, filter=None,
-                      key=None, reverse=False)
-        o get_node(self, nid)
-        o is_branch(self, nid)
-        o leaves(self, root=None)
-        o level(self, nid, filter=None)
-        o link_past_node(self, nid)
-        o @property nodes(self)
-        o parent(self, nid)
-        o siblings(self, nid)
-        o size(self, level=None)
-        o move_node(self, source, destination)
-        o paste(self, nid, new_tree, deepcopy=False)
-        o remove_node(self, identifier)
-        o remove_subtree(self, nid)
-        o rsearch(self, nid, filter=None)
-        o save2file(self, filename, nid=None, level=ROOT,
-                    idhidden=True, filter=None, key=None, reverse=False)
-        o show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-               key=None, reverse=False)
-        o subtree(self, nid)
-        o to_json(self)
-    """
-
-    # ROOT, DEPTH, WIDTH, ZIGZAG constants :
+    #: ROOT, DEPTH, WIDTH, ZIGZAG constants :
     (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
 
     def __contains__(self, identifier):
-        """
-                Tree.__contains__()
-        """
+        """Return a list of the nodes'identifiers matching the identifier argument"""
         return [node.identifier for node in self._nodes
                 if node.identifier is identifier]
 
     def __init__(self, tree=None, deep=False):
-        """
-                Tree.__init__()
+        """Initiate a new tree or copy another tree with a shallow or deep copy."""
 
-                Initiate a new tree or copy another tree with a shallow or deep
-                copy.
-
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                PARAMETERS :
-
-                o       tree : None or a Tree object
-                o       deep : boolean
-        """
+        #: dictionary, identifier: Node object
         self._nodes = {}
+
+        #: identifier of the root node
         self.root = None
 
         if tree is not None:
@@ -163,51 +77,35 @@ class Tree(object):
                 self._nodes = tree._nodes
 
     def __getitem__(self, key):
-        """
-                Tree.__getitem__()
-        """
+        """Return _nodes[key]"""
         try:
             return self._nodes[key]
         except KeyError:
             raise NodeIDAbsentError("Node '%s' is not in the tree" % key)
 
     def __len__(self):
-        """
-                Tree.__len__()
-        """
+        """Return len(_nodes)"""
         return len(self._nodes)
 
     def __setitem__(self, key, item):
-        """
-                Tree.__setitem__()
-        """
+        """Set _nodes[key]"""
         self._nodes.update({key: item})
 
     def __update_bpointer(self, nid, parent_id):
-        """
-                Tree.__update_bpointer()
-        """
+        """set self[nid].bpointer"""
         self[nid].update_bpointer(parent_id)
 
     def __update_fpointer(self, nid, child_id, mode):
-        """
-                Tree.__update_fpointer()
-        """
         if nid is None:
             return
         else:
             self[nid].update_fpointer(child_id, mode)
 
     def _real_true(self, p):
-        """
-                Tree._real_true()
-        """
         return True
 
     def _to_dict(self, nid=None, key=None, reverse=False):
-        """
-                Tree._to_dict()
-        """
+        """transform self into a dict"""
 
         nid = self.root if (nid is None) else nid
         tree_dict = {self[nid].tag: {"children": []}}
@@ -226,8 +124,6 @@ class Tree(object):
 
     def add_node(self, node, parent=None):
         """
-                Tree.add_node()
-
                 Add a new node to tree.
                 The 'node' parameter refers to an instance of Class::Node
         """
@@ -252,47 +148,28 @@ class Tree(object):
         self.__update_bpointer(node.identifier, parent)
 
     def all_nodes(self):
-        """
-                Tree.all_nodes()
-
-                Return all nodes in a list
-        """
+        """Return all nodes in a list"""
         return list(self._nodes.values())
 
     def children(self, nid):
         """
-                Tree.children()
-
                 Return the children (Node) list of nid.
                 Empty list is returned if nid does not exist
         """
         return [self[i] for i in self.is_branch(nid)]
 
     def contains(self, nid):
-        """
-                Tree.contains()
-
-                Check if the tree contains node of given id
-
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                RETURN VALUE : a boolean
-        """
+        """Check if the tree contains node of given id"""
         return True if nid in self._nodes else False
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
-        """
-                Tree.create_node()
-
-                Create a child node for given @parent node.
-        """
+        """Create a child node for given @parent node."""
         node = Node(tag=tag, identifier=identifier, data=data)
         self.add_node(node, parent)
         return node
 
     def depth(self, node=None):
         """
-                Tree.depth()
-
                 Get the maximum level of this tree or the level of the given
                 node
 
@@ -321,8 +198,6 @@ class Tree(object):
     def expand_tree(self, nid=None, mode=DEPTH, filter=None, key=None,
                     reverse=False):
         """
-                Tree.expand_tree()
-
                 Python generator. Loosly based on an algorithm from
                 'Essential LISP' by John R. Anderson, Albert T. Corbett, and
                 Brian J. Reiser, page 239-241
@@ -373,8 +248,6 @@ class Tree(object):
 
     def get_node(self, nid):
         """
-                Tree.get_node()
-
                 Return the node with nid.
                 None returned if nid not exists.
         """
@@ -384,8 +257,6 @@ class Tree(object):
 
     def is_branch(self, nid):
         """
-                Tree.is_branch()
-
                 Return the children (ID) list of nid.
                 Empty list is returned if nid does not exist
         """
@@ -402,8 +273,6 @@ class Tree(object):
 
     def leaves(self, root=None):
         """
-                Tree.leaves()
-
                 Get leaves of the whole tree of a subtree.
         """
         leaves = []
@@ -419,8 +288,6 @@ class Tree(object):
 
     def level(self, nid, filter=None):
         """
-                Tree.level()
-
                 Get the node level in this tree.
                 The level is an integer starting with '0' at the root.
                 In other words, the root lives at level '0';
@@ -432,8 +299,6 @@ class Tree(object):
 
     def link_past_node(self, nid):
         """
-                Tree.link_past_node()
-
                 Delete a node by linking past it.
                 For example, if we have a -> b -> c
                 and delete node b, we are left with a -> c
@@ -456,19 +321,11 @@ class Tree(object):
 
     @property
     def nodes(self):
-        """
-                Tree.nodes()
-
-                Return a dict form of nodes in a tree: {id: node_instance}
-        """
+        """Return a dict form of nodes in a tree: {id: node_instance}"""
         return self._nodes
 
     def parent(self, nid):
-        """
-                Tree.parent()
-
-                Get parent node object of given id
-        """
+        """Get parent node object of given id"""
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
@@ -480,8 +337,6 @@ class Tree(object):
 
     def siblings(self, nid):
         """
-                Tree.siblings()
-
                 Return the siblings of given @nid.
 
                 If @nid is root or there are no siblings, an empty list is
@@ -497,8 +352,6 @@ class Tree(object):
 
     def size(self, level=None):
         """
-                Tree.size()
-
                 Get the number of nodes of the whole tree if @level is not
                 given. Otherwise, the total number of nodes at specific level
                 is returned.
@@ -506,14 +359,12 @@ class Tree(object):
                 @param level The level number in the tree. It must be between
                 [0, tree.depth].
 
-                Otherwise, InvalidLevelNumber excpetion will be raised.
+                Otherwise, InvalidLevelNumber exception will be raised.
         """
         return len(self._nodes)
 
     def move_node(self, source, destination):
         """
-                Tree.move_node()
-
                 Move a node indicated by @source parameter to be a child of
                 @destination.
         """
@@ -527,8 +378,6 @@ class Tree(object):
 
     def paste(self, nid, new_tree, deepcopy=False):
         """
-                Tree.paste
-
                 Paste a @new_tree to the original one by linking the root
                 of new tree to given node (nid).
 
@@ -556,14 +405,9 @@ class Tree(object):
 
     def remove_node(self, identifier):
         """
-                Tree.remove_node()
-
                 Remove a node indicated by 'identifier'; all the successors are
                 removed as well.
                 Return the number of removed nodes.
-
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                RETURN VALUE : the (int)number of removed nodes.
         """
         removed = []
         if identifier is None:
@@ -589,8 +433,6 @@ class Tree(object):
 
     def remove_subtree(self, nid):
         """
-                Tree.remove_subtree()
-
                 Return a subtree deleted from this tree. If nid is None, an
                 empty tree is returned.
                 For the original tree, this method is similar to
@@ -627,13 +469,8 @@ class Tree(object):
 
     def rsearch(self, nid, filter=None):
         """
-                Tree.rsearch()
-
                 Traverse the tree branch along the branch from nid to its
                 ancestors (until root).
-
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                RETURN VALUE : As a generator, rsearch() yields $$$
         """
         if nid is None:
             return
@@ -651,11 +488,7 @@ class Tree(object):
 
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False):
-        """
-                Tree.save2file
-
-                Update 20/05/13: Save tree into file for offline analysis
-        """
+        """Update 20/05/13: Save tree into file for offline analysis"""
         leading = ''
         lasting = '|___ '
         nid = self.root if (nid is None) else nid
@@ -694,8 +527,6 @@ class Tree(object):
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False):
         """
-                Tree.show()
-
                 Another implementation of printing tree using Stack
                 Print tree structure in hierarchy style.
 
@@ -753,8 +584,6 @@ class Tree(object):
 
     def subtree(self, nid):
         """
-                Tree.subtree()
-
                 Return a shallow COPY of subtree with nid being the new root.
                 If nid is None, return an empty tree.
                 If you are looking for a deepcopy, please create a new tree
@@ -764,9 +593,6 @@ class Tree(object):
                     new_tree = Tree(t.subtree(t.root), deep=True)
 
                 This line creates a deep copy of the entire tree.
-
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                RETURN VALUE : a Tree object
         """
         st = Tree()
         if nid is None:
@@ -781,12 +607,7 @@ class Tree(object):
         return st
 
     def to_json(self):
-        """
-                Tree.to_json()
-
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                RETURN VALUE : str
-        """
+        """Return the json string corresponding to self"""
         return json.dumps(self._to_dict())
 
 if __name__ == '__main__':
