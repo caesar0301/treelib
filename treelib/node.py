@@ -16,8 +16,8 @@ class NodeIDTypeException(Exception):
 
 class Node(object):
     """
-        A Node object is stored inside the _nodes dictionary of a Tree object.
-        Use Node objects to store data inside the data attribute.
+    A Node object is stored inside the _nodes dictionary of a Tree object.
+    Use Node objects to store data inside the data attribute.
     """
 
     #: ADD, DELETE, INSERT constants :

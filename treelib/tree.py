@@ -15,30 +15,24 @@ __author__ = 'chenxm'
 
 
 class NodeIDAbsentError(Exception):
-    """
-        Exception throwed if a node's identifier is unknown
-    """
+    """Exception throwed if a node's identifier is unknown"""
     pass
 
 
 class MultipleRootError(Exception):
-    """
-        Exception throwed if more than one root exists in a tree.
-    """
+    """Exception throwed if more than one root exists in a tree."""
     pass
 
 
 class DuplicatedNodeIdError(Exception):
-    """
-        Exception throwed if an identifier already exists in a tree.
-    """
+    """Exception throwed if an identifier already exists in a tree."""
     pass
 
 
 class LinkPastRootNodeError(Exception):
     """
-        Exception throwed in Tree.link_past_node() if one attempts
-        to "link past" the root node of a tree.
+    Exception throwed in Tree.link_past_node() if one attempts
+    to "link past" the root node of a tree.
     """
     pass
 
@@ -124,8 +118,8 @@ class Tree(object):
 
     def add_node(self, node, parent=None):
         """
-                Add a new node to tree.
-                The 'node' parameter refers to an instance of Class::Node
+        Add a new node to tree.
+        The 'node' parameter refers to an instance of Class::Node
         """
         if not isinstance(node, Node):
             raise OSError("First parameter must be object of Class::Node.")
@@ -153,8 +147,8 @@ class Tree(object):
 
     def children(self, nid):
         """
-                Return the children (Node) list of nid.
-                Empty list is returned if nid does not exist
+        Return the children (Node) list of nid.
+        Empty list is returned if nid does not exist
         """
         return [self[i] for i in self.is_branch(nid)]
 
@@ -170,12 +164,11 @@ class Tree(object):
 
     def depth(self, node=None):
         """
-                Get the maximum level of this tree or the level of the given
-                node
+        Get the maximum level of this tree or the level of the given node
 
-                @param node Node instance or identifier
-                @return int
-                @throw NodeIDAbsentError
+        @param node Node instance or identifier
+        @return int
+        @throw NodeIDAbsentError
         """
         ret = 0
         if node is None:
@@ -198,14 +191,15 @@ class Tree(object):
     def expand_tree(self, nid=None, mode=DEPTH, filter=None, key=None,
                     reverse=False):
         """
-                Python generator. Loosly based on an algorithm from
-                'Essential LISP' by John R. Anderson, Albert T. Corbett, and
-                Brian J. Reiser, page 239-241
+        Python generator. Loosly based on an algorithm from
+        'Essential LISP' by John R. Anderson, Albert T. Corbett, and
+        Brian J. Reiser, page 239-241
 
-                UPDATE: the @filter function is performed on Node object during
-                traversing.
-                UPDATE: the @key and @reverse are present to sort nodes at each
-                level.
+        UPDATE: the @filter function is performed on Node object during
+        traversing.
+        
+        UPDATE: the @key and @reverse are present to sort nodes at each
+        level.
         """
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
@@ -247,18 +241,15 @@ class Tree(object):
                         stack = stack_fw if direction else stack_bw
 
     def get_node(self, nid):
-        """
-                Return the node with nid.
-                None returned if nid not exists.
-        """
+        """Return the node with nid. None returned if nid not exists."""
         if nid is None or not self.contains(nid):
             return None
         return self._nodes[nid]
 
     def is_branch(self, nid):
         """
-                Return the children (ID) list of nid.
-                Empty list is returned if nid does not exist
+        Return the children (ID) list of nid.
+        Empty list is returned if nid does not exist
         """
         if nid is None:
             raise OSError("First parameter can't be None")
@@ -272,9 +263,7 @@ class Tree(object):
         return fpointer
 
     def leaves(self, root=None):
-        """
-                Get leaves of the whole tree of a subtree.
-        """
+        """Get leaves of the whole tree of a subtree."""
         leaves = []
         if root is None:
             for node in self._nodes.values():
@@ -288,20 +277,21 @@ class Tree(object):
 
     def level(self, nid, filter=None):
         """
-                Get the node level in this tree.
-                The level is an integer starting with '0' at the root.
-                In other words, the root lives at level '0';
+        Get the node level in this tree.
+        The level is an integer starting with '0' at the root.
+        In other words, the root lives at level '0';
 
-                Update: @filter params is added to calculate level passing
-                        exclusive nodes.
+        Update: @filter params is added to calculate level passing
+        exclusive nodes.
         """
         return len([n for n in self.rsearch(nid, filter)])-1
 
     def link_past_node(self, nid):
         """
-                Delete a node by linking past it.
-                For example, if we have a -> b -> c
-                and delete node b, we are left with a -> c
+        Delete a node by linking past it.
+
+        For example, if we have a -> b -> c and delete node b, we are left
+        with a -> c
         """
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
@@ -337,10 +327,9 @@ class Tree(object):
 
     def siblings(self, nid):
         """
-                Return the siblings of given @nid.
+        Return the siblings of given @nid.
 
-                If @nid is root or there are no siblings, an empty list is
-                returned.
+        If @nid is root or there are no siblings, an empty list is returned.
         """
         siblings = []
 
@@ -352,21 +341,21 @@ class Tree(object):
 
     def size(self, level=None):
         """
-                Get the number of nodes of the whole tree if @level is not
-                given. Otherwise, the total number of nodes at specific level
-                is returned.
+        Get the number of nodes of the whole tree if @level is not
+        given. Otherwise, the total number of nodes at specific level
+        is returned.
 
-                @param level The level number in the tree. It must be between
-                [0, tree.depth].
+        @param level The level number in the tree. It must be between
+        [0, tree.depth].
 
-                Otherwise, InvalidLevelNumber exception will be raised.
+        Otherwise, InvalidLevelNumber exception will be raised.
         """
         return len(self._nodes)
 
     def move_node(self, source, destination):
         """
-                Move a node indicated by @source parameter to be a child of
-                @destination.
+        Move a node indicated by @source parameter to be a child of
+        @destination.
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
@@ -378,10 +367,10 @@ class Tree(object):
 
     def paste(self, nid, new_tree, deepcopy=False):
         """
-                Paste a @new_tree to the original one by linking the root
-                of new tree to given node (nid).
+        Paste a @new_tree to the original one by linking the root
+        of new tree to given node (nid).
 
-                Update: add @deepcopy of pasted tree.
+        Update: add @deepcopy of pasted tree.
         """
         assert isinstance(new_tree, Tree)
         if nid is None:
@@ -405,9 +394,10 @@ class Tree(object):
 
     def remove_node(self, identifier):
         """
-                Remove a node indicated by 'identifier'; all the successors are
-                removed as well.
-                Return the number of removed nodes.
+        Remove a node indicated by 'identifier'; all the successors are
+        removed as well.
+
+        Return the number of removed nodes.
         """
         removed = []
         if identifier is None:
@@ -433,20 +423,20 @@ class Tree(object):
 
     def remove_subtree(self, nid):
         """
-                Return a subtree deleted from this tree. If nid is None, an
-                empty tree is returned.
-                For the original tree, this method is similar to
-                `remove_node(self,nid)`, because given node and its children
-                are removed from the original tree in both methods.
-                For the returned value and performance, these two methods are
-                different:
+        Return a subtree deleted from this tree. If nid is None, an
+        empty tree is returned.
+        For the original tree, this method is similar to
+        `remove_node(self,nid)`, because given node and its children
+        are removed from the original tree in both methods.
+        For the returned value and performance, these two methods are
+        different:
 
-                    `remove_node` returns the number of deleted nodes;
-                    `remove_subtree` returns a subtree of deleted nodes;
+            `remove_node` returns the number of deleted nodes;
+            `remove_subtree` returns a subtree of deleted nodes;
 
-                You are always suggested to use `remove_node` if your only to
-                delete nodes from a tree, as the other one need memory
-                allocation to store the new tree.
+        You are always suggested to use `remove_node` if your only to
+        delete nodes from a tree, as the other one need memory
+        allocation to store the new tree.
         """
         st = Tree()
         if nid is None:
@@ -469,8 +459,8 @@ class Tree(object):
 
     def rsearch(self, nid, filter=None):
         """
-                Traverse the tree branch along the branch from nid to its
-                ancestors (until root).
+        Traverse the tree branch along the branch from nid to its
+        ancestors (until root).
         """
         if nid is None:
             return
@@ -527,25 +517,25 @@ class Tree(object):
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False):
         """
-                Another implementation of printing tree using Stack
-                Print tree structure in hierarchy style.
+        Another implementation of printing tree using Stack
+        Print tree structure in hierarchy style.
 
-                For example:
-                    Root
-                    |___ C01
-                    |    |___ C11
-                    |         |___ C111
-                    |         |___ C112
-                    |___ C02
-                    |___ C03
-                    |    |___ C31
+        For example:
+            Root
+            |___ C01
+            |    |___ C11
+            |         |___ C111
+            |         |___ C112
+            |___ C02
+            |___ C03
+            |    |___ C31
 
-                A more elegant way to achieve this function using Stack
-                structure, for constructing the Nodes Stack push and pop nodes
-                with additional level info.
+        A more elegant way to achieve this function using Stack
+        structure, for constructing the Nodes Stack push and pop nodes
+        with additional level info.
 
-                UPDATE: the @key @reverse is present to sort node at each
-                level.
+        UPDATE: the @key @reverse is present to sort node at each
+        level.
         """
         leading = ''
         lasting = '|___ '
@@ -584,15 +574,15 @@ class Tree(object):
 
     def subtree(self, nid):
         """
-                Return a shallow COPY of subtree with nid being the new root.
-                If nid is None, return an empty tree.
-                If you are looking for a deepcopy, please create a new tree
-                with this shallow copy,
+        Return a shallow COPY of subtree with nid being the new root.
+        If nid is None, return an empty tree.
+        If you are looking for a deepcopy, please create a new tree
+        with this shallow copy,
 
-                e.g.
-                    new_tree = Tree(t.subtree(t.root), deep=True)
+        e.g.
+            new_tree = Tree(t.subtree(t.root), deep=True)
 
-                This line creates a deep copy of the entire tree.
+        This line creates a deep copy of the entire tree.
         """
         st = Tree()
         if nid is None:
