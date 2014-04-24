@@ -105,6 +105,10 @@ class Node(object):
         else:
             return False
 
+    def is_root(self):
+        """return True if self has no parent, i.e. if self is root"""
+        return self._bpointer is None
+
     @property
     def tag(self):
         """return the value if _tag; see below for the setter"""

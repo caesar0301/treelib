@@ -70,6 +70,16 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(isinstance(self.tree, Tree), True)
         self.assertEqual(isinstance(self.copytree, Tree), True)
 
+    def test_is_root(self):
+        self.assertTrue(self.tree._nodes['harry'].is_root())
+        self.assertFalse(self.tree._nodes['jane'].is_root())
+
+    def test_paths_to_leaves(self):
+        paths = self.tree.paths_to_leaves()
+        self.assertEqual( len(paths), 2 )
+        self.assertTrue( ['harry', 'jane', 'diane'] in paths )
+        self.assertTrue( ['harry', 'bill', 'george'] in paths )
+
     def test_nodes(self):
         self.assertEqual(len(self.tree.nodes), 5)
         self.assertEqual(len(self.tree.all_nodes()), 5)

@@ -325,6 +325,39 @@ class Tree(object):
 
         return self[pid]
 
+    def paths_to_leaves(self):
+        """
+        Use this function to get the identifiers allowing to go from the root
+        nodes to each leaf.
+        Return a list of list of identifiers, root being not omitted.
+
+        For example :
+            Harry
+            |___ Bill
+            |___ Jane
+            |    |___ Diane
+            |         |___ George
+            |              |___ Jill
+            |         |___ Mary
+            |    |___ Mark
+
+        expected result :
+        [['harry', 'jane', 'diane', 'mary'],
+         ['harry', 'jane', 'mark'],
+         ['harry', 'jane', 'diane', 'george', 'jill'],
+         ['harry', 'bill']]
+        """
+        res = []
+
+        for leaf in self.leaves():
+            res.append( [leaf.identifier] )
+            current_node = leaf
+            while not current_node.is_root():
+                res[-1].insert(0, current_node._bpointer )
+                current_node = self._nodes[ current_node._bpointer ]
+
+        return res            
+
     def siblings(self, nid):
         """
         Return the siblings of given @nid.
