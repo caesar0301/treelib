@@ -197,7 +197,7 @@ class Tree(object):
 
         UPDATE: the @filter function is performed on Node object during
         traversing.
-        
+
         UPDATE: the @key and @reverse are present to sort nodes at each
         level.
         """
@@ -309,6 +309,19 @@ class Tree(object):
         parent.update_fpointer(nid, mode=parent.DELETE)
         del self._nodes[nid]
 
+    def move_node(self, source, destination):
+        """
+        Move a node indicated by @source parameter to be a child of
+        @destination.
+        """
+        if not self.contains(source) or not self.contains(destination):
+            raise NodeIDAbsentError
+
+        parent = self[source].bpointer
+        self.__update_fpointer(parent, source, Node.DELETE)
+        self.__update_fpointer(destination, source, Node.ADD)
+        self.__update_bpointer(source, destination)
+
     @property
     def nodes(self):
         """Return a dict form of nodes in a tree: {id: node_instance}"""
@@ -324,46 +337,6 @@ class Tree(object):
             return None
 
         return self[pid]
-
-    def siblings(self, nid):
-        """
-        Return the siblings of given @nid.
-
-        If @nid is root or there are no siblings, an empty list is returned.
-        """
-        siblings = []
-
-        if nid != self.root:
-            pid = self[nid].bpointer
-            siblings = [self[i] for i in self[pid].fpointer if i != nid]
-
-        return siblings
-
-    def size(self, level=None):
-        """
-        Get the number of nodes of the whole tree if @level is not
-        given. Otherwise, the total number of nodes at specific level
-        is returned.
-
-        @param level The level number in the tree. It must be between
-        [0, tree.depth].
-
-        Otherwise, InvalidLevelNumber exception will be raised.
-        """
-        return len(self._nodes)
-
-    def move_node(self, source, destination):
-        """
-        Move a node indicated by @source parameter to be a child of
-        @destination.
-        """
-        if not self.contains(source) or not self.contains(destination):
-            raise NodeIDAbsentError
-
-        parent = self[source].bpointer
-        self.__update_fpointer(parent, source, Node.DELETE)
-        self.__update_fpointer(destination, source, Node.ADD)
-        self.__update_bpointer(source, destination)
 
     def paste(self, nid, new_tree, deepcopy=False):
         """
@@ -391,6 +364,35 @@ class Tree(object):
             self._nodes.update(new_tree._nodes)
         self.__update_fpointer(nid, new_tree.root, Node.ADD)
         self.__update_bpointer(new_tree.root, nid)
+
+    def paths_to_leaves(self):
+        """
+        Use this function to get the identifiers allowing to go from the root
+        nodes to each leaf.
+        Return a list of list of identifiers, root being not omitted.
+
+        For example :
+            Harry
+            |___ Bill
+            |___ Jane
+            |    |___ Diane
+            |         |___ George
+            |              |___ Jill
+            |         |___ Mary
+            |    |___ Mark
+
+        expected result :
+        [['harry', 'jane', 'diane', 'mary'],
+         ['harry', 'jane', 'mark'],
+         ['harry', 'jane', 'diane', 'george', 'jill'],
+         ['harry', 'bill']]
+        """
+        res = []
+
+        for leaf in self.leaves():
+            res.append([nid for nid in self.rsearch(leaf.identifier)][::-1])
+
+        return res
 
     def remove_node(self, identifier):
         """
@@ -571,6 +573,33 @@ class Tree(object):
                           filter,
                           key,
                           reverse)
+
+    def siblings(self, nid):
+        """
+        Return the siblings of given @nid.
+
+        If @nid is root or there are no siblings, an empty list is returned.
+        """
+        siblings = []
+
+        if nid != self.root:
+            pid = self[nid].bpointer
+            siblings = [self[i] for i in self[pid].fpointer if i != nid]
+
+        return siblings
+
+    def size(self, level=None):
+        """
+        Get the number of nodes of the whole tree if @level is not
+        given. Otherwise, the total number of nodes at specific level
+        is returned.
+
+        @param level The level number in the tree. It must be between
+        [0, tree.depth].
+
+        Otherwise, InvalidLevelNumber exception will be raised.
+        """
+        return len(self._nodes)
 
     def subtree(self, nid):
         """
