@@ -552,7 +552,7 @@ class Tree(object):
         if level == self.ROOT:
             func(label)
         else:
-            leading = u''.join(map(lambda x: DT_VLINE + ' ' * 3 if not x else ' ' * 4, iflast[0:-1]))
+            leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3 if not x else ' ' * 4, iflast[0:-1]))
             lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
             func("{0}{1}{2}".format(leading, lasting, label))
 
