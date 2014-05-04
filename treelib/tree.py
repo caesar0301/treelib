@@ -482,7 +482,7 @@ class Tree(object):
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex'):
         """Update 20/05/13: Save tree into file for offline analysis"""
-        handler = lambda x: open(filename, 'ab').write(u''.join([x,'\n']).encode('utf-8'))
+        handler = lambda x: open(filename, 'ab').write(''.join([x,u'\n']).encode('utf-8'))
         self._print_backend(nid,
                             level,
                             idhidden,
