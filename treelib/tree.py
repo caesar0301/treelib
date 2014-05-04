@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """treelib - Simple to use for you.
 
    Python 2/3 Tree Implementation
 """
-
+from __future__ import print_function
+from __future__ import unicode_literals
 import json
 from copy import deepcopy
 try:
@@ -479,45 +481,31 @@ class Tree(object):
             current = self[current].bpointer
 
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
-                  filter=None, key=None, reverse=False):
+                  filter=None, key=None, reverse=False, line_type='ascii-ex'):
         """Update 20/05/13: Save tree into file for offline analysis"""
-        leading = ''
-        lasting = '|___ '
-        nid = self.root if (nid is None) else nid
-        if not self.contains(nid):
-            raise NodeIDAbsentError
-        label = ("{0}".format(self[nid].tag)) \
-                if idhidden else ("{0}[{1}]".format(self[nid].tag,
-                                                    self[nid].identifier))
-        filter = (self._real_true) if (filter is None) else filter
-
-        if level == self.ROOT:
-            open(filename, 'ab').write(label + '\n')
-        else:
-            if level <= 1:
-                leading += ('|' + ' ' * 4) * (level - 1)
-            else:
-                leading += ('|' + ' ' * 4) + (' ' * 5 * (level - 2))
-            open(filename, 'ab').write("{0}{1}{2}\n".format(leading,
-                                                            lasting,
-                                                            label))
-
-        if filter(self[nid]) and self[nid].expanded:
-            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
-            key = (lambda x: x) if (key is None) else key
-            queue.sort(key=key, reverse=reverse)
-            level += 1
-            for element in queue:
-                self.save2file(filename,
-                               element.identifier,
-                               level,
-                               idhidden,
-                               filter,
-                               key,
-                               reverse)
-
+        handler = lambda x: open(filename, 'ab').write(''.join([x,'\n']).encode('utf-8'))
+        self._print_backend(nid,
+                            level,
+                            idhidden,
+                            filter,
+                            key,
+                            reverse,
+                            line_type,
+                            handler)
+        
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False):
+             key=None, reverse=False, line_type='ascii-ex'):
+        self._print_backend(nid,
+                            level,
+                            idhidden,
+                            filter,
+                            key,
+                            reverse,
+                            line_type,
+                            func=print)
+
+    def _print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
+             key=None, reverse=False, line_type='ascii-ex', func=print, iflast=[]):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -539,8 +527,17 @@ class Tree(object):
         UPDATE: the @key @reverse is present to sort node at each
         level.
         """
+        line_types = \
+        {'ascii': ('|', '|-- ', '+-- '),
+         'ascii-ex': ('\u2502', '\u251c\u2500\u2500 ', '\u2514\u2500\u2500 '),
+         'ascii-exr': ('\u2502', '\u251c\u2500\u2500 ', '\u2570\u2500\u2500 '),
+         'ascii-em': ('\u2551', '\u2560\u2550\u2550 ', '\u255a\u2550\u2550 '),
+         'ascii-emv': ('\u2551', '\u255f\u2500\u2500 ', '\u2559\u2500\u2500 '),
+         'ascii-emh': ('\u2502', '\u255e\u2550\u2550 ', '\u2558\u2550\u2550 ')}
+        DT_VLINE, DT_LINE_BOX, DT_LINE_COR = line_types[line_type]
+
         leading = ''
-        lasting = '|___ '
+        lasting = DT_LINE_BOX
 
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
@@ -553,13 +550,11 @@ class Tree(object):
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
-            print(label)
+            func(label)
         else:
-            if level <= 1:
-                leading += ('|' + ' ' * 4) * (level - 1)
-            else:
-                leading += ('|' + ' ' * 4) + (' ' * 5 * (level - 2))
-            print("{0}{1}{2}".format(leading, lasting, label))
+            leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3 if not x else ' ' * 4, iflast[0:-1]))
+            lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
+            func("{0}{1}{2}".format(leading, lasting, label))
 
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
@@ -567,12 +562,17 @@ class Tree(object):
             queue.sort(key=key, reverse=reverse)
             level += 1
             for element in queue:
-                self.show(element.identifier,
+                iflast.append(queue.index(element) == len(queue)-1)
+                self._print_backend(element.identifier,
                           level,
                           idhidden,
                           filter,
                           key,
-                          reverse)
+                          reverse,
+                          line_type,
+                          func,
+                          iflast)
+                iflast.pop()
 
     def siblings(self, nid):
         """
