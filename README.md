@@ -36,14 +36,14 @@ Example 1: Create a tree
 
 Result:
 
-    Harry[harry]
-    |___ Jane[jane]
-    |    |___ Diane[diane]
-    |         |___ George[george]
-    |              |___ Jill[jill]
-    |         |___ Mary[mary]
-    |    |___ Mark[mark]
-    |___ Bill[bill]
+    Harry
+    ├── Jane
+    │   ├── Mark
+    │   └── Diane
+    │       ├── Mary
+    │       └── George
+    │           └── Jill
+    └── Bill
 
 Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
 
@@ -97,10 +97,10 @@ Example 4: get a subtree
 
 Result:
 
-    Diane[diane]
-    |___ George[george]
-    |    |___ Jill[jill]
-    |___ Mary[mary]
+    Diane
+    ├── George
+    │   └── Jill
+    └── Mary
 
 Example 5: paste a new tree to original one
 
@@ -113,17 +113,17 @@ Example 5: paste a new tree to original one
 
 Result:
 
-    Harry[harry]
-    |___ Jane[jane]
-    |    |___ Diane[diane]
-    |         |___ George[george]
-    |              |___ Jill[jill]
-    |                   |___ n1[1]
-    |                        |___ n2[2]
-    |                        |___ n3[3]
-    |         |___ Mary[mary]
-    |    |___ Mark[mark]
-    |___ Bill[bill]
+    Harry
+    ├── Bill
+    └── Jane
+        ├── Diane
+        │   ├── George
+        │   │   └── Jill
+        │   │       └── n1
+        │   │           ├── n2
+        │   │           └── n3
+        │   └── Mary
+        └── Mark
 
 Example 6: remove the existing node from the tree
 
@@ -141,14 +141,14 @@ Example 7: Move a node
 
 Result:
 
-    Harry[harry]
-    |___ Jane[jane]
-    |    |___ Diane[diane]
-    |         |___ George[george]
-    |         |___ Mary[mary]
-    |    |___ Mark[mark]
-    |___ Bill[bill]
-    |___ Jill[jill]
+    Harry
+    ├── Bill
+    ├── Jane
+    │   ├── Diane
+    │   │   ├── George
+    │   │   └── Mary
+    │   └── Mark
+    └── Jill
 
 Example 8: Get the height of the tree
 
