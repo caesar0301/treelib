@@ -5,6 +5,7 @@
    Python 2/3 Tree Implementation
 """
 from __future__ import print_function
+from __future__ import unicode_literals
 import json
 from copy import deepcopy
 try:
@@ -528,11 +529,11 @@ class Tree(object):
         """
         line_types = \
         {'ascii': ('|', '|-- ', '+-- '),
-         'ascii-ex': (u'\u2502', u'\u251c\u2500\u2500 ', u'\u2514\u2500\u2500 '),
-         'ascii-exr': (u'\u2502', u'\u251c\u2500\u2500 ', u'\u2570\u2500\u2500 '),
-         'ascii-em': (u'\u2551', u'\u2560\u2550\u2550 ', u'\u255a\u2550\u2550 '),
-         'ascii-emv': (u'\u2551', u'\u255f\u2500\u2500 ', u'\u2559\u2500\u2500 '),
-         'ascii-emh': (u'\u2502', u'\u255e\u2550\u2550 ', u'\u2558\u2550\u2550 ')}
+         'ascii-ex': ('\u2502', '\u251c\u2500\u2500 ', '\u2514\u2500\u2500 '),
+         'ascii-exr': ('\u2502', '\u251c\u2500\u2500 ', '\u2570\u2500\u2500 '),
+         'ascii-em': ('\u2551', '\u2560\u2550\u2550 ', '\u255a\u2550\u2550 '),
+         'ascii-emv': ('\u2551', '\u255f\u2500\u2500 ', '\u2559\u2500\u2500 '),
+         'ascii-emh': ('\u2502', '\u255e\u2550\u2550 ', '\u2558\u2550\u2550 ')}
         DT_VLINE, DT_LINE_BOX, DT_LINE_COR = line_types[line_type]
 
         leading = ''
@@ -553,7 +554,7 @@ class Tree(object):
         else:
             leading = u''.join(map(lambda x: DT_VLINE + ' ' * 3 if not x else ' ' * 4, iflast[0:-1]))
             lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
-            func(u"{0}{1}{2}".format(leading, lasting, label))
+            func("{0}{1}{2}".format(leading, lasting, label))
 
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
