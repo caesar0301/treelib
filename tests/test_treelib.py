@@ -206,6 +206,9 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(subtree_copy.parent("jane") is None, True)
         subtree_copy["jane"].tag = "Sweeti"
         self.assertEqual(self.tree["jane"].tag == "Jane", True)
+        self.assertEqual(subtree_copy.level("diane"), 1)
+        self.assertEqual(subtree_copy.level("jane"), 0)
+        self.assertEqual(self.tree.level("jane"), 1)
 
     def test_remove_subtree(self):
         subtree_shallow = self.tree.remove_subtree("jane")

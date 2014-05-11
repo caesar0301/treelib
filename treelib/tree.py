@@ -478,7 +478,8 @@ class Tree(object):
         while current is not None:
             if filter(self[current]):
                 yield current
-            current = self[current].bpointer
+            # subtree() hasn't update the bpointer
+            current = self[current].bpointer if self.root != current else None
 
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex'):
