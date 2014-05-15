@@ -74,6 +74,9 @@ class Tree(object):
 
     def __getitem__(self, key):
         """Return _nodes[key]"""
+        if isinstance(key, Node):
+            return self.__getitem__(key.identifier)
+
         try:
             return self._nodes[key]
         except KeyError:
@@ -256,6 +259,8 @@ class Tree(object):
 
     def get_node(self, nid):
         """Return the node with nid. None returned if nid not exists."""
+        if isinstance(nid, Node):
+            return self.get_node(nid.identifier)
         if nid is None or not self.contains(nid):
             return None
         return self._nodes[nid]
