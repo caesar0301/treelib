@@ -1,4 +1,4 @@
-treelib (original pyTree)
+treelib
 --------
 
 Tree Implementation in python: simple to use for you.
@@ -7,7 +7,7 @@ Tree Implementation in python: simple to use for you.
 
 
 
-Install
+Install from PyPI
 ---------
 
     sudo pip install -U treelib  (OR)      
@@ -134,6 +134,13 @@ For example, the same tree in example 1 can be printed with 'ascii-em' like
     ║   ╚══ Diane
     ║       ╚══ Mary
     ╚══ Bill
+    
+In the json form, `to_json()` takes optional parameter `with_data` to trigger if
+the data field is appended into json string. For example,
+
+    print tree.to_json(with_data=True) #output
+    {"Harry": {"data": null, "children": [{"Bill": {"data": null, "children": [{"George": {"data": null}}]}}, {"Jane": {"data": null, "children": [{"Diane": {"data": null}}]}}]}}
+
 
 Advanced Usage
 ---------
@@ -296,7 +303,7 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     t.save2file(filename[,nid[,level[,idhidden[,filter[,key[,reverse[,line_type]]]]]]]])
     
     # To format the tree in a json format.
-    t.to_json()
+    t.to_json([with_data])
     
     
 Contributors

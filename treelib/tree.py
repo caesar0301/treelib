@@ -104,11 +104,14 @@ class Tree(object):
     def _real_true(self, p):
         return True
 
-    def _to_dict(self, nid=None, key=None, reverse=False):
+    def _to_dict(self, nid=None, key=None, reverse=False, with_data=False):
         """transform self into a dict"""
 
         nid = self.root if (nid is None) else nid
-        tree_dict = {self[nid].tag: {"children":[], "data":self[nid].data}}
+        ntag = self[nid].tag
+        tree_dict = {ntag: {"children": []}}
+        if with_data:
+            tree_dict[ntag]["data"] = self[nid].data
 
         if self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer]
@@ -116,10 +119,11 @@ class Tree(object):
             queue.sort(key=key, reverse=reverse)
 
             for elem in queue:
-                tree_dict[self[nid].tag]["children"].append(
-                    self._to_dict(elem.identifier))
-            if tree_dict[self[nid].tag]["children"] == []:
-                tree_dict = {self[nid].tag: {"data":self[nid].data}}
+                tree_dict[ntag]["children"].append(
+                    self._to_dict(elem.identifier, with_data=with_data))
+            if len(tree_dict[ntag]["children"]) == 0:
+                tree_dict = self[nid].tag if not with_data else \
+                            {ntag: {"data":self[nid].data}}
             return tree_dict
 
     def add_node(self, node, parent=None):
@@ -633,9 +637,9 @@ class Tree(object):
             st._nodes.update({self[node_n].identifier: self[node_n]})
         return st
 
-    def to_json(self):
+    def to_json(self, with_data=False):
         """Return the json string corresponding to self"""
-        return json.dumps(self._to_dict())
+        return json.dumps(self._to_dict(with_data=with_data))
 
 if __name__ == '__main__':
     pass
