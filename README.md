@@ -7,13 +7,10 @@ Tree Implementation in python: simple to use for you.
 
 
 
-How to install
+Install
 ---------
 
-    sudo pip install -U treelib
-    
-or
-
+    sudo pip install -U treelib  (OR)      
     sudo easy_install -U treelib
 
     
@@ -21,145 +18,122 @@ or
 Basic Usage
 ----------
 
-Example 1: Create a tree
+**Example 1**: Create a tree
 
     tree = Tree()
     tree.create_node("Harry", "harry")  # root node
-    tree.create_node("Jane", "jane", parent = "harry")
-    tree.create_node("Bill", "bill", parent = "harry")
-    tree.create_node("Diane", "diane", parent = "jane")
-    tree.create_node("George", "george", parent = "diane")
-    tree.create_node("Mary", "mary", parent = "diane")
-    tree.create_node("Jill", "jill", parent = "george")
-    tree.create_node("Mark", "mark", parent = "jane")
+    tree.create_node("Jane", "jane", parent="harry")
+    tree.create_node("Bill", "bill", parent="harry")
+    tree.create_node("Diane", "diane", parent="jane")
+    tree.create_node("Mary", "mary", parent="diane")
+    tree.create_node("Mark", "mark", parent="jane")
     tree.show()
 
-Result:
+*Result*:
 
     Harry
     ├── Jane
     │   ├── Mark
     │   └── Diane
-    │       ├── Mary
-    │       └── George
-    │           └── Jill
+    │       └── Mary
     └── Bill
 
-Example 2: expand a tree with mode being Tree.DEPTH or Tree.WIDTH
+**Example 2**: expand a tree with specific mode (Tree.DEPTH [default], Tree.WIDTH, Tree.ZIGZAG)
 
-    for node in tree.expand_tree(mode=Tree.DEPTH):
-        print tree[node].tag
+    print(','.join([tree[node].tag for node in \
+                    tree.expand_tree(mode=Tree.DEPTH)]))
 
-Result:
+*Result*:
 
-    Harry
-    Jane
-    Diane
-    George
-    Jill
-    Mary
-    Mark
-    Bill
+    Harry,Bill,Jane,Diane,Mary,Mark
 
-Example 2a: expand a tree with mode being Tree.ZIGZAG
-            (WIDTH-first, level by level, first level left-to-right, second - right-to-left and so on)
+**Example 3**: expand tree with filter
 
-    for node in tree.expand_tree(mode=Tree.ZIGZAG):
-        print tree[node].identifier
+    print(','.join([tree[node].tag for node in \
+                    tree.expand_tree(filter = lambda x: \
+                    x.identifier != 'diane')]))
 
-Result:
+*Result*:
 
-    harry
-    bill
-    jane
-    diane
-    mark
-    mary
-    george
-    jill
+    Harry,Bill,Jane,Mark
 
-Example 3: expand tree with filter
-
-    for node in tree.expand_tree(filter = lambda x: x.identifier != 'george'):
-		print tree[node].tag
-
-Result:
-
-    Harry
-    Jane
-    Mark
-    Bill
-
-Example 4: get a subtree
+**Example 4**: get a subtree
 
     sub_t = tree.subtree('diane')
     sub_t.show()
 
-Result:
+*Result*:
 
     Diane
-    ├── George
-    │   └── Jill
     └── Mary
 
-Example 5: paste a new tree to original one
+**Example 5**: paste a new tree to original one
 
     new_tree = Tree()
-    new_tree.create_node("n1", "1")  # root node
-    new_tree.create_node("n2", "2", parent = "1")
-    new_tree.create_node("n3", "3", parent = "1")
-    tree.paste('jill', new_tree)
+    new_tree.create_node("n1", 1)  # root node
+    new_tree.create_node("n2", 2, parent=1)
+    new_tree.create_node("n3", 3, parent=1)
+    tree.paste('bill', new_tree)
     tree.show()
-
-Result:
+    
+*Result*:
 
     Harry
     ├── Bill
+    │   └── n1
+    │       ├── n2
+    │       └── n3
     └── Jane
         ├── Diane
-        │   ├── George
-        │   │   └── Jill
-        │   │       └── n1
-        │   │           ├── n2
-        │   │           └── n3
         │   └── Mary
         └── Mark
 
-Example 6: remove the existing node from the tree
+**Example 6**: remove the existing node from the tree
 
     tree.remove_node('1')
     tree.show()
 
-Result:
+*Result*:
 
-    As the result of example 1
+    As the result of **Example 1**.
 
-Example 7: Move a node
+**Example 7**: Move a node to another parent.
 
-    tree.move_node('jill', 'harry')
+    tree.move_node('mary', 'harry')
     tree.show()
 
-Result:
+*Result*:
 
     Harry
     ├── Bill
     ├── Jane
     │   ├── Diane
-    │   │   ├── George
-    │   │   └── Mary
     │   └── Mark
-    └── Jill
+    └── Mary
 
-Example 8: Get the height of the tree
+**Example 8**: Get the height of the tree
 
-    tree.depth() #3
+    tree.depth()
 
-Example 9: Get the level of a node
+**Example 9**: Get the level of a node
 
     node = tree.get_node("bill")
-    tree.depth(node) #1
-    node = tree.get_node("mark")
-    tree.depth(node) #2
+    tree.depth(node)
+    
+**Example 10**: Print or dump tree structure. You now have three ways to output
+your tree data, i.e., stdout with `show()`, plain text file with `save2file()`,
+and json string with `to_json()`. The former two use the same backend to generate
+a string of tree structure in a text graph. After the version 1.2.7a, you can
+also spicify the `line_type` parameter (now supporting 'ascii' [default],
+'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical form.
+For example, the same tree in example 1 can be printed with 'ascii-em' like
+
+    Harry
+    ╠══ Jane
+    ║   ╠══ Mark
+    ║   ╚══ Diane
+    ║       ╚══ Mary
+    ╚══ Bill
 
 Advanced Usage
 ---------
@@ -308,7 +282,7 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     # `idhidden` refers to hiding the node ID when priting;
     # `filter` refers to the function of one varible to act on the **node object**;
     # `key`, `reverse` are present to sort **node objects** in the same level.
-    t.show([nid[,level[,idhidden[,filter[,key[,reverse]]]]]]])
+    t.show([nid[,level[,idhidden[,filter[,key[,reverse[,line_type]]]]]]])
 
     # Return a soft copy of the subtree with `nid` being the root; The softness 
     # means all the nodes are shared between subtree and the original.
@@ -319,7 +293,7 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     t.remove_subtree(nid)
 
     # Save the tree into file for offline analysis.
-    t.save2file(filename[,nid[,level[,idhidden[,filter[,key[,reverse]]]]]]])
+    t.save2file(filename[,nid[,level[,idhidden[,filter[,key[,reverse[,line_type]]]]]]]])
     
     # To format the tree in a json format.
     t.to_json()

@@ -110,13 +110,15 @@ class TreeCase(unittest.TestCase):
             if nid == self.tree.root:
                 self.assertEqual(self.tree.parent(nid), None)
             else:
-                self.assertEqual(self.tree.parent(nid) in self.tree.all_nodes(), True)
+                self.assertEqual(self.tree.parent(nid) in \
+                                 self.tree.all_nodes(), True)
 
     def test_children(self):
         for nid in self.tree.nodes:
             children = self.tree.is_branch(nid)
             for child in children:
-                self.assertEqual(self.tree[child] in self.tree.all_nodes(), True)
+                self.assertEqual(self.tree[child] in self.tree.all_nodes(),
+                                 True)
             children = self.tree.children(nid)
             for child in children:
                 self.assertEqual(child in self.tree.all_nodes(), True)
@@ -153,10 +155,10 @@ class TreeCase(unittest.TestCase):
         |___ Jane
         |    |___ Diane
         """
-        self.assertEqual(self.tree.depth(self.tree.get_node("mark")), 4) # get depth via node instance
+        self.assertEqual(self.tree.depth(self.tree.get_node("mark")), 4)
         self.assertEqual(self.tree.depth(self.tree.get_node("jill")), 3)
         self.assertEqual(self.tree.depth(self.tree.get_node("george")), 2)
-        self.assertEqual(self.tree.depth("jane"), 1) # get depth via node identifier
+        self.assertEqual(self.tree.depth("jane"), 1)
         self.assertEqual(self.tree.depth("bill"), 1)
         self.assertEqual(self.tree.depth("harry"), 0)
 
@@ -170,7 +172,8 @@ class TreeCase(unittest.TestCase):
     def test_leaves(self):
         leaves = self.tree.leaves()
         for nid in self.tree.expand_tree():
-            self.assertEqual((self.tree[nid].is_leaf()) == (self.tree[nid] in leaves), True)
+            self.assertEqual((self.tree[nid].is_leaf()) == (self.tree[nid] \
+                                                            in leaves), True)
 
     def test_link_past_node(self):
         self.tree.create_node("Jill", "jill", parent="harry")
@@ -216,17 +219,22 @@ class TreeCase(unittest.TestCase):
         self.tree.paste("harry", subtree_shallow)
 
     def test_to_json(self):
-        self.tree.to_json()
+        json_str = self.tree.to_json()
+        self.assertEqual(json_str, '{"Harry": {"data": null, "children": \
+[{"Bill": {"data": null, "children": [{"George": {"data": null}}]}}, \
+{"Jane": {"data": null, "children": [{"Diane": {"data": null}}]}}]}}')
 
     def test_siblings(self):
         self.assertEqual(len(self.tree.siblings("harry")) == 0, True)
-        self.assertEqual(self.tree.siblings("jane")[0].identifier == "bill", True)
+        self.assertEqual(self.tree.siblings("jane")[0].identifier == "bill",
+                         True)
 
     def test_tree_data(self):
         class Flower(object):
             def __init__(self, color):
                 self.color = color
-        self.tree.create_node("Jill", "jill", parent="jane", data=Flower("white"))
+        self.tree.create_node("Jill", "jill", parent="jane",
+                              data=Flower("white"))
         self.assertEqual(self.tree["jill"].data.color, "white")
         self.tree.remove_node("jill")
 
@@ -234,7 +242,9 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree.level('harry'),  0)
         depth = self.tree.depth()
         self.assertEqual(self.tree.level('diane'),  depth)
-        self.assertEqual(self.tree.level('diane', lambda x:x.identifier!='jane'),depth-1)
+        self.assertEqual(self.tree.level('diane',
+                                         lambda x: x.identifier!='jane'),
+                         depth-1)
 
     def tearDown(self):
         self.tree = None

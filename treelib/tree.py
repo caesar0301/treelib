@@ -50,12 +50,16 @@ class Tree(object):
     (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
 
     def __contains__(self, identifier):
-        """Return a list of the nodes'identifiers matching the identifier argument"""
+        """Return a list of the nodes'identifiers matching the
+        identifier argument.
+        """
         return [node.identifier for node in self._nodes
                 if node.identifier is identifier]
 
     def __init__(self, tree=None, deep=False):
-        """Initiate a new tree or copy another tree with a shallow or deep copy."""
+        """Initiate a new tree or copy another tree with a shallow or
+        deep copy.
+        """
 
         #: dictionary, identifier: Node object
         self._nodes = {}
@@ -104,7 +108,7 @@ class Tree(object):
         """transform self into a dict"""
 
         nid = self.root if (nid is None) else nid
-        tree_dict = {self[nid].tag: {"children": []}}
+        tree_dict = {self[nid].tag: {"children":[], "data":self[nid].data}}
 
         if self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer]
@@ -115,7 +119,7 @@ class Tree(object):
                 tree_dict[self[nid].tag]["children"].append(
                     self._to_dict(elem.identifier))
             if tree_dict[self[nid].tag]["children"] == []:
-                tree_dict = self[nid].tag
+                tree_dict = {self[nid].tag: {"data":self[nid].data}}
             return tree_dict
 
     def add_node(self, node, parent=None):
@@ -484,7 +488,8 @@ class Tree(object):
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex'):
         """Update 20/05/13: Save tree into file for offline analysis"""
-        handler = lambda x: open(filename, 'ab').write(''.join([x,'\n']).encode('utf-8'))
+        handler = lambda x:\
+        open(filename, 'ab').write(''.join([x,'\n']).encode('utf-8'))
         self._print_backend(nid,
                             level,
                             idhidden,
@@ -493,7 +498,7 @@ class Tree(object):
                             reverse,
                             line_type,
                             handler)
-        
+
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False, line_type='ascii-ex'):
         self._print_backend(nid,
@@ -506,7 +511,8 @@ class Tree(object):
                             func=print)
 
     def _print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False, line_type='ascii-ex', func=print, iflast=[]):
+                       key=None, reverse=False, line_type='ascii-ex',
+                       func=print, iflast=[]):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -553,7 +559,8 @@ class Tree(object):
         if level == self.ROOT:
             func(label)
         else:
-            leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3 if not x else ' ' * 4, iflast[0:-1]))
+            leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3
+                                  if not x else ' ' * 4, iflast[0:-1]))
             lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
             func("{0}{1}{2}".format(leading, lasting, label))
 
