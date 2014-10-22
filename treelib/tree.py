@@ -53,8 +53,8 @@ class Tree(object):
         """Return a list of the nodes'identifiers matching the
         identifier argument.
         """
-        return [node.identifier for node in self._nodes
-                if node.identifier is identifier]
+        return [nid for nid in self._nodes
+                if nid == identifier]
 
     def __init__(self, tree=None, deep=False):
         """Initiate a new tree or copy another tree with a shallow or
