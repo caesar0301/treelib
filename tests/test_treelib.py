@@ -86,6 +86,7 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree.size(), 5)
         self.assertEqual(self.tree.get_node("jane").tag, "Jane")
         self.assertEqual(self.tree.contains("jane"), True)
+        self.assertEqual("jane" in self.tree, True)
         self.assertEqual(self.tree.contains("alien"), False)
         self.tree.create_node("Alien","alien", parent="jane");
         self.assertEqual(self.tree.contains("alien"), True)
