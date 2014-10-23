@@ -566,7 +566,7 @@ class Tree(object):
             leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3
                                   if not x else ' ' * 4, iflast[0:-1]))
             lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
-            func("{0}{1}{2}".format(leading, lasting, label))
+            func("{0}{1}{2}".format(leading, lasting, label).encode('utf-8'))
 
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
