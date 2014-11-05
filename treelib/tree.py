@@ -554,9 +554,11 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        label = ("{0}".format(self[nid].tag)) \
-                 if idhidden else ("{0}[{1}]".format(self[nid].tag,
-                                                     self[nid].identifier))
+        label = (u'{0}'.format(self[nid].tag.decode('utf-8')))\
+                 if idhidden \
+                    else (u'{0}[{1}]'.format(
+                            self[nid].tag.decode('utf-8'),
+                            self[nid].identifier.decode('utf-8')))
 
         filter = (self._real_true) if (filter is None) else filter
 
@@ -566,7 +568,7 @@ class Tree(object):
             leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3
                                   if not x else ' ' * 4, iflast[0:-1]))
             lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
-            func("{0}{1}{2}".format(leading, lasting, label))
+            func(u'{0}{1}{2}'.format(leading, lasting, label).encode('utf-8'))
 
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
