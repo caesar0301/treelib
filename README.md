@@ -251,7 +251,7 @@ Public methods are also available to make operations on the tree, e.g. a Tree ob
     t.add_node(node[,parent])
     
     # Create a new node and add it to this tree
-    t.create_node([tag[,identifier[,parent]]])
+    t.create_node([tag[,identifier[,parent[,data]]]])
     
     # Get the object of the node with ID of nid
     # An alternative way is using '[]' operation on the tree.
