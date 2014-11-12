@@ -99,7 +99,7 @@ class Node(object):
             self._set_identifier(value)
 
     def is_leaf(self):
-        """return True if the the current node has no soon"""
+        """return True if the the current node has no son"""
         if len(self.fpointer) == 0:
             return True
         else:

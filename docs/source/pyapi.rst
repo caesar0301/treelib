@@ -1,0 +1,397 @@
+Useful APIs
+============
+
+.. module:: treelib
+    :synopsis: Tree data structure in Python.
+
+This `treelib` is a simple module containing only two classes: ``Node`` and
+``Tree``. Tree is a self-contained structure with some nodes and connected by
+branches. One tree has and only has one root, while a node (except root) has
+several children and merely one parent.
+
+Basic Usage
+-------------
+
+.. code-block:: sh
+
+    >>> from treelib import Node, Tree
+    >>> tree = Tree()
+    >>> tree.create_node("Harry", "harry")  # root node
+    >>> tree.create_node("Jane", "jane", parent="harry")
+    >>> tree.create_node("Bill", "bill", parent="harry")
+    >>> tree.create_node("Diane", "diane", parent="jane")
+    >>> tree.create_node("Mary", "mary", parent="diane")
+    >>> tree.create_node("Mark", "mark", parent="jane")
+    >>> tree.show()
+    Harry
+    ├── Bill
+    └── Jane
+        ├── Diane
+        │   └── Mary
+        └── Mark
+
+
+:class:`Node` Objects
+-----------------------
+
+.. class:: Node([tag[, identifier[, expanded]]])
+
+   A :class:`Node` object contains basic properties such as node identifier,
+   node tag, parent node, children nodes etc., and some operations for a node.
+
+Class attributes are:
+
+.. attribute:: Node.ADD
+
+    Addition mode for method `update_fpointer()`.
+
+.. attribute:: Node.DELETE
+
+    Deletion mode for method `update_fpointer()`.
+
+.. attribute:: Node.INSERT
+
+    Behave in the same way with Node.ADD since version 1.1.
+
+.. attribute:: identifier
+
+    The unique ID of a node within the scope of a tree. This attribute can be
+    accessed and modified with ``.`` and ``=`` operator respectively.
+
+.. attribute:: tag
+
+    The readable node name for human. This attribute can be accessed and
+    modified with ``.`` and ``=`` operator respectively.
+
+.. attribute:: bpointer
+
+    The parent ID of a node. This attribute can be
+    accessed and modified with ``.`` and ``=`` operator respectively.
+
+.. attribute:: fpointer
+
+    With a getting operator, a list of IDs of node's children is obtained. With
+    a setting operator, the value can be list, set, or dict. For list or set,
+    it is converted to a list type by the package; for dict, the keys are
+    treated as the node IDs.
+
+Instance methods:
+
+.. method:: is_leaf ()
+
+    Check if the node has children. Return False if the ``fpointer`` is empty
+    or None.
+
+.. method:: is_root ()
+
+    Check if the node is the root of present tree.
+
+.. method:: update_bpointer (nid)
+
+    Set the parent (indicated by the ``nid`` parameter) of a node.
+
+.. method:: update_fpointer (nid, mode=Node.ADD)
+
+    Update the children list with different modes: addition (Node.ADD or
+    Node.INSERT) and deletion (Node.DELETE).
+
+
+:mod:`Tree` Objects
+---------------------
+
+.. class:: Tree(tree=None, deep=False)
+
+    The :class:`Tree` object defines the tree-like structure based on
+    :class:`Node` objects. A new tree can be created from scratch without any
+    parameter or a shallow/deep copy of another tree. When ``deep=True``, a
+    deepcopy operation is performed on feeding ``tree`` parameter and *more
+    memory is required to create the tree*.
+
+Class attributes are:
+
+.. attribute:: Tree.ROOT
+
+    Default value for the ``level`` parameter in tree's methods.
+
+.. attribute:: Tree.DEPTH
+
+    The depth-first search mode for tree.
+
+.. attribute:: Tree.WIDTH
+
+    The width-first search mode for tree.
+
+.. attribute:: Tree.ZIGZAG
+
+    The `ZIGZAG search
+    <http://en.wikipedia.org/wiki/Tree_%28data_structure%29>`_ mode for tree.
+
+.. attribute:: Tree.root
+
+    Get or set the ID of the root.  This attribute can be accessed and modified
+    with ``.`` and ``=`` operator respectively.
+
+Class methods:
+
+.. method:: size ()
+
+    Get the number of nodes in this tree.
+
+.. method:: contains (nid)
+
+    Check if the tree contains given node.
+
+.. method:: parent (nid)
+
+    Obtain specific node's parent (Node instance). Return None if the parent is
+    None or does not exist in the tree.
+
+.. method:: all_nodes ()
+
+    Get the list of all the nodes randomly belonging to this tree.
+
+.. method:: depth ()
+
+    Get depth of the tree.
+
+.. method:: leaves (nid)
+
+    Get leaves from given node.
+
+.. method:: add_node(node[, parent])
+
+    Add a new node object to the tree and make the parent as the root by
+    default.
+
+.. method:: create_node(tag[, identifier[, parent]])
+
+    Create a new node and add it to this tree.
+
+.. method:: expand_tree([nid[, mode[, filter[, key[, reverse]]]]]]) 
+
+    Traverse the tree nodes with different modes. ``nid`` refers to the
+    expanding point to start; ``mode`` refers to the search mode (Tree.DEPTH,
+    Tree.WIDTH); ``filter`` refers to the function of one variable to act on
+    the :class:`Node` object; ``key``, ``reverse`` are present to sort
+    :class:Node objects at the same level.
+
+.. method:: get_node(nid)
+
+    Get the object of the node with ID of ``nid`` An alternative way is using
+    '[]' operation on the tree. But small difference exists between them: the
+    get_node() will return None if ``nid`` is absent, whereas '[]' will raise
+    ``KeyError``.
+
+.. method:: is_branch(nid)
+
+    Get the children (only sons) list of the node with ID == nid.
+
+.. method:: siblings(nid)
+
+    Get all the siblings of given nid.
+
+.. method:: move_node(source, destination)
+
+    Move node (source) from its parent to another parent (destination).
+
+.. method:: paste(nid, new_tree) 
+
+    Paste a new tree to an existing tree, with ``nid`` becoming the parent of the
+    root of this new tree.
+
+.. method:: remove_node(nid)
+
+    Remove a node and free the memory along with its successors.
+
+.. method:: link_past_node(nid)
+
+    Remove a node and link its children to its parent (root is not allowed).
+
+.. method:: rsearch(nid[, filter])
+
+    Search the tree from ``nid`` to the root along links reservedly Note:
+    ``filter`` refers to the function of one variable to act on the
+    :class:`Node` object.
+
+
+.. method:: show([nid[, level[, idhidden[, filter[, key[, reverse[, line_type]]]]]]]])
+
+    Print the tree structure in hierarchy style. ``nid`` refers to the
+    expanding point to start; ``level`` refers to the node level in the tree
+    (root as level 0); ``idhidden`` refers to hiding the node ID when printing;
+    ``filter`` refers to the function of one variable to act on the
+    :class:`Node` object; ``key``, ``reverse`` are present to sort
+    :class:`Node` object in the same level.
+
+    You have three ways to output your tree data, i.e., stdout with show(),
+    plain text file with save2file(), and json string with to_json(). The
+    former two use the same backend to generate a string of tree structure in a
+    text graph. After the version 1.2.7a, you can also spicify the
+    ``line_type`` parameter (now supporting 'ascii' [default], 'ascii-ex',
+    'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical
+    form.
+
+.. method:: subtree(nid)
+
+    Return a soft copy of the subtree with ``nid`` being the root. The softness
+    means all the nodes are shared between subtree and the original.
+
+.. method:: remove_subtree(nid)
+
+    Return a subtree with ``nid`` being the root, and remove all nodes in the
+    subtree from the original one.
+
+.. method:: save2file(filename[, nid[, level[, idhidden[, filter[, key[, reverse]]]]]]])
+
+    Save the tree into file for offline analysis.
+
+.. method:: to_json()
+
+    To format the tree in a JSON format.
+
+
+Examples
+--------------
+
+**Example 1**: Expand a tree with specific mode (Tree.DEPTH [default],
+Tree.WIDTH, Tree.ZIGZAG).
+
+.. code-block:: sh
+
+    >>> print(','.join([tree[node].tag for node in \
+                tree.expand_tree(mode=Tree.DEPTH)]))
+    Harry,Bill,Jane,Diane,Mary,Mark
+
+**Example 2**: Expand tree with custom filter.
+
+.. code-block:: sh
+
+    >>> print(','.join([tree[node].tag for node in \
+                tree.expand_tree(filter = lambda x: \
+                x.identifier != 'diane')]))
+    Harry,Bill,Jane,Mark
+
+**Example 3**: Get a subtree with the root of 'diane'.
+
+.. code-block:: sh
+
+    >>> sub_t = tree.subtree('diane')
+    >>> sub_t.show()
+    Diane
+    └── Mary
+
+**Example 4**: Paste a new tree to the original one.
+
+.. code-block:: sh
+
+    >>> new_tree = Tree()
+    >>> new_tree.create_node("n1", 1)  # root node
+    >>> new_tree.create_node("n2", 2, parent=1)
+    >>> new_tree.create_node("n3", 3, parent=1)
+    >>> tree.paste('bill', new_tree)
+    >>> tree.show()
+    Harry
+    ├── Bill
+    │   └── n1
+    │       ├── n2
+    │       └── n3
+    └── Jane
+        ├── Diane
+        │   └── Mary
+        └── Mark
+
+**Example 5**: Remove the existing node from the tree
+
+.. code-block:: sh
+
+    >>> tree.remove_node(1)
+    >>> tree.show()
+    Harry
+    ├── Bill
+    └── Jane
+        ├── Diane
+        │   └── Mary
+        └── Mark
+
+**Example 6**: Move a node to another parent.
+
+.. code-block:: sh
+
+    >>> tree.move_node('mary', 'harry')
+    >>> tree.show()
+    Harry
+    ├── Bill
+    ├── Jane
+    │   ├── Diane
+    │   └── Mark
+    └── Mary
+
+**Example 7**: Get the height of the tree.
+
+.. code-block:: sh
+
+    >>> tree.depth()
+    2
+
+**Example 8**: Get the level of a node.
+
+.. code-block:: sh
+
+    >>> node = tree.get_node("bill")
+    >>> tree.depth(node)
+    1
+
+**Example 9**: Print or dump tree structure. For example, the same tree in
+ basic example can be printed with 'ascii-em':
+
+.. code-block:: sh
+
+    >>> tree.show(line_type="ascii-em")
+    Harry
+    ╠══ Bill
+    ╠══ Jane
+    ║   ╠══ Diane
+    ║   ╚══ Mark
+    ╚══ Mary
+
+In the JSON form, to_json() takes optional parameter with_data to trigger if
+the data field is appended into JSON string. For example,
+
+.. code-block:: sh
+
+    >>> print(tree.to_json(with_data=True))
+    {"Harry": {"data": null, "children": [{"Bill": {"data": null}}, {"Jane": {"data": null, "children": [{"Diane": {"data": null}}, {"Mark": {"data": null}}]}}, {"Mary": {"data": null}}]}}
+
+
+Advanced Usage
+----------------
+
+Sometimes, you need trees to store your own data. The newsest version of
+:mod:`treelib` supports ``.data`` variable to store whatever you want. For
+example, to define a flower tree with your own data:
+
+.. code-block:: sh
+
+    >>> class Flower(object): \
+        def __init__(self, color): \
+            self.color = color
+
+You can create a flower tree now:
+
+.. code-block:: sh
+
+    >>> ftree = Tree()
+    >>> ftree.create_node("Root", "root")
+    >>> ftree.create_node("F1", "f1", parent='root', data=Flower("white"))
+    >>> ftree.create_node("F2", "f2", parent='root', data=Flower("red"))
+
+**Notes:** Before version 1.2.5, you may need to inherit and modify the
+ behaviors of tree. Both are supported since then. For flower example,
+
+.. code-block:: sh
+
+    >>> class FlowerNode(treelib.Node): \
+        def __init__(self, color): \
+            self.color = color
+    >>> # create a new node
+    >>> fnode = FlowerNode("white")
