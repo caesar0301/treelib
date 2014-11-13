@@ -223,13 +223,12 @@ Class methods:
     :class:`Node` object; ``key``, ``reverse`` are present to sort
     :class:`Node` object in the same level.
 
-    You have three ways to output your tree data, i.e., stdout with show(),
-    plain text file with save2file(), and json string with to_json(). The
+    You have three ways to output your tree data, i.e., stdout with ``show()``,
+    plain text file with ``save2file()``, and json string with ``to_json()``. The
     former two use the same backend to generate a string of tree structure in a
-    text graph. After the version 1.2.7a, you can also spicify the
-    ``line_type`` parameter (now supporting 'ascii' [default], 'ascii-ex',
-    'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical
-    form.
+    text graph.
+
+    *Version >= 1.2.7a*: you can also spicify the ``line_type`` parameter (now supporting 'ascii' [default], 'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical form.
 
 .. method:: subtree(nid)
 
@@ -373,8 +372,8 @@ example, to define a flower tree with your own data:
 .. code-block:: sh
 
     >>> class Flower(object): \
-        def __init__(self, color): \
-            self.color = color
+            def __init__(self, color): \
+                self.color = color
 
 You can create a flower tree now:
 
@@ -385,13 +384,12 @@ You can create a flower tree now:
     >>> ftree.create_node("F1", "f1", parent='root', data=Flower("white"))
     >>> ftree.create_node("F2", "f2", parent='root', data=Flower("red"))
 
-**Notes:** Before version 1.2.5, you may need to inherit and modify the
- behaviors of tree. Both are supported since then. For flower example,
+**Notes:** Before version 1.2.5, you may need to inherit and modify the behaviors of tree. Both are supported since then. For flower example,
 
 .. code-block:: sh
 
     >>> class FlowerNode(treelib.Node): \
-        def __init__(self, color): \
-            self.color = color
+            def __init__(self, color): \
+                self.color = color
     >>> # create a new node
     >>> fnode = FlowerNode("white")
