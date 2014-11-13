@@ -2,17 +2,17 @@ Install
 ==========
 
 The rapidest way to install treelib is using the package management tools like
-``easy_install`` or ``pip`` with commands:
+``easy_install`` or ``pip`` with command
 
 	.. code-block:: sh
 
 		$ sudo easy_install -U treelib
 
-or
+or the setup script
 
 	.. code-block:: sh
 
-		$ sudo pip install -U treelib
+		$ sudo python setup.py install
 
 **Note**: With the package management tools, the hosted version may be falling
 behind current development branch on `Github
