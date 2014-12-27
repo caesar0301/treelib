@@ -19,15 +19,7 @@ For installation, APIs and examples, see http://caesar0301.github.io/treelib/
 Contributors
 ---------
 
-* Brett Alistair Kromkamp (brettkromkamp@gmail.com):
-  Basic framework finished.
-
-* Xiaming Chen (chenxm35@gmail.com): For reasearch utility,
-I finish main parts and make the library freely public.
-
-* Holger Bast (holgerbast@gmx.de): Replaces list with dict
-for nodes indexing and improves the performance to a
-large extend.
-
-* Ilya Kuprik (ilya-spy@ynadex.ru): Added ZIGZAG tree-walk mode to
-function tree_expand()
+>* Brett Alistair Kromkamp (brettkromkamp@gmail.com): Basic framework finished.  
+>* Xiaming Chen (chenxm35@gmail.com): For reasearch utility, I finish main parts and make the library freely public.  
+>* Holger Bast (holgerbast@gmx.de): Replaces list with dict for nodes indexing and improves the performance to a large extend.  
+>* Ilya Kuprik (ilya-spy@ynadex.ru): Added ZIGZAG tree-walk mode to function tree_expand()
