@@ -6,6 +6,10 @@
 Welcome to treelib's documentation!
 ===================================
 
+.. role:: red
+
+:red:`Redistributed under Apache License (2.0) since version 1.3.0.`
+
 `Tree data structure <http://en.wikipedia.org/wiki/Tree_%28data_structure%29>`_
 is an important data structure in computer programming languages. It has
 important applications where hierarchical data connections are present such as
