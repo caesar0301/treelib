@@ -18,7 +18,7 @@ For installation, APIs and examples, see http://caesar0301.github.io/treelib/
 License
 -------
 
-> Before version 1.3.0: GPL
+> Before version 1.3.0: GPL  
 > After that: Apache
 
 Contributors
