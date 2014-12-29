@@ -14,9 +14,8 @@
 
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..', 'treelib'))
-from treelib import __version__
 
+__version__ = "1.3.0"
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
