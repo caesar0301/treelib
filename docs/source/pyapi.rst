@@ -17,6 +17,7 @@ several children and merely one parent.
    A :class:`Node` object contains basic properties such as node identifier,
    node tag, parent node, children nodes etc., and some operations for a node.
 
+
 Class attributes are:
 
 .. attribute:: Node.ADD
@@ -30,6 +31,11 @@ Class attributes are:
 .. attribute:: Node.INSERT
 
     Behave in the same way with Node.ADD since version 1.1.
+
+
+.. currentmodule:: node
+
+Instance attributes:
 
 .. attribute:: identifier
 
@@ -52,6 +58,7 @@ Class attributes are:
     a setting operator, the value can be list, set, or dict. For list or set,
     it is converted to a list type by the package; for dict, the keys are
     treated as the node IDs.
+
 
 Instance methods:
 
@@ -85,6 +92,7 @@ Instance methods:
     deepcopy operation is performed on feeding ``tree`` parameter and *more
     memory is required to create the tree*.
 
+
 Class attributes are:
 
 .. attribute:: Tree.ROOT
@@ -104,12 +112,18 @@ Class attributes are:
     The `ZIGZAG search
     <http://en.wikipedia.org/wiki/Tree_%28data_structure%29>`_ mode for tree.
 
-.. attribute:: Tree.root
+
+.. currentmodule:: tree
+
+Instance attributes:
+
+.. attribute:: root
 
     Get or set the ID of the root.  This attribute can be accessed and modified
     with ``.`` and ``=`` operator respectively.
 
-Class methods:
+
+Instance methods:
 
 .. method:: size ()
 
