@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+try:
+    from StringIO import StringIO as BytesIO
+except ImportError:
+    from io import BytesIO
 import unittest
 from treelib import Tree, Node
 from treelib.tree import NodeIDAbsentError
@@ -58,9 +64,9 @@ class NodeCase(unittest.TestCase):
 class TreeCase(unittest.TestCase):
     def setUp(self):
         tree = Tree()
-        tree.create_node("Harry", "harry")
-        tree.create_node("Jane", "jane", parent="harry")
-        tree.create_node("Bill", "bill", parent="harry")
+        tree.create_node("Hárry", "hárry")
+        tree.create_node("Jane", "jane", parent="hárry")
+        tree.create_node("Bill", "bill", parent="hárry")
         tree.create_node("Diane", "diane", parent="jane")
         tree.create_node("George", "george", parent="bill")
         self.tree = tree
@@ -71,14 +77,14 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(isinstance(self.copytree, Tree), True)
 
     def test_is_root(self):
-        self.assertTrue(self.tree._nodes['harry'].is_root())
+        self.assertTrue(self.tree._nodes['hárry'].is_root())
         self.assertFalse(self.tree._nodes['jane'].is_root())
 
     def test_paths_to_leaves(self):
         paths = self.tree.paths_to_leaves()
         self.assertEqual( len(paths), 2 )
-        self.assertTrue( ['harry', 'jane', 'diane'] in paths )
-        self.assertTrue( ['harry', 'bill', 'george'] in paths )
+        self.assertTrue( ['hárry', 'jane', 'diane'] in paths )
+        self.assertTrue( ['hárry', 'bill', 'george'] in paths )
 
     def test_nodes(self):
         self.assertEqual(len(self.tree.nodes), 5)
@@ -148,7 +154,7 @@ class TreeCase(unittest.TestCase):
         # Try getting the level of the node
         """
         self.tree.show()
-        Harry
+        Hárry
         |___ Bill
         |    |___ George
         |         |___ Jill
@@ -161,7 +167,7 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree.depth(self.tree.get_node("george")), 2)
         self.assertEqual(self.tree.depth("jane"), 1)
         self.assertEqual(self.tree.depth("bill"), 1)
-        self.assertEqual(self.tree.depth("harry"), 0)
+        self.assertEqual(self.tree.depth("hárry"), 0)
 
         # Try getting Exception
         node = Node("Test One", "identifier 1")
@@ -177,11 +183,11 @@ class TreeCase(unittest.TestCase):
                                                             in leaves), True)
 
     def test_link_past_node(self):
-        self.tree.create_node("Jill", "jill", parent="harry")
+        self.tree.create_node("Jill", "jill", parent="hárry")
         self.tree.create_node("Mark", "mark", parent="jill")
-        self.assertEqual("mark" not in self.tree.is_branch("harry"), True)
+        self.assertEqual("mark" not in self.tree.is_branch("hárry"), True)
         self.tree.link_past_node("jill")
-        self.assertEqual("mark" in self.tree.is_branch("harry"), True)
+        self.assertEqual("mark" in self.tree.is_branch("hárry"), True)
 
     def test_expand_tree(self):
         nodes = [self.tree[nid] for nid in self.tree.expand_tree()]
@@ -202,7 +208,7 @@ class TreeCase(unittest.TestCase):
         self.tree.remove_node("jill")
 
     def test_rsearch(self):
-        for nid in ["harry", "jane", "diane"]:
+        for nid in ["hárry", "jane", "diane"]:
             self.assertEqual(nid in self.tree.rsearch("diane"), True)
 
     def test_subtree(self):
@@ -216,8 +222,8 @@ class TreeCase(unittest.TestCase):
 
     def test_remove_subtree(self):
         subtree_shallow = self.tree.remove_subtree("jane")
-        self.assertEqual("jane" not in self.tree.is_branch("harry"), True)
-        self.tree.paste("harry", subtree_shallow)
+        self.assertEqual("jane" not in self.tree.is_branch("hárry"), True)
+        self.tree.paste("hárry", subtree_shallow)
 
     def test_to_json(self):
         self.assertEqual.__self__.maxDiff = None
@@ -225,7 +231,7 @@ class TreeCase(unittest.TestCase):
         self.tree.to_json(True)
 
     def test_siblings(self):
-        self.assertEqual(len(self.tree.siblings("harry")) == 0, True)
+        self.assertEqual(len(self.tree.siblings("hárry")) == 0, True)
         self.assertEqual(self.tree.siblings("jane")[0].identifier == "bill",
                          True)
 
@@ -239,12 +245,28 @@ class TreeCase(unittest.TestCase):
         self.tree.remove_node("jill")
 
     def test_level(self):
-        self.assertEqual(self.tree.level('harry'),  0)
+        self.assertEqual(self.tree.level('hárry'),  0)
         depth = self.tree.depth()
         self.assertEqual(self.tree.level('diane'),  depth)
         self.assertEqual(self.tree.level('diane',
                                          lambda x: x.identifier!='jane'),
                          depth-1)
+
+    def test_print_backend(self):
+        reader = BytesIO()
+
+        def write(line):
+            reader.write(line + b'\n')
+
+        self.tree._print_backend(func=write)
+
+        assert reader.getvalue() == """\
+Hárry
+├── Bill
+│   └── George
+└── Jane
+    └── Diane
+""".encode('utf8')
 
     def tearDown(self):
         self.tree = None

@@ -556,16 +556,16 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        label = ('{0}'.format(self[nid].tag.decode('utf-8')))\
+        label = ('{0}'.format(self[nid].tag))\
                  if idhidden \
                     else ('{0}[{1}]'.format(
-                            self[nid].tag.decode('utf-8'),
-                            self[nid].identifier.decode('utf-8')))
+                            self[nid].tag,
+                            self[nid].identifier))
 
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
-            func(label)
+            func(label.encode('utf8'))
         else:
             leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3
                                   if not x else ' ' * 4, iflast[0:-1]))
