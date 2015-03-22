@@ -91,6 +91,17 @@ class Tree(object):
         """Set _nodes[key]"""
         self._nodes.update({key: item})
 
+    def __str__(self):
+        """Return a string describing the tree."""
+        return "\n".join(self._print_backend(nid=None,
+                                             level=self.ROOT,
+                                             idhidden=True,
+                                             filter=None,
+                                             key=None,
+                                             reverse=False,
+                                             line_type='ascii-ex',
+                                             func=None))
+
     def __update_bpointer(self, nid, parent_id):
         """set self[nid].bpointer"""
         self[nid].update_bpointer(parent_id)
@@ -507,21 +518,17 @@ class Tree(object):
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False, line_type='ascii-ex'):
-        self._print_backend(nid,
-                            level,
-                            idhidden,
-                            filter,
-                            key,
-                            reverse,
-                            line_type,
-                            func=print)
+        """Return a string describing the tree."""
+        print(str(self))
 
     def _print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
                        key=None, reverse=False, line_type='ascii-ex',
                        func=print, iflast=[]):
         """
-        Another implementation of printing tree using Stack
-        Print tree structure in hierarchy style.
+        Another implementation of printing tree using Stack.
+        Return(if func=None) or print(if func=other, e.g. print) tree structure in hierarchy style.
+
+        If func=None, the return value isn't a string but a list of strings.
 
         For example:
             Root
@@ -540,6 +547,8 @@ class Tree(object):
         UPDATE: the @key @reverse is present to sort node at each
         level.
         """
+        res = []
+
         line_types = \
         {'ascii': ('|', '|-- ', '+-- '),
          'ascii-ex': ('\u2502', '\u251c\u2500\u2500 ', '\u2514\u2500\u2500 '),
@@ -565,12 +574,12 @@ class Tree(object):
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
-            func(label.encode('utf8'))
+            res.append(label)
         else:
             leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3
                                   if not x else ' ' * 4, iflast[0:-1]))
             lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
-            func('{0}{1}{2}'.format(leading, lasting, label).encode('utf-8'))
+            res.append('{0}{1}{2}'.format(leading, lasting, label))
 
         if filter(self[nid]) and self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
@@ -579,16 +588,21 @@ class Tree(object):
             level += 1
             for element in queue:
                 iflast.append(queue.index(element) == len(queue)-1)
-                self._print_backend(element.identifier,
-                          level,
-                          idhidden,
-                          filter,
-                          key,
-                          reverse,
-                          line_type,
-                          func,
-                          iflast)
+                res.extend( self._print_backend(element.identifier,
+                                                level,
+                                                idhidden,
+                                                filter,
+                                                key,
+                                                reverse,
+                                                line_type,
+                                                func,
+                                                iflast))
                 iflast.pop()
+
+        if func is None:
+            return res
+        else:
+            func("\n".join(line.encode('utf-8') for line in res))
 
     def siblings(self, nid):
         """
