@@ -6,12 +6,17 @@
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+import sys
 import json
 from copy import deepcopy
 try:
     from .node import Node
 except:
     from node import Node
+try:
+    from StringIO import StringIO as BytesIO
+except ImportError:
+    from io import BytesIO
 
 __author__ = 'chenxm'
 
@@ -42,7 +47,27 @@ class LinkPastRootNodeError(Exception):
 class InvalidLevelNumber(Exception):
     pass
 
+def python_2_unicode_compatible(klass):
+    """
+    (slightly modified from : 
+        http://django.readthedocs.org/en/latest/_modules/django/utils/encoding.html)
 
+    A decorator that defines __unicode__ and __str__ methods under Python 2.
+    Under Python 3 it does nothing.
+
+    To support Python 2 and 3 with a single code base, define a __str__ method
+    returning text and apply this decorator to the class.
+    """
+    if sys.version_info[0] == 2:
+        if '__str__' not in klass.__dict__:
+            raise ValueError("@python_2_unicode_compatible cannot be applied "
+                             "to %s because it doesn't define __str__()." %
+                             klass.__name__)
+        klass.__unicode__ = klass.__str__
+        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+    return klass
+
+@python_2_unicode_compatible
 class Tree(object):
     """Tree objects are made of Node(s) stored in _nodes dictionary."""
 
@@ -90,6 +115,15 @@ class Tree(object):
     def __setitem__(self, key, item):
         """Set _nodes[key]"""
         self._nodes.update({key: item})
+
+    def __str__(self):
+        self.reader = ""
+
+        def write(line):
+            self.reader += line.decode('utf-8') + "\n"
+
+        self._print_backend(func=write)
+        return self.reader
 
     def __update_bpointer(self, nid, parent_id):
         """set self[nid].bpointer"""

@@ -253,20 +253,13 @@ class TreeCase(unittest.TestCase):
                          depth-1)
 
     def test_print_backend(self):
-        reader = BytesIO()
-
-        def write(line):
-            reader.write(line + b'\n')
-
-        self.tree._print_backend(func=write)
-
-        assert reader.getvalue() == """\
+        assert str(self.tree) == """\
 Hárry
 ├── Bill
 │   └── George
 └── Jane
     └── Diane
-""".encode('utf8')
+"""
 
     def tearDown(self):
         self.tree = None
