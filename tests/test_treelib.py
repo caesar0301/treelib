@@ -254,7 +254,7 @@ class TreeCase(unittest.TestCase):
                          depth-1)
 
     def test_print_backend(self):
-        expected_result = u"""\
+        expected_result = """\
 Hárry
 ├── Bill
 │   └── George
