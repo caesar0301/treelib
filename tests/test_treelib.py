@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import sys
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
@@ -253,13 +254,20 @@ class TreeCase(unittest.TestCase):
                          depth-1)
 
     def test_print_backend(self):
-        assert str(self.tree) == """\
+        expected_result = u"""\
 Hárry
 ├── Bill
 │   └── George
 └── Jane
     └── Diane
 """
+
+        if sys.version_info[0] == 2:
+            # Python2.x :
+            assert str(self.tree) == expected_result.encode('utf-8')
+        else:
+            # Python3.x :
+            assert str(self.tree) == expected_result
 
     def tearDown(self):
         self.tree = None
