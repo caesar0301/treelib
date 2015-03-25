@@ -9,8 +9,20 @@ This `treelib` is a simple module containing only two classes: ``Node`` and
 branches. One tree has and only has one root, while a node (except root) has
 several children and merely one parent.
 
+*Note:* To solve the string compatibility between Python 2.x and 3.x, treelib
+follows the way of porting Python 3.x to 2/3. That means, all strings are
+manipulated as unicode and you do not need `u''` prefix anymore. The impacted
+functions include `str()`, `show()` and `save2file()` routines. But if your
+data contains non-ascii characters and Python 2.x is used, you have to trigger
+the compatibility by declaring `unicode_literals` in the code:
+
+.. code-block:: sh
+
+    >>> from __future__ import unicode_literals
+
+
 :class:`Node` Objects
------------------------
+---------------------
 
 .. class:: Node([tag[, identifier[, expanded]]])
 
@@ -159,7 +171,7 @@ Instance methods:
 
     Create a new node and add it to this tree.
 
-.. method:: expand_tree([nid[, mode[, filter[, key[, reverse]]]]]]) 
+.. method:: expand_tree([nid[, mode[, filter[, key[, reverse]]]]]])
 
     Traverse the tree nodes with different modes. ``nid`` refers to the
     expanding point to start; ``mode`` refers to the search mode (Tree.DEPTH,
@@ -186,7 +198,7 @@ Instance methods:
 
     Move node (source) from its parent to another parent (destination).
 
-.. method:: paste(nid, new_tree) 
+.. method:: paste(nid, new_tree)
 
     Paste a new tree to an existing tree, with ``nid`` becoming the parent of the
     root of this new tree.
@@ -219,7 +231,9 @@ Instance methods:
     former two use the same backend to generate a string of tree structure in a
     text graph.
 
-    *Version >= 1.2.7a*: you can also spicify the ``line_type`` parameter (now supporting 'ascii' [default], 'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical form.
+    *Version >= 1.2.7a*: you can also spicify the ``line_type`` parameter (now
+     supporting 'ascii' [default], 'ascii-ex', 'ascii-exr', 'ascii-em',
+     'ascii-emv', 'ascii-emh') to the change graphical form.
 
 .. method:: subtree(nid)
 

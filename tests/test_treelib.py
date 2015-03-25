@@ -269,6 +269,9 @@ Hárry
             # Python3.x :
             assert str(self.tree) == expected_result
 
+    def test_show(self):
+        self.tree.show()
+
     def tearDown(self):
         self.tree = None
         self.copytree = None
