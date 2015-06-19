@@ -18,6 +18,8 @@ try:
 except ImportError:
     from io import BytesIO
 
+
+
 __author__ = 'chenxm'
 
 
@@ -205,7 +207,7 @@ class Tree(object):
     def __real_true(self, p):
         return True
 
-    def __to_dict(self, nid=None, key=None, reverse=False, with_data=False):
+    def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
         """transform self into a dict"""
 
         nid = self.root if (nid is None) else nid
@@ -217,11 +219,12 @@ class Tree(object):
         if self[nid].expanded:
             queue = [self[i] for i in self[nid].fpointer]
             key = (lambda x: x) if (key is None) else key
-            queue.sort(key=key, reverse=reverse)
+            if sort:
+                queue.sort(key=key, reverse=reverse)
 
             for elem in queue:
                 tree_dict[ntag]["children"].append(
-                    self.__to_dict(elem.identifier, with_data=with_data))
+                    self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse))
             if len(tree_dict[ntag]["children"]) == 0:
                 tree_dict = self[nid].tag if not with_data else \
                             {ntag: {"data":self[nid].data}}
@@ -664,9 +667,9 @@ class Tree(object):
             st._nodes.update({self[node_n].identifier: self[node_n]})
         return st
 
-    def to_json(self, with_data=False):
+    def to_json(self, with_data=False, sort=True, reverse=False):
         """Return the json string corresponding to self"""
-        return json.dumps(self.__to_dict(with_data=with_data))
+        return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
 if __name__ == '__main__':
     pass
