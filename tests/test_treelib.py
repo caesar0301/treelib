@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import sys
+import os
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
@@ -275,7 +276,61 @@ Hárry
     def tearDown(self):
         self.tree = None
         self.copytree = None
+    
+    def read_generated_output(self, filename):
+        output = open(filename)
+        generated = output.read().decode('utf-8')
+        output.close()
+        
+        return generated
+    
+    def test_to_dot(self):
+        self.tree.to_dot('tree.dot')
+        expected = """\
+digraph tree {
+\thárry [label="Hárry", shape=circle]
+\tbill [label="Bill", shape=circle]
+\tjane [label="Jane", shape=circle]
+\tgeorge [label="George", shape=circle]
+\tdiane [label="Diane", shape=circle]
 
+\thárry -> jane
+\thárry -> bill
+\tbill -> george
+\tjane -> diane
+}"""
+        
+        generated = self.read_generated_output('tree.dot')
+        
+        self.assertEqual(generated, expected, "Generated dot tree is not the expected one")  
+        os.remove('tree.dot')
+        
+    def test_to_dot_empty_tree(self):
+        empty_tree = Tree()
+        empty_tree.to_dot("tree.dot")
+        
+        expected = """\
+digraph tree {
+
+}"""
+        generated = self.read_generated_output('tree.dot')
+        
+        self.assertEqual(expected, generated, 'The generated output for an empty tree is not empty')
+        os.remove('tree.dot')
+    
+    def test_unicode_filename(self):
+        tree = Tree()
+        tree.create_node('Node 1', 'node_1')
+        tree.to_dot('ŕʩϢ.dot')
+        
+        expected = """\
+digraph tree {
+\tnode_1 [label="Node 1", shape=circle]
+
+}"""
+        self.assertTrue(os.path.isfile('ŕʩϢ.dot'), "The file ŕʩϢ.dot could not be found.")
+        generated = self.read_generated_output('ŕʩϢ.dot')
+        self.assertEqual(expected, generated, "The generated file content is not the expected one")
 
 def suite():
     suites = [NodeCase, TreeCase]

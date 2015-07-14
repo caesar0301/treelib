@@ -672,26 +672,31 @@ class Tree(object):
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
     def to_dot(self, filename, shape='circle', graph='digraph'):
-
+        
         nodes, connections = [], []
-        for n in self.expand_tree(mode=self.WIDTH):
-            nid = self[n].identifier
-            state = nid + ' [label="' + self[n].tag + '", shape=' + shape + ']'
-            nodes.append(state)
-
-            for c in self.children(nid):
-                cid = c.identifier
-
-                connections.append(str(nid) + ' -> ' + str(cid))
+        if self.nodes:        
+            
+            for n in self.expand_tree(mode=self.WIDTH):
+                nid = self[n].identifier
+                state = nid + ' [label="' + self[n].tag + '", shape=' + shape + ']'
+                nodes.append(state)
+    
+                for c in self.children(nid):
+                    cid = c.identifier
+    
+                    connections.append(nid + ' -> ' + cid)
 
         # write nodes and connections to dot format
         with open(filename, 'w') as f:
             f.write(graph +' tree {\n')
             for n in nodes:
-                f.write('\t' + n + '\n')
-
+                out_line = '\t' + n + '\n'
+                f.write(out_line.encode('utf-8'))
+            
+            f.write('\n')
             for c in connections:
-                f.write('\t' + c + '\n')
+                out_line = '\t' + c + '\n'
+                f.write(out_line.encode('utf-8'))
 
             f.write('}')
 
