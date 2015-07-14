@@ -331,6 +331,7 @@ digraph tree {
         self.assertTrue(os.path.isfile('ŕʩϢ.dot'), "The file ŕʩϢ.dot could not be found.")
         generated = self.read_generated_output('ŕʩϢ.dot')
         self.assertEqual(expected, generated, "The generated file content is not the expected one")
+        os.remove('ŕʩϢ.dot')
 
 def suite():
     suites = [NodeCase, TreeCase]
