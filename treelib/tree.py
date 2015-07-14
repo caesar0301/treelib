@@ -672,6 +672,7 @@ class Tree(object):
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
     def to_dot(self, filename, shape='circle', graph='digraph'):
+        """Exports the tree in the dot format of the graphivz software"""
         
         nodes, connections = [], []
         if self.nodes:        
