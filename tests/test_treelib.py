@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 import sys
 import os
+import codecs
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
@@ -278,8 +279,8 @@ Hárry
         self.copytree = None
     
     def read_generated_output(self, filename):
-        output = open(filename)
-        generated = output.read().decode('utf-8')
+        output = codecs.open(filename, 'r', 'utf-8')
+        generated = output.read()
         output.close()
         
         return generated

@@ -8,6 +8,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 import sys
 import json
+import codecs
 from copy import deepcopy
 try:
     from .node import Node
@@ -673,7 +674,7 @@ class Tree(object):
 
     def to_dot(self, filename, shape='circle', graph='digraph'):
         """Exports the tree in the dot format of the graphivz software"""
-        
+                
         nodes, connections = [], []
         if self.nodes:        
             
@@ -688,16 +689,14 @@ class Tree(object):
                     connections.append(nid + ' -> ' + cid)
 
         # write nodes and connections to dot format
-        with open(filename, 'w') as f:
+        with codecs.open(filename, 'w', 'utf-8') as f:
             f.write(graph +' tree {\n')
             for n in nodes:
-                out_line = '\t' + n + '\n'
-                f.write(out_line.encode('utf-8'))
+                f.write('\t' + n + '\n')
             
             f.write('\n')
             for c in connections:
-                out_line = '\t' + c + '\n'
-                f.write(out_line.encode('utf-8'))
+                f.write('\t' + c + '\n')
 
             f.write('}')
 
