@@ -3,11 +3,11 @@
 from __future__ import unicode_literals
 from treelib import Tree
 from treelib.plugins import *
-import codecs
 import os
 import unittest
 
-class PluginCase(unittest.TestCase):
+class DotExportCase(unittest.TestCase):
+    """Test class for the export to dot format function"""
 
     def setUp(self):
         tree = Tree()
@@ -25,7 +25,7 @@ class PluginCase(unittest.TestCase):
         
         return generated
     
-    def test_to_dot(self):
+    def test_export_to_dot(self):
         export_to_dot(self.tree, 'tree.dot')
         expected = """\
 digraph tree {
@@ -47,7 +47,7 @@ digraph tree {
         self.assertEqual(generated, expected, "Generated dot tree is not the expected one")  
         os.remove('tree.dot')
         
-    def test_to_dot_empty_tree(self):
+    def test_export_to_dot_empty_tree(self):
         empty_tree = Tree()
         export_to_dot(empty_tree, 'tree.dot')
         
