@@ -33,3 +33,6 @@ def export_to_dot(tree, filename, shape='circle', graph='digraph'):
             f.write('\t' + c + '\n')
 
         f.write('}')
+
+if __name__ == '__main__':
+    pass
