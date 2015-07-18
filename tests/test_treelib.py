@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import sys
+import os
+import codecs
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
@@ -275,15 +277,13 @@ Hárry
     def tearDown(self):
         self.tree = None
         self.copytree = None
-
-
+    
 def suite():
     suites = [NodeCase, TreeCase]
     suite = unittest.TestSuite()
     for s in suites:
         suite.addTest(unittest.makeSuite(s))
     return suite
-
 
 
 if __name__ == '__main__':
