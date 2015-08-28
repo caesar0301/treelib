@@ -5,6 +5,9 @@
 """
 from __future__ import unicode_literals
 import codecs
+import json                                                                                                              
+from treelib import Node, Tree
+from collections import Hashable
 
 def export_to_dot(tree, filename, shape='circle', graph='digraph'):
     """Exports the tree in the dot format of the graphviz software"""
@@ -33,6 +36,27 @@ def export_to_dot(tree, filename, shape='circle', graph='digraph'):
             f.write('\t' + c + '\n')
 
         f.write('}')
+        
+
+# takes in a jsonified tree and returns the correct tree structure
+def unjsonify(jsonTree):
+    def giveKey(d):
+        return d.keys()[0]
+    def unjsonifyHelper(node, subtree):
+        for childStruct in subtree[node]['children']: # childStruct is immutable element if base case, else dict
+            if type(childStruct) == list: childStruct = tuple(childStruct) # tuples in original tree
+            if isinstance(childStruct, Hashable): # base case
+                newTree.create_node(childStruct, childStruct, parent=node)
+            else:
+                childNode = giveKey(childStruct)
+                newTree.create_node(childNode, childNode, parent=node)
+                unjsonifyHelper(childNode, childStruct)
+    jsonTree = json.loads(jsonTree)
+    root = giveKey(jsonTree)
+    newTree = Tree()
+    newTree.create_node(root, root)
+    unjsonifyHelper(root, jsonTree)
+    return newTree
 
 if __name__ == '__main__':
     pass
