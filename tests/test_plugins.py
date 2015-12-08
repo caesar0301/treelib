@@ -29,16 +29,16 @@ class DotExportCase(unittest.TestCase):
         export_to_dot(self.tree, 'tree.dot')
         expected = """\
 digraph tree {
-\thárry [label="Hárry", shape=circle]
-\tbill [label="Bill", shape=circle]
-\tjane [label="Jane", shape=circle]
-\tgeorge [label="George", shape=circle]
-\tdiane [label="Diane", shape=circle]
+\t"hárry" [label="Hárry", shape=circle]
+\t"bill" [label="Bill", shape=circle]
+\t"jane" [label="Jane", shape=circle]
+\t"george" [label="George", shape=circle]
+\t"diane" [label="Diane", shape=circle]
 
-\thárry -> jane
-\thárry -> bill
-\tbill -> george
-\tjane -> diane
+\t"hárry" -> "jane"
+\t"hárry" -> "bill"
+\t"bill" -> "george"
+\t"jane" -> "diane"
 }"""
         
         self.assertTrue(os.path.isfile('tree.dot'), "The file tree.dot could not be found.")
@@ -68,13 +68,28 @@ digraph tree {
         
         expected = """\
 digraph tree {
-\tnode_1 [label="Node 1", shape=circle]
+\t"node_1" [label="Node 1", shape=circle]
 
 }"""
         self.assertTrue(os.path.isfile('ŕʩϢ.dot'), "The file ŕʩϢ.dot could not be found.")
         generated = self.read_generated_output('ŕʩϢ.dot')
         self.assertEqual(expected, generated, "The generated file content is not the expected one")
         os.remove('ŕʩϢ.dot')
+
+    def test_export_with_minus_in_filename(self):
+        tree = Tree()
+        tree.create_node('Example Node', 'example-node')
+        expected = """\
+digraph tree {
+\t"example-node" [label="Example Node", shape=circle]
+
+}"""
+
+        export_to_dot(tree, 'id_with_minus.dot')
+        self.assertTrue(os.path.isfile('id_with_minus.dot'), "The file id_with_minus.dot could not be found.")
+        generated = self.read_generated_output('id_with_minus.dot')
+        self.assertEqual(expected, generated, "The generated file content is not the expected one")
+        os.remove('id_with_minus.dot')
 
     def tearDown(self):
         self.tree = None
