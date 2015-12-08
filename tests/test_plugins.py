@@ -76,12 +76,12 @@ digraph tree {
         self.assertEqual(expected, generated, "The generated file content is not the expected one")
         os.remove('ŕʩϢ.dot')
 
-    def export_with_treelib_unique_id(self):
+    def test_export_with_minus_in_filename(self):
         tree = Tree()
         tree.create_node('Example Node', 'example-node')
         expected = """\
 digraph tree {
-\t"example-node" [label="Example Node"]
+\t"example-node" [label="Example Node", shape=circle]
 
 }"""
 
