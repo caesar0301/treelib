@@ -6,6 +6,7 @@
 from __future__ import unicode_literals
 import codecs
 
+
 def export_to_dot(tree, filename, shape='circle', graph='digraph'):
     """Exports the tree in the dot format of the graphviz software"""
         
@@ -14,17 +15,17 @@ def export_to_dot(tree, filename, shape='circle', graph='digraph'):
         
         for n in tree.expand_tree(mode=tree.WIDTH):
             nid = tree[n].identifier
-            state = nid + ' [label="' + tree[n].tag + '", shape=' + shape + ']'
+            state = '"' + nid + '"' + ' [label="' + tree[n].tag + '", shape=' + shape + ']'
             nodes.append(state)
 
             for c in tree.children(nid):
                 cid = c.identifier
 
-                connections.append(nid + ' -> ' + cid)
+                connections.append('"' + nid + '"' + ' -> ' + '"' + cid + '"')
 
     # write nodes and connections to dot format
     with codecs.open(filename, 'w', 'utf-8') as f:
-        f.write(graph +' tree {\n')
+        f.write(graph + ' tree {\n')
         for n in nodes:
             f.write('\t' + n + '\n')
         
