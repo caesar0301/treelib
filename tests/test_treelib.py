@@ -247,6 +247,14 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree["jill"].data.color, "white")
         self.tree.remove_node("jill")
 
+    def test_show_data_property(self):
+        new_tree = Tree()
+        class Flower(object):
+            def __init__(self, color):
+                self.color = color
+        new_tree.create_node("Jill", "jill", data=Flower("white"))
+        new_tree.show(data_property="color")
+
     def test_level(self):
         self.assertEqual(self.tree.level('hárry'),  0)
         depth = self.tree.depth()
