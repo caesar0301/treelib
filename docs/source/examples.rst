@@ -155,9 +155,18 @@ You can create a flower tree now:
 .. code-block:: sh
 
     >>> ftree = Tree()
-    >>> ftree.create_node("Root", "root")
+    >>> ftree.create_node("Root", "root", data=Flower("black"))
     >>> ftree.create_node("F1", "f1", parent='root', data=Flower("white"))
     >>> ftree.create_node("F2", "f2", parent='root', data=Flower("red"))
+
+Printing the colors of the tree:
+
+.. code-block:: sh
+
+    >>> ftree.show(data_property="color")
+        black
+        ├── white
+        └── red
 
 **Notes:** Before version 1.2.5, you may need to inherit and modify the behaviors of tree. Both are supported since then. For flower example,
 

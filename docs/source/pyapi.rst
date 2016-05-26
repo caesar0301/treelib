@@ -217,14 +217,15 @@ Instance methods:
     ``filter`` refers to the function of one variable to act on the
     :class:`Node` object.
 
-.. method:: show([nid[, level[, idhidden[, filter[, key[, reverse[, line_type]]]]]]]])
+.. method:: show([nid[, level[, idhidden[, filter[, key[, reverse[, line_type[, data_property]]]]]]]]])
 
     Print the tree structure in hierarchy style. ``nid`` refers to the
     expanding point to start; ``level`` refers to the node level in the tree
     (root as level 0); ``idhidden`` refers to hiding the node ID when printing;
     ``filter`` refers to the function of one variable to act on the
     :class:`Node` object; ``key``, ``reverse`` are present to sort
-    :class:`Node` object in the same level.
+    :class:`Node` object in the same level. ``data_property`` refers to the property
+    on the node data object to be printed.
 
     You have three ways to output your tree data, i.e., stdout with ``show()``,
     plain text file with ``save2file()``, and json string with ``to_json()``. The

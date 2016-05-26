@@ -27,6 +27,9 @@ class NodeIDAbsentError(Exception):
     """Exception throwed if a node's identifier is unknown"""
     pass
 
+class NodePropertyAbsentError(Exception):
+    """Exception throwed if a node's data property is not specified"""
+    pass
 
 class MultipleRootError(Exception):
     """Exception throwed if more than one root exists in a tree."""
@@ -129,7 +132,7 @@ class Tree(object):
 
     def __print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
                        key=None, reverse=False, line_type='ascii-ex',
-                       func=print, iflast=[]):
+                       data_property=None, func=print, iflast=[],):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -167,10 +170,18 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        label = ('{0}'.format(self[nid].tag))\
+        if data_property is not None and hasattr(self[nid].data, data_property):
+            displayValue = getattr(self[nid].data, data_property)
+        elif data_property is None:
+            displayValue = self[nid].tag
+        else:
+            raise NodePropertyAbsentError("Node '%s' does not have data property '%s'" \
+                % (nid, data_property))
+
+        label = ('{0}'.format(displayValue))\
                  if idhidden \
                     else ('{0}[{1}]'.format(
-                            self[nid].tag,
+                            displayValue,
                             self[nid].identifier))
 
         filter = (self.__real_true) if (filter is None) else filter
@@ -191,7 +202,7 @@ class Tree(object):
             for element in queue:
                 iflast.append(queue.index(element) == len(queue)-1)
                 self.__print_backend(element.identifier, level, idhidden,
-                    filter, key, reverse, line_type, func, iflast)
+                    filter, key, reverse, line_type, data_property, func, iflast)
                 iflast.pop()
 
     def __update_bpointer(self, nid, parent_id):
@@ -594,7 +605,7 @@ class Tree(object):
             current = self[current].bpointer if self.root != current else None
 
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
-                  filter=None, key=None, reverse=False, line_type='ascii-ex'):
+                  filter=None, key=None, reverse=False, line_type='ascii-ex', data_property=None):
         """Update 20/05/13: Save tree into file for offline analysis"""
         def _write_line(line, f):
             f.write(line + b'\n')
@@ -602,17 +613,17 @@ class Tree(object):
         handler = lambda x: _write_line(x, open(filename, 'ab'))
 
         self.__print_backend(nid, level, idhidden, filter,
-            key, reverse, line_type, func=handler)
+            key, reverse, line_type, data_property, func=handler)
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False, line_type='ascii-ex'):
+             key=None, reverse=False, line_type='ascii-ex', data_property=None):
         self.reader = ""
 
         def write(line):
             self.reader += line.decode('utf-8') + "\n"
 
         self.__print_backend(nid, level, idhidden, filter,
-            key, reverse, line_type, func=write)
+            key, reverse, line_type, data_property, func=write)
 
         print(self.reader)
 
