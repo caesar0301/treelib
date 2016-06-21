@@ -8,6 +8,9 @@ python:
 
 install:
   - "pip install -r requirements-testing.txt"
+  - "python setup install"
 
 script:
   - /usr/bin/env bash test.sh
+  - /usr/bin/env python tests/test_treelib.py
+  - /usr/bin/env python tests/test_plugins.py

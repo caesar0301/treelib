@@ -397,7 +397,7 @@ class Tree(object):
         else:
             for node in self.expand_tree(root):
                 if self[node].is_leaf():
-                    leaves.append(node)
+                    leaves.append(self[node])
         return leaves
 
     def level(self, nid, filter=None):

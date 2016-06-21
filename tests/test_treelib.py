@@ -72,6 +72,13 @@ class TreeCase(unittest.TestCase):
         tree.create_node("Bill", "bill", parent="hárry")
         tree.create_node("Diane", "diane", parent="jane")
         tree.create_node("George", "george", parent="bill")
+        """
+        Hárry
+        ├── Bill
+        │   └── George
+        └── Jane
+            └── Diane
+        """
         self.tree = tree
         self.copytree = Tree(self.tree, True)
 
@@ -184,6 +191,9 @@ class TreeCase(unittest.TestCase):
         for nid in self.tree.expand_tree():
             self.assertEqual((self.tree[nid].is_leaf()) == (self.tree[nid] \
                                                             in leaves), True)
+        leaves = self.tree.leaves(root='jane')
+        for nid in self.tree.expand_tree(nid='jane'):
+            self.assertEqual(self.tree[nid].is_leaf() == (self.tree[nid] in leaves), True)
 
     def test_link_past_node(self):
         self.tree.create_node("Jill", "jill", parent="hárry")
