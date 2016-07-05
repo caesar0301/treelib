@@ -47,22 +47,28 @@ Class attributes are:
 
 .. currentmodule:: node
 
+
+
 Instance attributes:
+
 
 .. attribute:: identifier
 
     The unique ID of a node within the scope of a tree. This attribute can be
     accessed and modified with ``.`` and ``=`` operator respectively.
 
+
 .. attribute:: tag
 
     The readable node name for human. This attribute can be accessed and
     modified with ``.`` and ``=`` operator respectively.
 
+
 .. attribute:: bpointer
 
     The parent ID of a node. This attribute can be
     accessed and modified with ``.`` and ``=`` operator respectively.
+
 
 .. attribute:: fpointer
 
@@ -70,6 +76,11 @@ Instance attributes:
     a setting operator, the value can be list, set, or dict. For list or set,
     it is converted to a list type by the package; for dict, the keys are
     treated as the node IDs.
+
+
+.. attribute:: data
+
+    User payload associated with this node.
 
 
 Instance methods:
@@ -91,6 +102,7 @@ Instance methods:
 
     Update the children list with different modes: addition (Node.ADD or
     Node.INSERT) and deletion (Node.DELETE).
+
 
 
 :mod:`Tree` Objects
@@ -127,7 +139,10 @@ Class attributes are:
 
 .. currentmodule:: tree
 
+
+
 Instance attributes:
+
 
 .. attribute:: root
 
@@ -135,41 +150,43 @@ Instance attributes:
     with ``.`` and ``=`` operator respectively.
 
 
-Instance methods:
 
-.. method:: size ()
+**Instance methods**:
 
-    Get the number of nodes in this tree.
-
-.. method:: contains (nid)
-
-    Check if the tree contains given node.
-
-.. method:: parent (nid)
-
-    Obtain specific node's parent (Node instance). Return None if the parent is
-    None or does not exist in the tree.
-
-.. method:: all_nodes ()
-
-    Get the list of all the nodes randomly belonging to this tree.
-
-.. method:: depth ()
-
-    Get depth of the tree.
-
-.. method:: leaves (nid)
-
-    Get leaves from given node.
 
 .. method:: add_node(node[, parent])
 
     Add a new node object to the tree and make the parent as the root by
     default.
 
-.. method:: create_node(tag[, identifier[, parent]])
 
-    Create a new node and add it to this tree.
+.. method:: all_nodes()
+
+    Get the list of all the nodes randomly belonging to this tree.
+
+
+.. method:: children(nid)
+
+    Return the children (Node) list of ``nid``. Empty list is returned if
+    ``nid`` does not exist
+
+
+.. method:: contains (nid)
+
+    Check if the tree contains given node.
+
+
+.. method:: create_node(tag[, identifier[, parent[, data]]])
+
+    Create a new node and add it to this tree. If ``identifier`` is absent,
+    a UUID will be generated automatically.
+
+
+.. method:: depth ([node])
+
+    Get the maximum level of this tree or the level of the given node
+    (Note: the parameter is node_instance rather than node_identifier).
+
 
 .. method:: expand_tree([nid[, mode[, filter[, key[, reverse]]]]]])
 
@@ -179,6 +196,7 @@ Instance methods:
     the :class:`Node` object; ``key``, ``reverse`` are present to sort
     :class:Node objects at the same level.
 
+
 .. method:: get_node(nid)
 
     Get the object of the node with ID of ``nid`` An alternative way is using
@@ -186,36 +204,78 @@ Instance methods:
     get_node() will return None if ``nid`` is absent, whereas '[]' will raise
     ``KeyError``.
 
+
 .. method:: is_branch(nid)
 
     Get the children (only sons) list of the node with ID == nid.
 
-.. method:: siblings(nid)
 
-    Get all the siblings of given nid.
+.. method:: leaves (nid)
+
+    Get leaves from given node.
+
+
+.. method:: level(nid[, filter])
+
+    Get the node level in this tree. The level is an integer starting with '0'
+    at the root. In other words, the root lives at level '0';
+
+
+.. method:: link_past_node(nid)
+
+    Remove a node and link its children to its parent (root is not allowed).
+
 
 .. method:: move_node(source, destination)
 
     Move node (source) from its parent to another parent (destination).
 
-.. method:: paste(nid, new_tree)
+
+.. method:: nodes()
+
+    Return a dict form of nodes in a tree: {id: node_instance}
+
+
+.. method:: parent (nid)
+
+    Obtain specific node's parent (Node instance). Return None if the parent is
+    None or does not exist in the tree.
+
+
+.. method:: paste(nid, new_tree[, deepcopy])
 
     Paste a new tree to an existing tree, with ``nid`` becoming the parent of the
     root of this new tree.
+
+
+.. method:: paths_to_leaves()
+
+    Use this function to get the identifiers allowing to go from the root nodes
+    to each leaf. Return a list of list of identifiers, root being not omitted.
+
 
 .. method:: remove_node(nid)
 
     Remove a node and free the memory along with its successors.
 
-.. method:: link_past_node(nid)
 
-    Remove a node and link its children to its parent (root is not allowed).
+.. method:: remove_subtree(nid)
+
+    Return a subtree with ``nid`` being the root, and remove all nodes in the
+    subtree from the original one.
+
 
 .. method:: rsearch(nid[, filter])
 
     Search the tree from ``nid`` to the root along links reservedly. Parameter
     ``filter`` refers to the function of one variable to act on the
     :class:`Node` object.
+
+
+.. method:: save2file(filename[, nid[, level[, idhidden[, filter[, key[, reverse]]]]]]])
+
+    Save the tree into file for offline analysis.
+
 
 .. method:: show([nid[, level[, idhidden[, filter[, key[, reverse[, line_type[, data_property]]]]]]]]])
 
@@ -236,19 +296,28 @@ Instance methods:
      supporting 'ascii' [default], 'ascii-ex', 'ascii-exr', 'ascii-em',
      'ascii-emv', 'ascii-emh') to the change graphical form.
 
+
+.. method:: siblings(nid)
+
+    Get all the siblings of given nid.
+
+
+.. method:: size ([level])
+
+    Get the number of nodes of the whole tree if ``level`` is not given.
+    Otherwise, the total number of nodes at specific level is returned.
+
+
 .. method:: subtree(nid)
 
     Return a soft copy of the subtree with ``nid`` being the root. The softness
     means all the nodes are shared between subtree and the original.
 
-.. method:: remove_subtree(nid)
 
-    Return a subtree with ``nid`` being the root, and remove all nodes in the
-    subtree from the original one.
+.. method:: to_dict([nid[, key[, sort[, reverse[, with_data]]]]])
 
-.. method:: save2file(filename[, nid[, level[, idhidden[, filter[, key[, reverse]]]]]]])
+    Transform the whole tree into a dict.
 
-    Save the tree into file for offline analysis.
 
 .. method:: to_json()
 

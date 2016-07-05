@@ -15,7 +15,7 @@
 import sys
 import os
 
-__version__ = "1.3.0"
+__version__ = "1.3.5"
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
