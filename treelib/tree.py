@@ -8,6 +8,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 import sys
 import json
+import collections
 from copy import deepcopy
 try:
     from .node import Node
@@ -92,7 +93,7 @@ class Tree(object):
         """
 
         #: dictionary, identifier: Node object
-        self._nodes = {}
+        self._nodes = collections.OrderedDict()
 
         #: identifier of the root node
         self.root = None
@@ -132,7 +133,7 @@ class Tree(object):
 
     def __print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
                        key=None, reverse=False, line_type='ascii-ex',
-                       data_property=None, func=print, iflast=[],):
+                       data_property=None, func=print):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -154,56 +155,86 @@ class Tree(object):
         UPDATE: the @key @reverse is present to sort node at each
         level.
         """
-        line_types = \
-        {'ascii': ('|', '|-- ', '+-- '),
-         'ascii-ex': ('\u2502', '\u251c\u2500\u2500 ', '\u2514\u2500\u2500 '),
-         'ascii-exr': ('\u2502', '\u251c\u2500\u2500 ', '\u2570\u2500\u2500 '),
-         'ascii-em': ('\u2551', '\u2560\u2550\u2550 ', '\u255a\u2550\u2550 '),
-         'ascii-emv': ('\u2551', '\u255f\u2500\u2500 ', '\u2559\u2500\u2500 '),
-         'ascii-emh': ('\u2502', '\u255e\u2550\u2550 ', '\u2558\u2550\u2550 ')}
-        DT_VLINE, DT_LINE_BOX, DT_LINE_COR = line_types[line_type]
+        # Factory for proper get_label() function
+        if data_property:
+            if idhidden:
+                def get_label(node):
+                    return getattr(node.data, data_property)
+            else:
+                def get_label(node):
+                    return "%s[%s]" % (getattr(node.data, data_property), node.identifier)
+        else:
+            if idhidden:
+                def get_label(node):
+                    return node.tag
+            else:
+                def get_label(node):
+                    return "%s[%s]" % (node.tag, node.identifier)
 
+        # legacy ordering
+        if key is None:
+            key = lambda node: node
+
+        # iter with func
+        for pre, node in self.__get(nid, level, filter, key, reverse,
+                                    line_type):
+            label = get_label(node)
+            func('{0}{1}'.format(pre, label).encode('utf-8'))
+
+    def get(self, nid=None, level=ROOT, filter=None, key=None, reverse=None,
+            line_type='ascii-ex'):
+        return self.__get(nid, level, filter, key, reverse, line_type)
+
+    def __get(self, nid, level, filter_, key, reverse, line_type):
+        # default filter
+        if filter_ is None:
+            filter_ = lambda node: True
+
+        # render characters
+        dt = {
+            'ascii': ('|', '|-- ', '+-- '),
+            'ascii-ex': ('\u2502', '\u251c\u2500\u2500 ', '\u2514\u2500\u2500 '),
+            'ascii-exr': ('\u2502', '\u251c\u2500\u2500 ', '\u2570\u2500\u2500 '),
+            'ascii-em': ('\u2551', '\u2560\u2550\u2550 ', '\u255a\u2550\u2550 '),
+            'ascii-emv': ('\u2551', '\u255f\u2500\u2500 ', '\u2559\u2500\u2500 '),
+            'ascii-emh': ('\u2502', '\u255e\u2550\u2550 ', '\u2558\u2550\u2550 '),
+        }[line_type]
+
+        return self.__get_iter(nid, level, filter_, key, reverse, dt, [])
+
+    def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last):
+        dt_vline, dt_line_box, dt_line_cor = dt
         leading = ''
-        lasting = DT_LINE_BOX
+        lasting = dt_line_box
 
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        if data_property is not None and hasattr(self[nid].data, data_property):
-            displayValue = getattr(self[nid].data, data_property)
-        elif data_property is None:
-            displayValue = self[nid].tag
-        else:
-            raise NodePropertyAbsentError("Node '%s' does not have data property '%s'" \
-                % (nid, data_property))
-
-        label = ('{0}'.format(displayValue))\
-                 if idhidden \
-                    else ('{0}[{1}]'.format(
-                            displayValue,
-                            self[nid].identifier))
-
-        filter = (self.__real_true) if (filter is None) else filter
+        node = self[nid]
 
         if level == self.ROOT:
-            func(label.encode('utf8'))
+            yield "", node
         else:
-            leading = ''.join(map(lambda x: DT_VLINE + ' ' * 3
-                                  if not x else ' ' * 4, iflast[0:-1]))
-            lasting = DT_LINE_COR if iflast[-1] else DT_LINE_BOX
-            func('{0}{1}{2}'.format(leading, lasting, label).encode('utf-8'))
+            leading = ''.join(map(lambda x: dt_vline + ' ' * 3
+                                  if not x else ' ' * 4, is_last[0:-1]))
+            lasting = dt_line_cor if is_last[-1] else dt_line_box
+            yield leading + lasting, node
 
-        if filter(self[nid]) and self[nid].expanded:
-            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
-            key = (lambda x: x) if (key is None) else key
-            queue.sort(key=key, reverse=reverse)
+        if filter_(node) and node.expanded:
+            children = [self[i] for i in node.fpointer if filter_(self[i])]
+            idxlast = len(children)-1
+            if key:
+                children.sort(key=key, reverse=reverse)
+            elif reverse:
+                children = reversed(children)
             level += 1
-            for element in queue:
-                iflast.append(queue.index(element) == len(queue)-1)
-                self.__print_backend(element.identifier, level, idhidden,
-                    filter, key, reverse, line_type, data_property, func, iflast)
-                iflast.pop()
+            for idx, child in enumerate(children):
+                is_last.append(idx == idxlast)
+                for item in self.__get_iter(child.identifier, level, filter_,
+                                            key, reverse, dt, is_last):
+                    yield item
+                is_last.pop()
 
     def __update_bpointer(self, nid, parent_id):
         """set self[nid].bpointer"""

@@ -12,6 +12,15 @@ import unittest
 from treelib import Tree, Node
 from treelib.tree import NodeIDAbsentError
 
+def encode(value):
+    if sys.version_info[0] == 2:
+        # Python2.x :
+        return value.encode('utf-8')
+    else:
+        # Python3.x :
+        return value
+
+
 class NodeCase(unittest.TestCase):
     def setUp(self):
         self.node1 = Node("Test One", "identifier 1")
@@ -282,20 +291,58 @@ Hárry
     └── Diane
 """
 
-        if sys.version_info[0] == 2:
-            # Python2.x :
-            assert str(self.tree) == expected_result.encode('utf-8')
-        else:
-            # Python3.x :
-            assert str(self.tree) == expected_result
+        assert str(self.tree) == encode(expected_result)
 
     def test_show(self):
         self.tree.show()
 
+    def test_get(self):
+        items = [(pre, node.tag) for pre, node in self.tree.get()]
+        expected = [
+            ('', 'Hárry'),
+            ('├── ', 'Jane'),
+            ('│   └── ', 'Diane'),
+            ('└── ', 'Bill'),
+            ('    └── ', 'George'),
+        ]
+        self.assertEqual(items, [(pre, label) for pre, label in expected])
+
+    def test_order(self):
+        tree = Tree()
+        tree.create_node("root", "root")
+        for sub in ("Ab", "Cd", "zD", "Dff", "77", "Ber", "Aa"):
+            tree.create_node(sub, sub, parent="root")
+            for subsub in ("rt", 4, "99"):
+                tag = "%s/%s" % (sub, subsub)
+                tree.create_node(tag, tag, parent=sub)
+        values = [node.tag for (_, node) in tree.get()]
+        expected = ['root',
+                    'Ab', 'Ab/rt', 'Ab/4', 'Ab/99',
+                    'Cd', 'Cd/rt', 'Cd/4', 'Cd/99',
+                    'zD', 'zD/rt', 'zD/4', 'zD/99',
+                    'Dff', 'Dff/rt', 'Dff/4', 'Dff/99',
+                    '77', '77/rt', '77/4', '77/99',
+                    'Ber', 'Ber/rt', 'Ber/4', 'Ber/99',
+                    'Aa', 'Aa/rt', 'Aa/4', 'Aa/99']
+        self.assertEqual(values, expected)
+
+        values = [node.tag for (_, node) in tree.get(reverse=True)]
+        expected = ['root',
+                    'Aa', 'Aa/99', 'Aa/4', 'Aa/rt',
+                    'Ber', 'Ber/99', 'Ber/4', 'Ber/rt',
+                    '77', '77/99', '77/4', '77/rt',
+                    'Dff', 'Dff/99', 'Dff/4', 'Dff/rt',
+                    'zD', 'zD/99', 'zD/4', 'zD/rt',
+                    'Cd', 'Cd/99', 'Cd/4', 'Cd/rt',
+                    'Ab', 'Ab/99', 'Ab/4', 'Ab/rt',
+        ]
+        self.assertEqual(values, expected)
+
+
     def tearDown(self):
         self.tree = None
         self.copytree = None
-    
+
 def suite():
     suites = [NodeCase, TreeCase]
     suite = unittest.TestSuite()
