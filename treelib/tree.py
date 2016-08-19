@@ -173,7 +173,8 @@ class Tree(object):
 
         # legacy ordering
         if key is None:
-            key = lambda node: node
+            def key(node):
+                return node
 
         # iter with func
         for pre, node in self.__get(nid, level, filter, key, reverse,
@@ -188,7 +189,8 @@ class Tree(object):
     def __get(self, nid, level, filter_, key, reverse, line_type):
         # default filter
         if filter_ is None:
-            filter_ = lambda node: True
+            def filter_(node):
+                return True
 
         # render characters
         dt = {
