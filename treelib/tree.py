@@ -8,7 +8,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 import sys
 import json
-import collections
 from copy import deepcopy
 try:
     from .node import Node
@@ -93,7 +92,7 @@ class Tree(object):
         """
 
         #: dictionary, identifier: Node object
-        self._nodes = collections.OrderedDict()
+        self._nodes = {}
 
         #: identifier of the root node
         self.root = None
