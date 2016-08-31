@@ -4,6 +4,8 @@ treelib
 Tree implementation in python: simple to use for you.
 
 [![Build Status](https://travis-ci.org/caesar0301/treelib.svg?branch=master)](https://travis-ci.org/caesar0301/treelib)
+[![Documentation Status](https://readthedocs.org/projects/treelib/badge/?version=latest)](http://treelib.readthedocs.io/en/latest/?badge=latest)
+
 
 Quick Start
 -----------
@@ -13,7 +15,7 @@ Quick Start
 Documentation
 -------------
 
-For installation, APIs and examples, see http://caesar0301.github.io/treelib/
+For installation, APIs and examples, see http://treelib.readthedocs.io/en/latest/
 
 License
 -------
