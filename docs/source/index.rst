@@ -20,9 +20,7 @@ The main features of `treelib` includes:
 
 	* Simple to use in both python 2 and 3.
 	* Efficient operation of node indexing with the benefit of dictionary type.
-   * Support common tree operations like **traversing**,
-     **insertion**, **deletion**, **node moving**, **shallow/deep
-     copying**, **subtree cutting** etc.
+	* Support common tree operations like **traversing**, **insertion**, **deletion**, **node moving**, **shallow/deep copying**, **subtree cutting** etc.
 	* Support user-defined data payload to accelerate your model construction.
 	* Has pretty tree showing and text/json dump for pretty show and offline analysis.
 
