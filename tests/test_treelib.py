@@ -203,8 +203,13 @@ class TreeCase(unittest.TestCase):
         self.assertEqual("mark" in self.tree.is_branch("hárry"), True)
 
     def test_expand_tree(self):
-        nodes = [self.tree[nid] for nid in self.tree.expand_tree()]
-        self.assertEqual(len(nodes), 5)
+        nodes = [nid for nid in self.tree.expand_tree()]
+        self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'george', u'jane', u'diane'])
+        nodes = [nid for nid in self.tree.expand_tree(nid="bill")]
+        self.assertEqual(len(nodes), 2)
+        nodes = [nid for nid in self.tree.expand_tree(mode=Tree.WIDTH)]
+        self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'jane', u'george', u'diane'])
+        nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag == "Diane")]
 
     def test_move_node(self):
         diane_parent = self.tree.parent("diane")
