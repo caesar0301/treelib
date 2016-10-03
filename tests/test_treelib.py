@@ -218,7 +218,10 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(len(nodes), 2)
         nodes = [nid for nid in self.tree.expand_tree(mode=Tree.WIDTH)]
         self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'jane', u'george', u'diane'])
-        nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag == "Diane")]
+        nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag == "Bill")]
+        self.assertEqual(len(nodes), 0)
+        nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag != "Bill")]
+        self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'diane'])
 
     def test_move_node(self):
         diane_parent = self.tree.parent("diane")

@@ -246,29 +246,6 @@ class Tree(object):
     def __real_true(self, p):
         return True
 
-    def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
-        """transform self into a dict"""
-
-        nid = self.root if (nid is None) else nid
-        ntag = self[nid].tag
-        tree_dict = {ntag: {"children": []}}
-        if with_data:
-            tree_dict[ntag]["data"] = self[nid].data
-
-        if self[nid].expanded:
-            queue = [self[i] for i in self[nid].fpointer]
-            key = (lambda x: x) if (key is None) else key
-            if sort:
-                queue.sort(key=key, reverse=reverse)
-
-            for elem in queue:
-                tree_dict[ntag]["children"].append(
-                    self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse))
-            if len(tree_dict[ntag]["children"]) == 0:
-                tree_dict = self[nid].tag if not with_data else \
-                            {ntag: {"data":self[nid].data}}
-            return tree_dict
-
     def add_node(self, node, parent=None):
         """
         Add a new node to tree.
@@ -349,7 +326,8 @@ class Tree(object):
         Brian J. Reiser, page 239-241
 
         UPDATE: the @filter function is performed on Node object during
-        traversing.
+        traversing. In this manner, the traversing will not continue to
+        following children of node whose condition does not pass the filter.
 
         UPDATE: the @key and @reverse are present to sort nodes at each
         level.
@@ -709,6 +687,29 @@ class Tree(object):
     def to_json(self, with_data=False, sort=True, reverse=False):
         """Return the json string corresponding to self"""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
+
+    def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
+        """transform self into a dict"""
+
+        nid = self.root if (nid is None) else nid
+        ntag = self[nid].tag
+        tree_dict = {ntag: {"children": []}}
+        if with_data:
+            tree_dict[ntag]["data"] = self[nid].data
+
+        if self[nid].expanded:
+            queue = [self[i] for i in self[nid].fpointer]
+            key = (lambda x: x) if (key is None) else key
+            if sort:
+                queue.sort(key=key, reverse=reverse)
+
+            for elem in queue:
+                tree_dict[ntag]["children"].append(
+                    self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse))
+            if len(tree_dict[ntag]["children"]) == 0:
+                tree_dict = self[nid].tag if not with_data else \
+                            {ntag: {"data":self[nid].data}}
+            return tree_dict
 
 if __name__ == '__main__':
     pass

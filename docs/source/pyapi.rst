@@ -4,17 +4,18 @@ Useful APIs
 .. module:: treelib
     :synopsis: Tree data structure in Python.
 
-This `treelib` is a simple module containing only two classes: ``Node`` and
-``Tree``. Tree is a self-contained structure with some nodes and connected by
-branches. One tree has and only has one root, while a node (except root) has
-several children and merely one parent.
+`treelib` is a Python module with two primary classes: ``Node`` and
+``Tree``. Tree is a self-contained structure with some nodes and
+connected by branches. A tree owns merely a root, while a
+node (except root) has some children and one parent.
 
-*Note:* To solve the string compatibility between Python 2.x and 3.x, treelib
-follows the way of porting Python 3.x to 2/3. That means, all strings are
-manipulated as unicode and you do not need `u''` prefix anymore. The impacted
-functions include `str()`, `show()` and `save2file()` routines. But if your
-data contains non-ascii characters and Python 2.x is used, you have to trigger
-the compatibility by declaring `unicode_literals` in the code:
+*Note:* To solve string compatibility between Python 2.x and 3.x,
+treelib follows the way of porting Python 3.x to 2/3. That means, all
+strings are manipulated as unicode and you do not need `u''` prefix
+anymore. The impacted functions include `str()`, `show()` and
+`save2file()` routines. But if your data contains non-ascii
+characters and Python 2.x is used, you have to trigger the
+compatibility by declaring `unicode_literals` in the code:
 
 .. code-block:: sh
 
@@ -192,8 +193,10 @@ Instance attributes:
 
     Traverse the tree nodes with different modes. ``nid`` refers to the
     expanding point to start; ``mode`` refers to the search mode (Tree.DEPTH,
-    Tree.WIDTH); ``filter`` refers to the function of one variable to act on
-    the :class:`Node` object; ``key``, ``reverse`` are present to sort
+    Tree.WIDTH). ``filter`` refers to the function of one variable to act on
+    the :class:`Node` object. In this manner, the traversing will not continue to
+    following children of node whose condition does not pass the filter.
+    ``key``, ``reverse`` are present to sort
     :class:Node objects at the same level.
 
 
@@ -281,11 +284,13 @@ Instance attributes:
 
     Print the tree structure in hierarchy style. ``nid`` refers to the
     expanding point to start; ``level`` refers to the node level in the tree
-    (root as level 0); ``idhidden`` refers to hiding the node ID when printing;
+    (root as level 0).
+    ``idhidden`` refers to hiding the node ID when printing.
     ``filter`` refers to the function of one variable to act on the
-    :class:`Node` object; ``key``, ``reverse`` are present to sort
-    :class:`Node` object in the same level. ``data_property`` refers to the property
-    on the node data object to be printed.
+    :class:`Node` object.  In this manner, the traversing will not continue to
+    following children of node whose condition does not pass the filter.
+    ``key``, ``reverse`` are present to sort :class:`Node` object in the same level.
+    ``data_property`` refers to the property on the node data object to be printed.
 
     You have three ways to output your tree data, i.e., stdout with ``show()``,
     plain text file with ``save2file()``, and json string with ``to_json()``. The
