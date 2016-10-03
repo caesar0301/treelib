@@ -8,7 +8,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 import sys
 import json
-import collections
 from copy import deepcopy
 try:
     from .node import Node
@@ -93,7 +92,7 @@ class Tree(object):
         """
 
         #: dictionary, identifier: Node object
-        self._nodes = collections.OrderedDict()
+        self._nodes = {}
 
         #: identifier of the root node
         self.root = None
@@ -173,7 +172,8 @@ class Tree(object):
 
         # legacy ordering
         if key is None:
-            key = lambda node: node
+            def key(node):
+                return node
 
         # iter with func
         for pre, node in self.__get(nid, level, filter, key, reverse,
@@ -188,7 +188,8 @@ class Tree(object):
     def __get(self, nid, level, filter_, key, reverse, line_type):
         # default filter
         if filter_ is None:
-            filter_ = lambda node: True
+            def filter_(node):
+                return True
 
         # render characters
         dt = {
