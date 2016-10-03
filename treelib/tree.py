@@ -181,10 +181,6 @@ class Tree(object):
             label = get_label(node)
             func('{0}{1}'.format(pre, label).encode('utf-8'))
 
-    def get(self, nid=None, level=ROOT, filter=None, key=None, reverse=None,
-            line_type='ascii-ex'):
-        return self.__get(nid, level, filter, key, reverse, line_type)
-
     def __get(self, nid, level, filter_, key, reverse, line_type):
         # default filter
         if filter_ is None:
