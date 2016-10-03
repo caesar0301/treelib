@@ -137,5 +137,14 @@ class Node(object):
             print("WARNNING: INSERT is deprecated to ADD mode")
             self.update_fpointer(nid)
 
+    def __repr__(self):
+        name = self.__class__.__name__
+        kwargs = [
+            "tag=%r" % self.tag,
+            "identifier=%r" % self.identifier,
+            "data=%r" % self.data,
+        ]
+        return "%s(%s)" % (name, ", ".join(kwargs))
+
 if __name__ == '__main__':
     pass
