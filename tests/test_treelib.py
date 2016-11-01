@@ -347,7 +347,7 @@ Hárry
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: False)), ())
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: n.is_root())), (nodes[0],))
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: not n.is_root())), (nodes[1],))
-        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: True)), tuple(nodes))
+        self.assertTrue(set(new_tree.filter_nodes(lambda n: True)), set(nodes))
 
 def suite():
     suites = [NodeCase, TreeCase]
