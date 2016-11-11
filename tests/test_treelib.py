@@ -200,7 +200,7 @@ class TreeCase(unittest.TestCase):
         for nid in self.tree.expand_tree():
             self.assertEqual((self.tree[nid].is_leaf()) == (self.tree[nid] \
                                                             in leaves), True)
-        leaves = self.tree.leaves(root='jane')
+        leaves = self.tree.leaves(nid='jane')
         for nid in self.tree.expand_tree(nid='jane'):
             self.assertEqual(self.tree[nid].is_leaf() == (self.tree[nid] in leaves), True)
 
