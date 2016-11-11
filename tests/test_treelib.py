@@ -286,11 +286,20 @@ class TreeCase(unittest.TestCase):
 
     def test_show_data_property(self):
         new_tree = Tree()
-        class Flower(object):
-            def __init__(self, color):
-                self.color = color
-        new_tree.create_node("Jill", "jill", data=Flower("white"))
-        new_tree.show(data_property="color")
+
+        sys.stdout = open(os.devnull, "w")  # stops from printing to console
+
+        try:
+            new_tree.show()
+
+            class Flower(object):
+                def __init__(self, color):
+                    self.color = color
+            new_tree.create_node("Jill", "jill", data=Flower("white"))
+            new_tree.show(data_property="color")
+        finally:
+            sys.stdout.close()
+            sys.stdout = sys.__stdout__  # stops from printing to console
 
     def test_level(self):
         self.assertEqual(self.tree.level('hárry'),  0)
@@ -312,7 +321,13 @@ Hárry
         assert str(self.tree) == encode(expected_result)
 
     def test_show(self):
-        self.tree.show()
+        sys.stdout = open(os.devnull, "w")  # stops from printing to console
+
+        try:
+            self.tree.show()
+        finally:
+            sys.stdout.close()
+            sys.stdout = sys.__stdout__  # stops from printing to console
 
     def tearDown(self):
         self.tree = None

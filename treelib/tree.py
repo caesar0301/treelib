@@ -644,8 +644,11 @@ class Tree(object):
         def write(line):
             self.reader += line.decode('utf-8') + "\n"
 
-        self.__print_backend(nid, level, idhidden, filter,
-            key, reverse, line_type, data_property, func=write)
+        try:
+            self.__print_backend(nid, level, idhidden, filter,
+                key, reverse, line_type, data_property, func=write)
+        except NodeIDAbsentError:
+            print('Tree is empty')
 
         print(self.reader)
 
