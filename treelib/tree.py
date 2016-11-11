@@ -277,7 +277,7 @@ class Tree(object):
 
     def all_nodes_itr(self):
         """
-        Returns all nodes in a iterator
+        Returns all nodes in an iterator
         Added by William Rusnack
         """
         return self._nodes.values()
@@ -378,6 +378,15 @@ class Tree(object):
                         direction = not direction
                         stack = stack_fw if direction else stack_bw
 
+    def filter_nodes(self, func):
+        """
+        Filters all nodes by function
+        function is passed one node as an argument and that node is included if function returns true
+        returns a filter iterator of the node in python 3 or a list of the nodes in python 2
+        Added William Rusnack
+        """
+        return filter(func, self.all_nodes_itr())
+
     def get_node(self, nid):
         """Return the node with nid. None returned if nid not exists."""
         if nid is None or not self.contains(nid):
@@ -400,15 +409,15 @@ class Tree(object):
             fpointer = []
         return fpointer
 
-    def leaves(self, root=None):
+    def leaves(self, nid=None):
         """Get leaves of the whole tree of a subtree."""
         leaves = []
-        if root is None:
+        if nid is None:
             for node in self._nodes.values():
                 if node.is_leaf():
                     leaves.append(node)
         else:
-            for node in self.expand_tree(root):
+            for node in self.expand_tree(nid):
                 if self[node].is_leaf():
                     leaves.append(self[node])
         return leaves
@@ -617,15 +626,6 @@ class Tree(object):
             # subtree() hasn't update the bpointer
             current = self[current].bpointer if self.root != current else None
 
-    def filter_nodes(self, function):
-        """
-        Filters all nodes by function
-        function is passed one node as an argument and that node is included if function returns true
-        returns a filter iterator of the node in python 3 or a list of the nodes in python 2
-        Added William Rusnack
-        """
-        return filter(function, self.all_nodes_itr())
-
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex', data_property=None):
         """Update 20/05/13: Save tree into file for offline analysis"""
@@ -700,10 +700,6 @@ class Tree(object):
             st._nodes.update({self[node_n].identifier: self[node_n]})
         return st
 
-    def to_json(self, with_data=False, sort=True, reverse=False):
-        """Return the json string corresponding to self"""
-        return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
-
     def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
         """transform self into a dict"""
 
@@ -726,6 +722,10 @@ class Tree(object):
                 tree_dict = self[nid].tag if not with_data else \
                             {ntag: {"data":self[nid].data}}
             return tree_dict
+
+    def to_json(self, with_data=False, sort=True, reverse=False):
+        """Return the json string corresponding to self"""
+        return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
 if __name__ == '__main__':
     pass

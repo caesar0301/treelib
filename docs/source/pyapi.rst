@@ -165,6 +165,9 @@ Instance attributes:
 
     Get the list of all the nodes randomly belonging to this tree.
 
+.. method:: all_nodes_iter()
+
+    Returns all nodes in an iterator.
 
 .. method:: children(nid)
 
@@ -199,6 +202,12 @@ Instance attributes:
     ``key``, ``reverse`` are present to sort
     :class:Node objects at the same level.
 
+.. method:: filter_nodes(func)
+
+    Filters all nodes by function.
+    ``func`` is passed one node as an argument and that node is included if function returns true.
+    Returns a filter iterator of the node in python 3 or a list of the nodes in python 2.
+    Thanks for William Rusnack.
 
 .. method:: get_node(nid)
 
