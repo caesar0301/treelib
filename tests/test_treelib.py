@@ -321,7 +321,9 @@ Hárry
         assert str(self.tree) == encode(expected_result)
 
     def test_show(self):
+        reload(sys)
         sys.stdout = open(os.devnull, "w")  # stops from printing to console
+        sys.setdefaultencoding('utf-8')
 
         try:
             self.tree.show()
