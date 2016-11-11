@@ -108,6 +108,9 @@ class Tree(object):
 
     def __getitem__(self, key):
         """Return _nodes[key]"""
+        if isinstance(key, Node):
+            return self.__getitem__(key.identifier)
+
         try:
             return self._nodes[key]
         except KeyError:
@@ -235,9 +238,19 @@ class Tree(object):
 
     def __update_bpointer(self, nid, parent_id):
         """set self[nid].bpointer"""
+        if isinstance(nid, Node):
+            return self.__update_bpointer(nid.identifier, parent_id)
+        if isinstance(parent_id, Node):
+            return self.__update_bpointer(nid, parent_id.identifier)
+
         self[nid].update_bpointer(parent_id)
 
     def __update_fpointer(self, nid, child_id, mode):
+        if isinstance(nid, Node):
+            return self.__update_fpointer(nid.identifier, child_id, mode)
+        if isinstance(child_id, Node):
+            return self.__update_fpointer(nid, child_id.identifier, mode)
+
         if nid is None:
             return
         else:
@@ -291,7 +304,9 @@ class Tree(object):
 
     def contains(self, nid):
         """Check if the tree contains node of given id"""
-        return True if nid in self._nodes else False
+        if isinstance(nid, Node):
+            return self.contains(nid.identifier)
+        return nid in self._nodes
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """Create a child node for given @parent node."""
@@ -389,6 +404,8 @@ class Tree(object):
 
     def get_node(self, nid):
         """Return the node with nid. None returned if nid not exists."""
+        if isinstance(nid, Node):
+            return self.get_node(nid.identifier)
         if nid is None or not self.contains(nid):
             return None
         return self._nodes[nid]
