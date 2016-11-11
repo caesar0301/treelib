@@ -17,14 +17,14 @@ class DotExportCase(unittest.TestCase):
         tree.create_node("Diane", "diane", parent="jane")
         tree.create_node("George", "george", parent="bill")
         self.tree = tree
-    
+
     def read_generated_output(self, filename):
         output = codecs.open(filename, 'r', 'utf-8')
         generated = output.read()
         output.close()
-        
+
         return generated
-    
+
     def test_export_to_dot(self):
         export_to_dot(self.tree, 'tree.dot')
         expected = """\
@@ -40,32 +40,32 @@ digraph tree {
 \t"bill" -> "george"
 \t"jane" -> "diane"
 }"""
-        
+
         self.assertTrue(os.path.isfile('tree.dot'), "The file tree.dot could not be found.")
         generated = self.read_generated_output('tree.dot')
-        
-        self.assertEqual(generated, expected, "Generated dot tree is not the expected one")  
+
+        self.assertEqual(generated, expected, "Generated dot tree is not the expected one")
         os.remove('tree.dot')
-        
+
     def test_export_to_dot_empty_tree(self):
         empty_tree = Tree()
         export_to_dot(empty_tree, 'tree.dot')
-        
+
         expected = """\
 digraph tree {
 
 }"""
         self.assertTrue(os.path.isfile('tree.dot'), "The file tree.dot could not be found.")
         generated = self.read_generated_output('tree.dot')
-        
+
         self.assertEqual(expected, generated, 'The generated output for an empty tree is not empty')
         os.remove('tree.dot')
-    
+
     def test_unicode_filename(self):
         tree = Tree()
         tree.create_node('Node 1', 'node_1')
         export_to_dot(tree, 'ŕʩϢ.dot')
-        
+
         expected = """\
 digraph tree {
 \t"node_1" [label="Node 1", shape=circle]

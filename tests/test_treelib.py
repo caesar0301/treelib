@@ -318,6 +318,37 @@ Hárry
         self.tree = None
         self.copytree = None
 
+    def test_all_nodes_itr(self):
+        """
+        tests: Tree.all_nodes_iter
+        Added by: William Rusnack
+        """
+        new_tree = Tree()
+        self.assertEqual(len(new_tree.all_nodes_itr()), 0)
+        nodes = []
+        nodes.append(new_tree.create_node('root_node'))
+        nodes.append(new_tree.create_node('second', parent=new_tree.root))
+        for nd in new_tree.all_nodes_itr():
+            self.assertTrue(nd in nodes)
+
+    def test_filter_nodes(self):
+        """
+        tests: Tree.filter_nodes
+        Added by: William Rusnack
+        """
+        new_tree = Tree()
+
+        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: True)), ())
+
+        nodes = []
+        nodes.append(new_tree.create_node('root_node'))
+        nodes.append(new_tree.create_node('second', parent=new_tree.root))
+
+        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: False)), ())
+        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: n.is_root())), (nodes[0],))
+        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: not n.is_root())), (nodes[1],))
+        self.assertTrue(set(new_tree.filter_nodes(lambda n: True)), set(nodes))
+
 def suite():
     suites = [NodeCase, TreeCase]
     suite = unittest.TestSuite()

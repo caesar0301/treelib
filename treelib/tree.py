@@ -275,6 +275,13 @@ class Tree(object):
         """Return all nodes in a list"""
         return list(self._nodes.values())
 
+    def all_nodes_itr(self):
+        """
+        Returns all nodes in a iterator
+        Added by William Rusnack
+        """
+        return self._nodes.values()
+
     def children(self, nid):
         """
         Return the children (Node) list of nid.
@@ -609,6 +616,15 @@ class Tree(object):
                 yield current
             # subtree() hasn't update the bpointer
             current = self[current].bpointer if self.root != current else None
+
+    def filter_nodes(self, function):
+        """
+        Filters all nodes by function
+        function is passed one node as an argument and that node is included if function returns true
+        returns a filter iterator of the node in python 3 or a list of the nodes in python 2
+        Added William Rusnack
+        """
+        return filter(function, self.all_nodes_itr())
 
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex', data_property=None):
