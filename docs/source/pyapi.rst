@@ -151,6 +151,10 @@ Instance attributes:
     with ``.`` and ``=`` operator respectively.
 
 
+.. method:: nodes
+
+    Return a dict form of nodes in a tree: {id: node_instance}
+
 
 **Instance methods**:
 
@@ -241,11 +245,6 @@ Instance attributes:
 .. method:: move_node(source, destination)
 
     Move node (source) from its parent to another parent (destination).
-
-
-.. method:: nodes()
-
-    Return a dict form of nodes in a tree: {id: node_instance}
 
 
 .. method:: parent (nid)
