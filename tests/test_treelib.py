@@ -321,7 +321,7 @@ Hárry
         assert str(self.tree) == encode(expected_result)
 
     def test_show(self):
-        if sys.version_info.major < 3:
+        if sys.version_info[0] < 3:
             reload(sys)
             sys.setdefaultencoding('utf-8')
         sys.stdout = open(os.devnull, "w")  # stops from printing to console
