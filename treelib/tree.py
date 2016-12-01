@@ -388,7 +388,7 @@ class Tree(object):
         return filter(func, self.all_nodes_itr())
 
     def get_node(self, nid):
-        """Return the node with nid. None returned if nid not exists."""
+        """Return the node with `nid`. None returned if `nid` does not exist."""
         if nid is None or not self.contains(nid):
             return None
         return self._nodes[nid]

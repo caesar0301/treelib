@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 """treelib - Simple to use for you.
-
    Python 2/3 Tree Implementation
 """
 
@@ -9,8 +8,8 @@ import uuid
 
 class Node(object):
     """
-    A Node object is stored inside the _nodes dictionary of a Tree object.
-    Use Node objects to store data inside the data attribute.
+    Nodes are elementary objects which are stored a `_nodes` dictionary of a Tree.
+    Use `data` attribute to store node-specific data.
     """
 
     #: ADD, DELETE, INSERT constants :
@@ -53,12 +52,12 @@ class Node(object):
 
     @property
     def bpointer(self):
-        """return the value of _bpointer; see below for the setter"""
+        """Return the value of `_bpointer`."""
         return self._bpointer
 
     @bpointer.setter
     def bpointer(self, nid):
-        """set the value of _bpointer; see above for the getter"""
+        """Set the value of `_bpointer`."""
         if nid is not None:
             self._bpointer = nid
         else:
@@ -68,12 +67,12 @@ class Node(object):
 
     @property
     def fpointer(self):
-        """return the value of _fpointer; see below for the setter"""
+        """Return the value of `_fpointer`."""
         return self._fpointer
 
     @fpointer.setter
     def fpointer(self, value):
-        """set the value of _fpointer; see above for the getter"""
+        """Set the value of `_fpointer`."""
         if value is None:
             self._fpointer = list()
         elif isinstance(value, list):
@@ -87,44 +86,44 @@ class Node(object):
 
     @property
     def identifier(self):
-        """return the value of _identifier; see below for the setter"""
+        """Return the value of `_identifier`."""
         return self._identifier
 
     @identifier.setter
     def identifier(self, value):
-        """set the value of _identifier; see above for the getter"""
+        """Set the value of `_identifier`."""
         if value is None:
             print("WARNNING: node ID can not be None")
         else:
             self._set_identifier(value)
 
     def is_leaf(self):
-        """return True if the the current node has no son"""
+        """Return true if current node has no children."""
         if len(self.fpointer) == 0:
             return True
         else:
             return False
 
     def is_root(self):
-        """return True if self has no parent, i.e. if self is root"""
+        """Return true if self has no parent, i.e. as root."""
         return self._bpointer is None
 
     @property
     def tag(self):
-        """return the value if _tag; see below for the setter"""
+        """Return the value of `_tag`."""
         return self._tag
 
     @tag.setter
     def tag(self, value):
-        """set the value if _tag; see above for the getter"""
+        """Set the value of `_tag`."""
         self._tag = value if value is not None else None
 
     def update_bpointer(self, nid):
-        """set bpointer"""
+        """Update parent node."""
         self.bpointer = nid
 
     def update_fpointer(self, nid, mode=ADD):
-        """set _fpointer recursively"""
+        """Update all children nodes."""
         if nid is None:
             return
 
