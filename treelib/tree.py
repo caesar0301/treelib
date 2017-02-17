@@ -52,6 +52,14 @@ class LinkPastRootNodeError(Exception):
 class InvalidLevelNumber(Exception):
     pass
 
+
+class DerootTreeAttempt(Exception):
+    """
+    Exception thrown if any attempt is made to deroot the tree,
+    as in when calling Tree.move_node(root, destination).
+    """
+    pass
+
 def python_2_unicode_compatible(klass):
     """
     (slightly modified from :
@@ -465,9 +473,17 @@ class Tree(object):
             raise NodeIDAbsentError
 
         parent = self[source].bpointer
-        self.__update_fpointer(parent, source, Node.DELETE)
-        self.__update_fpointer(destination, source, Node.ADD)
-        self.__update_bpointer(source, destination)
+        if self[source].is_root():
+            raise DerootTreeAttempt
+        elif self[destination].bpointer == source:
+            # Special case where we exchange child/parent
+            self.move_node(destination, parent)
+            self.move_node(source, destination)
+        else:
+            # General case
+            self.__update_fpointer(parent, source, Node.DELETE)
+            self.__update_fpointer(destination, source, Node.ADD)
+            self.__update_bpointer(source, destination)
 
     @property
     def nodes(self):
