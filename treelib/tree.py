@@ -27,9 +27,11 @@ class NodeIDAbsentError(Exception):
     """Exception throwed if a node's identifier is unknown"""
     pass
 
+
 class NodePropertyAbsentError(Exception):
     """Exception throwed if a node's data property is not specified"""
     pass
+
 
 class MultipleRootError(Exception):
     """Exception throwed if more than one root exists in a tree."""
@@ -53,12 +55,13 @@ class InvalidLevelNumber(Exception):
     pass
 
 
-class DerootTreeAttempt(Exception):
+class LoopError(Exception):
     """
-    Exception thrown if any attempt is made to deroot the tree,
-    as in when calling Tree.move_node(root, destination).
+    Exception thrown if trying to move node B to node A's position
+    while A is B's ancestor.
     """
     pass
+
 
 def python_2_unicode_compatible(klass):
     """
@@ -471,19 +474,24 @@ class Tree(object):
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
-
+        elif self.is_ancestor(source, destination):
+            raise LoopError
+        
         parent = self[source].bpointer
-        if self[source].is_root():
-            raise DerootTreeAttempt
-        elif self[destination].bpointer == source:
-            # Special case where we exchange child/parent
-            self.move_node(destination, parent)
-            self.move_node(source, destination)
-        else:
-            # General case
-            self.__update_fpointer(parent, source, Node.DELETE)
-            self.__update_fpointer(destination, source, Node.ADD)
-            self.__update_bpointer(source, destination)
+        self.__update_fpointer(parent, source, Node.DELETE)
+        self.__update_fpointer(destination, source, Node.ADD)
+        self.__update_bpointer(source, destination)
+
+    def is_ancestor(self, ancestor, grandchild):
+        parent = self[grandchild].bpointer
+        child = grandchild
+        while parent is not None:
+            if parent == ancestor:
+                return True
+            else:
+                child = self[child].bpointer
+                parent = self[child].bpointer
+        return False
 
     @property
     def nodes(self):
