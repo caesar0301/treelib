@@ -61,7 +61,7 @@ class Node(object):
         if nid is not None:
             self._bpointer = nid
         else:
-            # print("WARNNING: the bpointer of node %s " \
+            # print("WARNING: the bpointer of node %s " \
             #      "is set to None" % self._identifier)
             self._bpointer = None
 
@@ -93,7 +93,7 @@ class Node(object):
     def identifier(self, value):
         """Set the value of `_identifier`."""
         if value is None:
-            print("WARNNING: node ID can not be None")
+            print("WARNING: node ID can not be None")
         else:
             self._set_identifier(value)
 
@@ -133,7 +133,7 @@ class Node(object):
             if nid in self._fpointer:
                 self._fpointer.remove(nid)
         elif mode is self.INSERT:  # deprecate to ADD mode
-            print("WARNNING: INSERT is deprecated to ADD mode")
+            print("WARNING: INSERT is deprecated to ADD mode")
             self.update_fpointer(nid)
 
     def __repr__(self):
