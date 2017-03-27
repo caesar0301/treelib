@@ -27,9 +27,11 @@ class NodeIDAbsentError(Exception):
     """Exception throwed if a node's identifier is unknown"""
     pass
 
+
 class NodePropertyAbsentError(Exception):
     """Exception throwed if a node's data property is not specified"""
     pass
+
 
 class MultipleRootError(Exception):
     """Exception throwed if more than one root exists in a tree."""
@@ -51,6 +53,15 @@ class LinkPastRootNodeError(Exception):
 
 class InvalidLevelNumber(Exception):
     pass
+
+
+class LoopError(Exception):
+    """
+    Exception thrown if trying to move node B to node A's position
+    while A is B's ancestor.
+    """
+    pass
+
 
 def python_2_unicode_compatible(klass):
     """
@@ -463,11 +474,24 @@ class Tree(object):
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
+        elif self.is_ancestor(source, destination):
+            raise LoopError
 
         parent = self[source].bpointer
         self.__update_fpointer(parent, source, Node.DELETE)
         self.__update_fpointer(destination, source, Node.ADD)
         self.__update_bpointer(source, destination)
+
+    def is_ancestor(self, ancestor, grandchild):
+        parent = self[grandchild].bpointer
+        child = grandchild
+        while parent is not None:
+            if parent == ancestor:
+                return True
+            else:
+                child = self[child].bpointer
+                parent = self[child].bpointer
+        return False
 
     @property
     def nodes(self):

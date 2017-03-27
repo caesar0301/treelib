@@ -10,7 +10,7 @@ except ImportError:
     from io import BytesIO
 import unittest
 from treelib import Tree, Node
-from treelib.tree import NodeIDAbsentError
+from treelib.tree import NodeIDAbsentError, LoopError
 
 def encode(value):
     if sys.version_info[0] == 2:
@@ -366,6 +366,17 @@ Hárry
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: n.is_root())), (nodes[0],))
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: not n.is_root())), (nodes[1],))
         self.assertTrue(set(new_tree.filter_nodes(lambda n: True)), set(nodes))
+
+    def test_loop(self):
+        tree = Tree()
+        tree.create_node('a', 'a')
+        tree.create_node('b', 'b', parent='a')
+        tree.create_node('c', 'c', parent='b')
+        tree.create_node('d', 'd', parent='c')
+        try:
+            tree.move_node('b', 'd')
+        except LoopError, e:
+            pass
 
 def suite():
     suites = [NodeCase, TreeCase]
