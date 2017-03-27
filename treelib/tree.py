@@ -476,7 +476,7 @@ class Tree(object):
             raise NodeIDAbsentError
         elif self.is_ancestor(source, destination):
             raise LoopError
-        
+
         parent = self[source].bpointer
         self.__update_fpointer(parent, source, Node.DELETE)
         self.__update_fpointer(destination, source, Node.ADD)
