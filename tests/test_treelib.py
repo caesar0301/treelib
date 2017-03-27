@@ -375,7 +375,7 @@ Hárry
         tree.create_node('d', 'd', parent='c')
         try:
             tree.move_node('b', 'd')
-        except LoopError, e:
+        except LoopError:
             pass
 
 def suite():
