@@ -269,18 +269,20 @@ class Tree(object):
             raise DuplicatedNodeIdError("Can't create node "
                                         "with ID '%s'" % node.identifier)
 
-        if parent is None:
+        pid = parent.identifier if isinstance(parent, Node) else parent
+
+        if pid is None:
             if self.root is not None:
                 raise MultipleRootError("A tree takes one root merely.")
             else:
                 self.root = node.identifier
-        elif not self.contains(parent):
+        elif not self.contains(pid):
             raise NodeIDAbsentError("Parent node '%s' "
-                                    "is not in the tree" % parent)
+                                    "is not in the tree" % pid)
 
         self._nodes.update({node.identifier: node})
-        self.__update_fpointer(parent, node.identifier, Node.ADD)
-        self.__update_bpointer(node.identifier, parent)
+        self.__update_fpointer(pid, node.identifier, Node.ADD)
+        self.__update_bpointer(node.identifier, pid)
 
     def all_nodes(self):
         """Return all nodes in a list"""
