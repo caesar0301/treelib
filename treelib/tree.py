@@ -257,6 +257,22 @@ class Tree(object):
     def __real_true(self, p):
         return True
 
+    def import_tree_dict(self, tree_dict):
+        """ import a hierarchical dictionary and add nodes recursively"""
+        def add_children(children, parent):
+            for i, child in enumerate(children):
+                childID = child['id']
+                childName = child['name']
+                self.create_node(childName, childID, parent=parent)
+                add_children(child['children'], child['id'])
+
+        root = tree_dict
+        rootID = root['id']
+        rootName = root['name']
+        self.create_node(rootName, rootID)
+        add_children(root['children'], root['id'])
+        return
+      
     def add_node(self, node, parent=None):
         """
         Add a new node to tree.
