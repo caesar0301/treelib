@@ -309,6 +309,11 @@ class TreeCase(unittest.TestCase):
                                          lambda x: x.identifier!='jane'),
                          depth-1)
 
+    def test_size(self):
+        self.assertEqual(self.tree.size(level=2), 2)
+        self.assertEqual(self.tree.size(level=1), 2)
+        self.assertEqual(self.tree.size(level=0), 1)
+
     def test_print_backend(self):
         expected_result = """\
 Hárry
