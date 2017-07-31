@@ -708,9 +708,9 @@ class Tree(object):
         else:
             try:
                 level = int(level)
+                return len([node for node in self.all_nodes_itr() if self.level(node.identifier) == level])
             except:
                 raise TypeError("level should be an integer instead of '%s'" % type(level))
-            return len([node for node in self.all_nodes_itr() if self.level(node.identifier) == level])
             
 
     def subtree(self, nid):
