@@ -1,4 +1,4 @@
-__version__ = '1.3.7'
+__version__ = '1.4.0'
 
 from .tree import Tree
 from .node import Node
