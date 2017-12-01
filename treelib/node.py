@@ -17,10 +17,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""treelib - Simple to use for you.
-   Python 2/3 Tree Implementation
-"""
-
 import uuid
 
 from .exceptions import NodePropertyError
