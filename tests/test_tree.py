@@ -299,7 +299,7 @@ Hárry
         """
         new_tree = Tree()
         self.assertEqual(len(new_tree.all_nodes_itr()), 0)
-        nodes = []
+        nodes = list()
         nodes.append(new_tree.create_node('root_node'))
         nodes.append(new_tree.create_node('second', parent=new_tree.root))
         for nd in new_tree.all_nodes_itr():
@@ -314,7 +314,7 @@ Hárry
 
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: True)), ())
 
-        nodes = []
+        nodes = list()
         nodes.append(new_tree.create_node('root_node'))
         nodes.append(new_tree.create_node('second', parent=new_tree.root))
 
@@ -333,3 +333,36 @@ Hárry
             tree.move_node('b', 'd')
         except LoopError:
             pass
+
+    def test_modify_node_identifier_directly_failed(self):
+        tree = Tree()
+        tree.create_node("Harry", "harry")
+        tree.create_node("Jane", "jane", parent="harry")
+        n = tree.get_node("jane")
+        self.assertTrue(n.identifier == 'jane')
+
+        # Failed to modify
+        n.identifier = "xyz"
+        self.assertTrue(tree.get_node("xyz") is None)
+        self.assertTrue(tree.get_node("jane").identifier == 'xyz')
+
+    def test_modify_node_identifier_recursively(self):
+        tree = Tree()
+        tree.create_node("Harry", "harry")
+        tree.create_node("Jane", "jane", parent="harry")
+        n = tree.get_node("jane")
+        self.assertTrue(n.identifier == 'jane')
+
+        # Success to modify
+        tree.update_node(n.identifier, identifier='xyz')
+        self.assertTrue(tree.get_node("jane") is None)
+        self.assertTrue(tree.get_node("xyz").identifier == 'xyz')
+
+    def test_modify_node_identifier_root(self):
+        tree = Tree()
+        tree.create_node("Harry", "harry")
+        tree.create_node("Jane", "jane", parent="harry")
+        tree.update_node(tree['harry'].identifier, identifier='xyz', tag='XYZ')
+        self.assertTrue(tree.root == 'xyz')
+        self.assertTrue(tree['xyz'].tag == 'XYZ')
+        self.assertEqual(tree.parent('jane').identifier, 'xyz')

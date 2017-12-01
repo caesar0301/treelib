@@ -23,6 +23,8 @@
 
 import uuid
 
+from .exceptions import NodePropertyError
+
 
 class Node(object):
     """
@@ -31,7 +33,7 @@ class Node(object):
     """
 
     #: ADD, DELETE, INSERT constants :
-    (ADD, DELETE, INSERT) = list(range(3))
+    (ADD, DELETE, INSERT, REPLACE) = list(range(4))
 
     def __init__(self, tag=None, identifier=None, expanded=True, data=None):
         """Create a new Node object to be placed inside a Tree object"""
@@ -140,19 +142,30 @@ class Node(object):
         """Update parent node."""
         self.bpointer = nid
 
-    def update_fpointer(self, nid, mode=ADD):
+    def update_fpointer(self, nid, mode=ADD, replace=None):
         """Update all children nodes."""
         if nid is None:
             return
 
         if mode is self.ADD:
             self._fpointer.append(nid)
+
         elif mode is self.DELETE:
             if nid in self._fpointer:
                 self._fpointer.remove(nid)
+
         elif mode is self.INSERT:  # deprecate to ADD mode
             print("WARNING: INSERT is deprecated to ADD mode")
             self.update_fpointer(nid)
+
+        elif mode is self.REPLACE:
+            if replace is None:
+                raise NodePropertyError(
+                    'Argument "repalce" should be provided when mode is {}'.format(mode)
+                )
+
+            ind = self._fpointer.index(nid)
+            self._fpointer[ind] = replace
 
     def __repr__(self):
         name = self.__class__.__name__

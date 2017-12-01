@@ -30,55 +30,15 @@ import sys
 from copy import deepcopy
 
 try:
-    from .node import Node
-except ImportError:
-    from node import Node
-try:
     from StringIO import StringIO as BytesIO
 except ImportError:
     from io import BytesIO
 
+from .exceptions import *
+from .node import Node
+
+
 __author__ = 'chenxm'
-
-
-class NodeIDAbsentError(Exception):
-    """Exception throwed if a node's identifier is unknown"""
-    pass
-
-
-class NodePropertyAbsentError(Exception):
-    """Exception throwed if a node's data property is not specified"""
-    pass
-
-
-class MultipleRootError(Exception):
-    """Exception throwed if more than one root exists in a tree."""
-    pass
-
-
-class DuplicatedNodeIdError(Exception):
-    """Exception throwed if an identifier already exists in a tree."""
-    pass
-
-
-class LinkPastRootNodeError(Exception):
-    """
-    Exception throwed in Tree.link_past_node() if one attempts
-    to "link past" the root node of a tree.
-    """
-    pass
-
-
-class InvalidLevelNumber(Exception):
-    pass
-
-
-class LoopError(Exception):
-    """
-    Exception thrown if trying to move node B to node A's position
-    while A is B's ancestor.
-    """
-    pass
 
 
 def python_2_unicode_compatible(klass):
@@ -152,13 +112,13 @@ class Tree(object):
         self._nodes.update({key: item})
 
     def __str__(self):
-        self.reader = ""
+        self._reader = ""
 
         def write(line):
-            self.reader += line.decode('utf-8') + "\n"
+            self._reader += line.decode('utf-8') + "\n"
 
         self.__print_backend(func=write)
-        return self.reader
+        return self._reader
 
     def __print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
                        key=None, reverse=False, line_type='ascii-ex',
@@ -684,10 +644,10 @@ class Tree(object):
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False, line_type='ascii-ex', data_property=None):
-        self.reader = ""
+        self._reader = ""
 
         def write(line):
-            self.reader += line.decode('utf-8') + "\n"
+            self._reader += line.decode('utf-8') + "\n"
 
         try:
             self.__print_backend(nid, level, idhidden, filter,
@@ -695,7 +655,7 @@ class Tree(object):
         except NodeIDAbsentError:
             print('Tree is empty')
 
-        print(self.reader)
+        print(self._reader)
 
     def siblings(self, nid):
         """
@@ -781,3 +741,34 @@ class Tree(object):
     def to_json(self, with_data=False, sort=True, reverse=False):
         """Return the json string corresponding to self"""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
+
+    def update_node(self, nid, **attrs):
+        """
+        Update node's attributes.
+        :param nid: the identifier of modified node
+        :param attrs: attribute pairs recognized by Node object
+        :return: None
+        """
+        cn = self[nid]
+        for attr, val in attrs.items():
+            if attr == 'identifier':
+                # Updating node id meets following contraints:
+                # * Update node identifier property
+                # * Update parent's followers
+                # * Update children's parents
+                # * Update tree registration of var _nodes
+                # * Update tree root if necessary
+                cn = self._nodes.pop(nid)
+                setattr(cn, 'identifier', val)
+                self._nodes[val] = cn
+
+                if cn.bpointer is not None:
+                    self[cn.bpointer].update_fpointer(nid=nid, replace=val, mode=Node.REPLACE)
+
+                for fp in cn.fpointer:
+                    self[fp].update_bpointer(nid=val)
+
+                if self.root == nid:
+                    self.root = val
+            else:
+                setattr(cn, attr, val)

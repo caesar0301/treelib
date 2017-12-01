@@ -5,9 +5,11 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 install:
   - "python setup.py install"
 
 script:
-  - /usr/bin/bash testing.sh
+  - pip install -r requirements-testing.txt
+  - sh testing.sh
