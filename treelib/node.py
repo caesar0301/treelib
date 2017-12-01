@@ -170,8 +170,8 @@ class Node(object):
     def __repr__(self):
         name = self.__class__.__name__
         kwargs = [
-            "tag={}".format(self.tag),
-            "identifier={}".format(self.identifier),
-            "data={}".format(self.data),
+            "tag={0}".format(self.tag),
+            "identifier={0}".format(self.identifier),
+            "data={0}".format(self.data),
         ]
         return "%s(%s)" % (name, ", ".join(kwargs))
