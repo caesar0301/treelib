@@ -10,5 +10,4 @@ install:
   - "python setup.py install"
 
 script:
-  - /usr/bin/env python tests/test_treelib.py
-  - /usr/bin/env python tests/test_plugins.py
+  - /usr/bin/bash testing.sh

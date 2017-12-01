@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+import unittest
+
+import os
+
 from treelib import Tree
 from treelib.plugins import *
-import os
-import unittest
+
 
 class DotExportCase(unittest.TestCase):
     """Test class for the export to dot format function"""
@@ -93,6 +97,3 @@ digraph tree {
 
     def tearDown(self):
         self.tree = None
-
-if __name__ == "__main__":
-    unittest.main()

@@ -1,14 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Copyright (C) 2011
+# Brett Alistair Kromkamp - brettkromkamp@gmail.com
+# Copyright (C) 2012-2017
+# Xiaming Chen - chenxm35@gmail.com
+# and other contributors.
+# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """treelib - Simple to use for you.
 
    Python 2/3 Tree Implementation
 """
 from __future__ import print_function
 from __future__ import unicode_literals
-import sys
+
 import json
+import sys
 from copy import deepcopy
+
 try:
     from .node import Node
 except ImportError:
@@ -17,8 +37,6 @@ try:
     from StringIO import StringIO as BytesIO
 except ImportError:
     from io import BytesIO
-
-
 
 __author__ = 'chenxm'
 
@@ -82,6 +100,7 @@ def python_2_unicode_compatible(klass):
         klass.__unicode__ = klass.__str__
         klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
     return klass
+
 
 @python_2_unicode_compatible
 class Tree(object):
@@ -711,7 +730,6 @@ class Tree(object):
                 return len([node for node in self.all_nodes_itr() if self.level(node.identifier) == level])
             except:
                 raise TypeError("level should be an integer instead of '%s'" % type(level))
-            
 
     def subtree(self, nid):
         """
@@ -763,6 +781,3 @@ class Tree(object):
     def to_json(self, with_data=False, sort=True, reverse=False):
         """Return the json string corresponding to self"""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
-
-if __name__ == '__main__':
-    pass

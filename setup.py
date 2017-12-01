@@ -1,20 +1,19 @@
-import os
-import sys
 from setuptools import setup
+
 from treelib import __version__
 
 setup(
-    name = "treelib",
-    version = __version__,
-    url = 'https://github.com/caesar0301/treelib',
-    author = 'Xiaming Chen',
-    author_email = 'chenxm35@gmail.com',
-    description = 'A Python 2/3 implementation of tree structure.',
+    name="treelib",
+    version=__version__,
+    url='https://github.com/caesar0301/treelib',
+    author='Xiaming Chen',
+    author_email='chenxm35@gmail.com',
+    description='A Python 2/3 implementation of tree structure.',
     long_description='''This is a simple tree data structure implementation in python.''',
-    license = "Apache License, Version 2.0",
-    packages = ['treelib'],
-    keywords = ['data structure', 'tree', 'tools'],
-    classifiers = [
+    license="Apache License, Version 2.0",
+    packages=['treelib'],
+    keywords=['data structure', 'tree', 'tools'],
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
             'Intended Audience :: Developers',
