@@ -695,7 +695,7 @@ class Tree(object):
         except NodeIDAbsentError:
             print('Tree is empty')
 
-        print(self.reader.encode('utf-8'))
+        print(self.reader)
 
     def siblings(self, nid):
         """
