@@ -5,7 +5,9 @@ Tree implementation in python: simple to use for you.
 
 [![Build Status](https://travis-ci.org/caesar0301/treelib.svg?branch=master)](https://travis-ci.org/caesar0301/treelib)
 [![Documentation Status](https://readthedocs.org/projects/treelib/badge/?version=latest)](http://treelib.readthedocs.io/en/latest/?badge=latest)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/pypi/l/treelib.svg)](https://pypi.python.org/pypi/treelib)
+[![Versions](https://img.shields.io/pypi/pyversions/treelib.svg)](https://pypi.python.org/pypi/treelib)
+[![Status](https://img.shields.io/pypi/status/treelib.svg)](https://pypi.python.org/pypi/treelib)
 
 
 Quick Start
