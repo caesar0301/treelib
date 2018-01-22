@@ -490,12 +490,12 @@ class Tree(object):
 
         return self[pid]
 
-    def paste(self, nid, new_tree, deepcopy=False):
+    def paste(self, nid, new_tree, deep=False):
         """
         Paste a @new_tree to the original one by linking the root
         of new tree to given node (nid).
 
-        Update: add @deepcopy of pasted tree.
+        Update: add @deep copy of pasted tree.
         """
         assert isinstance(new_tree, Tree)
         if nid is None:
@@ -509,9 +509,9 @@ class Tree(object):
             # TODO: a deprecated routine is needed to avoid exception
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
-        if deepcopy:
+        if deep:
             for node in new_tree._nodes:
-                self._nodes.update({node.identifier: deepcopy(node)})
+                self._nodes.update({node: deepcopy(new_tree[node])})
         else:
             self._nodes.update(new_tree._nodes)
         self.__update_fpointer(nid, new_tree.root, Node.ADD)
