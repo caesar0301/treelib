@@ -136,6 +136,14 @@ the data field is appended into JSON string. For example,
     >>> print(tree.to_json(with_data=True))
     {"Harry": {"data": null, "children": [{"Bill": {"data": null}}, {"Jane": {"data": null, "children": [{"Diane": {"data": null}}, {"Mark": {"data": null}}]}}, {"Mary": {"data": null}}]}}
 
+**Example 10**: Save tree into file
+  The function save2file require a filename.
+  The file is opened to write using mode 'ab'.
+
+.. code-block:: sh
+
+    >>> tree.save2file('tree.txt')
+
 
 Advanced Usage
 ----------------
