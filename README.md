@@ -1,7 +1,7 @@
 treelib
 -------
 
-Tree implementation in python: simple to use for you.
+Tree implementation in python: simple for you to use.
 
 [![Build Status](https://travis-ci.org/caesar0301/treelib.svg?branch=master)](https://travis-ci.org/caesar0301/treelib)
 [![Documentation Status](https://readthedocs.org/projects/treelib/badge/?version=latest)](http://treelib.readthedocs.io/en/latest/?badge=latest)
