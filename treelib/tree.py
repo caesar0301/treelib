@@ -295,6 +295,35 @@ class Tree(object):
         """
         return self._nodes.values()
 
+    def ancestor(self, nid, level=None):
+        """
+        For a given id, get ancestor node object at a given level.
+        If no level is provided, the parent node is returned.
+        """
+        if not self.contains(nid):
+            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
+
+        descendant = self[nid]
+        ascendant = self[nid].bpointer
+        ascendant_level = self.level(ascendant)
+
+        if level is None:
+            return ascendant
+        elif nid == self.root:
+            return self[nid]
+        elif level >= self.level(descendant.identifier):
+            raise InvalidLevelNumber("Descendant level (level %s) must be greater \
+                                      than its ancestor's level (level %s)" % (str(self.level(descendant.identifier)), level))
+
+        while ascendant is not None:
+            if ascendant_level == level:
+                return self[ascendant]
+            else:
+                descendant = ascendant
+                ascendant = self[descendant].bpointer
+                ascendant_level = self.level(ascendant)
+        return None
+
     def children(self, nid):
         """
         Return the children (Node) list of nid.

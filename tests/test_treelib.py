@@ -139,6 +139,15 @@ class TreeCase(unittest.TestCase):
                 self.assertEqual(self.tree.parent(nid) in \
                                  self.tree.all_nodes(), True)
 
+    def test_ancestor(self):
+        for nid in self.tree.nodes:
+            if nid == self.tree.root:
+                self.assertEqual(self.tree.ancestor(nid), None)
+            else:
+                for level in range(self.tree.level(nid) - 1, 0, -1):
+                    self.assertEqual(self.tree.ancestor(nid, level=level) in \
+                                     self.tree.all_nodes(), True)
+
     def test_children(self):
         for nid in self.tree.nodes:
             children = self.tree.is_branch(nid)
