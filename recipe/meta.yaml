@@ -3,7 +3,7 @@ package:
   version: {{ environ['VERSION'] }}
 
 source:
-  git_url: git://github.com/sterlingbaldwin/treelib.git
+  git_url: git://github.com/caesar0301/treelib.git
   git_tag: {{ environ['TAG'] }}
 
 build:
@@ -23,4 +23,3 @@ requirements:
   
   run:
     - python
-    
