@@ -9,6 +9,7 @@ source:
 build:
   script: python setup.py install
   string: {{ environ['BUILD_NAME'] }}
+  noarch: python
 
 about:
     home: https://treelib.readthedocs.io/en/latest/
