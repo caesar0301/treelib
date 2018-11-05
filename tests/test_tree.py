@@ -366,3 +366,18 @@ Hárry
         self.assertTrue(tree.root == 'xyz')
         self.assertTrue(tree['xyz'].tag == 'XYZ')
         self.assertEqual(tree.parent('jane').identifier, 'xyz')
+
+    def test_subclassing(self):
+        class SubNode(Node):
+            pass
+
+        class SubTree(Tree):
+            node_class = SubNode
+
+        tree = SubTree()
+        node = tree.create_node()
+        self.assertTrue(isinstance(node, SubNode))
+
+        tree = Tree(node_class=SubNode)
+        node = tree.create_node()
+        self.assertTrue(isinstance(node, SubNode))
