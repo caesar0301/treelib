@@ -32,13 +32,11 @@ class TreeCase(unittest.TestCase):
         tree.create_node("Bill", "bill", parent="hárry")
         tree.create_node("Diane", "diane", parent="jane")
         tree.create_node("George", "george", parent="bill")
-        """
-        Hárry
-        ├── Bill
-        │   └── George
-        └── Jane
-            └── Diane
-        """
+        # Hárry
+        #   |-- Jane
+        #       |-- Diane
+        #   |-- Bill
+        #       |-- George
         self.tree = tree
         self.copytree = Tree(self.tree, True)
 
@@ -164,8 +162,13 @@ class TreeCase(unittest.TestCase):
 
     def test_expand_tree(self):
         ## default config
-        nodes = [nid for nid in self.tree.expand_tree()]
-        # self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'george', u'jane', u'diane'])
+        # Hárry
+        #   |-- Jane
+        #       |-- Diane
+        #   |-- Bill
+        #       |-- George
+        nodes = [nid for nid in self.tree.expand_tree(sorting=False)]
+        self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'diane', u'bill', u'george'])
         self.assertEqual(len(nodes), 5)
 
         ## expanding from specific node
@@ -173,15 +176,16 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(len(nodes), 2)
 
         ## changing into width mode
-        nodes = [nid for nid in self.tree.expand_tree(mode=Tree.WIDTH)]
-        # self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'jane', u'george', u'diane'])
+        nodes = [nid for nid in self.tree.expand_tree(mode=Tree.WIDTH, sorting=False)]
+        self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'bill', u'diane', u'george'])
         self.assertEqual(len(nodes), 5)
 
         ## expanding by filters
+        # Stops at root
         nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag == "Bill")]
         self.assertEqual(len(nodes), 0)
         nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag != "Bill")]
-        # self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'diane'])
+        self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'diane'])
         self.assertEqual(len(nodes), 3)
 
     def test_move_node(self):
