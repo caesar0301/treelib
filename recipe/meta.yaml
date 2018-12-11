@@ -1,0 +1,25 @@
+package:
+  name: treelib
+  version: {{ environ['VERSION'] }}
+
+source:
+  git_url: git://github.com/caesar0301/treelib.git
+  git_tag: {{ environ['TAG'] }}
+
+build:
+  script: python setup.py install
+  string: {{ environ['BUILD_NAME'] }}
+  noarch: python
+
+about:
+    home: https://treelib.readthedocs.io/en/latest/
+    summary: An efficient implementation of tree data structure in python 2/3.
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - pip
+  
+  run:
+    - python
