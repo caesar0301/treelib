@@ -37,7 +37,6 @@ except ImportError:
 from .exceptions import *
 from .node import Node
 
-
 __author__ = 'chenxm'
 
 
@@ -121,8 +120,8 @@ class Tree(object):
         return self._reader
 
     def __print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
-                       key=None, reverse=False, line_type='ascii-ex',
-                       data_property=None, func=print):
+                        key=None, reverse=False, line_type='ascii-ex',
+                        data_property=None, func=print):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -204,13 +203,13 @@ class Tree(object):
             yield "", node
         else:
             leading = ''.join(map(lambda x: dt_vline + ' ' * 3
-                                  if not x else ' ' * 4, is_last[0:-1]))
+            if not x else ' ' * 4, is_last[0:-1]))
             lasting = dt_line_cor if is_last[-1] else dt_line_box
             yield leading + lasting, node
 
         if filter_(node) and node.expanded:
             children = [self[i] for i in node.fpointer if filter_(self[i])]
-            idxlast = len(children)-1
+            idxlast = len(children) - 1
             if key:
                 children.sort(key=key, reverse=reverse)
             elif reverse:
@@ -318,20 +317,28 @@ class Tree(object):
         return ret
 
     def expand_tree(self, nid=None, mode=DEPTH, filter=None, key=None,
-                    reverse=False):
+                    reverse=False, sorting=True):
         """
-        Python generator. Loosly based on an algorithm from
-        'Essential LISP' by John R. Anderson, Albert T. Corbett, and
-        Brian J. Reiser, page 239-241
-
-        UPDATE: the @filter function is performed on Node object during
-        traversing. In this manner, the traversing will not continue to
-        following children of node whose condition does not pass the filter.
-
-        UPDATE: the @key and @reverse are present to sort nodes at each
-        level.
+        Python generator to traverse the tree (or a subtree) with optional
+        node filtering and sorting.
+        Loosely based on an algorithm from 'Essential LISP' by John R. Anderson,
+        Albert T. Corbett, and Brian J. Reiser, page 239-241
+        :param nid: Node identifier from which tree traversal will start.
+            If None tree root will be used
+        :param mode: Traversal mode, may be either DEPTH, WIDTH or ZIGZAG
+        :param filter: the @filter function is performed on Node object during
+            traversing. In this manner, the traversing will NOT visit the node
+            whose condition does not pass the filter and its children.
+        :param key: the @key and @reverse are present to sort nodes at each
+            level. If @key is None sorting is performed on node tag.
+        :param reverse: if True reverse sorting
+        :param sorting: if True perform node sorting, if False return
+            nodes in original insertion order. In latter case @key and
+            @reverse parameters are ignored.
+        :return: Node IDs that satisfy the conditions
+        :rtype: generator object
         """
-        nid = self.root if (nid is None) else nid
+        nid = self.root if nid is None else nid
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
@@ -340,12 +347,14 @@ class Tree(object):
             yield nid
             queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
             if mode in [self.DEPTH, self.WIDTH]:
-                queue.sort(key=key, reverse=reverse)
+                if sorting:
+                    queue.sort(key=key, reverse=reverse)
                 while queue:
                     yield queue[0].identifier
                     expansion = [self[i] for i in queue[0].fpointer
                                  if filter(self[i])]
-                    expansion.sort(key=key, reverse=reverse)
+                    if sorting:
+                        expansion.sort(key=key, reverse=reverse)
                     if mode is self.DEPTH:
                         queue = expansion + queue[1:]  # depth-first
                     elif mode is self.WIDTH:
@@ -369,6 +378,9 @@ class Tree(object):
                     if not stack:
                         direction = not direction
                         stack = stack_fw if direction else stack_bw
+
+            else:
+                raise ValueError("Traversal mode '{}' is not supported".format(mode))
 
     def filter_nodes(self, func):
         """
@@ -423,7 +435,7 @@ class Tree(object):
         Update: @filter params is added to calculate level passing
         exclusive nodes.
         """
-        return len([n for n in self.rsearch(nid, filter)])-1
+        return len([n for n in self.rsearch(nid, filter)]) - 1
 
     def link_past_node(self, nid):
         """
@@ -634,13 +646,14 @@ class Tree(object):
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex', data_property=None):
         """Update 20/05/13: Save tree into file for offline analysis"""
+
         def _write_line(line, f):
             f.write(line + b'\n')
 
         handler = lambda x: _write_line(x, open(filename, 'ab'))
 
         self.__print_backend(nid, level, idhidden, filter,
-            key, reverse, line_type, data_property, func=handler)
+                             key, reverse, line_type, data_property, func=handler)
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False, line_type='ascii-ex', data_property=None):
@@ -651,7 +664,7 @@ class Tree(object):
 
         try:
             self.__print_backend(nid, level, idhidden, filter,
-                key, reverse, line_type, data_property, func=write)
+                                 key, reverse, line_type, data_property, func=write)
         except NodeIDAbsentError:
             print('Tree is empty')
 
@@ -735,7 +748,7 @@ class Tree(object):
                     self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse))
             if len(tree_dict[ntag]["children"]) == 0:
                 tree_dict = self[nid].tag if not with_data else \
-                            {ntag: {"data":self[nid].data}}
+                    {ntag: {"data": self[nid].data}}
             return tree_dict
 
     def to_json(self, with_data=False, sort=True, reverse=False):
