@@ -67,6 +67,7 @@ class Tree(object):
 
     #: ROOT, DEPTH, WIDTH, ZIGZAG constants :
     (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
+    node_class = Node
 
     def __contains__(self, identifier):
         """Return a list of the nodes'identifiers matching the
@@ -75,10 +76,14 @@ class Tree(object):
         return [node for node in self._nodes
                 if node == identifier]
 
-    def __init__(self, tree=None, deep=False):
+    def __init__(self, tree=None, deep=False, node_class=None):
         """Initiate a new tree or copy another tree with a shallow or
         deep copy.
         """
+
+        if node_class:
+            assert issubclass(node_class, Node)
+            self.node_class = node_class
 
         #: dictionary, identifier: Node object
         self._nodes = {}
@@ -240,14 +245,14 @@ class Tree(object):
         Add a new node to tree.
         The 'node' parameter refers to an instance of Class::Node
         """
-        if not isinstance(node, Node):
-            raise OSError("First parameter must be object of Class::Node.")
+        if not isinstance(node, self.node_class):
+            raise OSError("First parameter must be object of {}".format(self.node_class))
 
         if node.identifier in self._nodes:
             raise DuplicatedNodeIdError("Can't create node "
                                         "with ID '%s'" % node.identifier)
 
-        pid = parent.identifier if isinstance(parent, Node) else parent
+        pid = parent.identifier if isinstance(parent, self.node_class) else parent
 
         if pid is None:
             if self.root is not None:
@@ -259,7 +264,7 @@ class Tree(object):
                                     "is not in the tree" % pid)
 
         self._nodes.update({node.identifier: node})
-        self.__update_fpointer(pid, node.identifier, Node.ADD)
+        self.__update_fpointer(pid, node.identifier, self.node_class.ADD)
         self.__update_bpointer(node.identifier, pid)
 
     def all_nodes(self):
@@ -286,7 +291,7 @@ class Tree(object):
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """Create a child node for given @parent node."""
-        node = Node(tag=tag, identifier=identifier, data=data)
+        node = self.node_class(tag=tag, identifier=identifier, data=data)
         self.add_node(node, parent)
         return node
 
@@ -307,7 +312,7 @@ class Tree(object):
                 ret = level if level >= ret else ret
         else:
             # Get level of the given node
-            if not isinstance(node, Node):
+            if not isinstance(node, self.node_class):
                 nid = node
             else:
                 nid = node.identifier
@@ -471,8 +476,8 @@ class Tree(object):
             raise LoopError
 
         parent = self[source].bpointer
-        self.__update_fpointer(parent, source, Node.DELETE)
-        self.__update_fpointer(destination, source, Node.ADD)
+        self.__update_fpointer(parent, source, self.node_class.DELETE)
+        self.__update_fpointer(destination, source, self.node_class.ADD)
         self.__update_bpointer(source, destination)
 
     def is_ancestor(self, ancestor, grandchild):
@@ -526,7 +531,7 @@ class Tree(object):
                 self._nodes.update({node: deepcopy(new_tree[node])})
         else:
             self._nodes.update(new_tree._nodes)
-        self.__update_fpointer(nid, new_tree.root, Node.ADD)
+        self.__update_fpointer(nid, new_tree.root, self.node_class.ADD)
         self.__update_bpointer(new_tree.root, nid)
 
     def paths_to_leaves(self):
@@ -584,7 +589,7 @@ class Tree(object):
         for id in removed:
             del self._nodes[id]
         # Update its parent info
-        self.__update_fpointer(parent, identifier, Node.DELETE)
+        self.__update_fpointer(parent, identifier, self.node_class.DELETE)
         return cnt
 
     def remove_subtree(self, nid):
@@ -620,7 +625,7 @@ class Tree(object):
         for id in removed:
             st._nodes.update({id: self._nodes.pop(id)})
         # Update its parent info
-        self.__update_fpointer(parent, nid, Node.DELETE)
+        self.__update_fpointer(parent, nid, self.node_class.DELETE)
         return st
 
     def rsearch(self, nid, filter=None):
@@ -776,7 +781,7 @@ class Tree(object):
                 self._nodes[val] = cn
 
                 if cn.bpointer is not None:
-                    self[cn.bpointer].update_fpointer(nid=nid, replace=val, mode=Node.REPLACE)
+                    self[cn.bpointer].update_fpointer(nid=nid, replace=val, mode=self.node_class.REPLACE)
 
                 for fp in cn.fpointer:
                     self[fp].update_bpointer(nid=val)
