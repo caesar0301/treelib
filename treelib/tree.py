@@ -19,7 +19,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Tree structure in treelib.
+Tree structure in `treelib`.
+
+The :class:`Tree` object defines the tree-like structure based on :class:`Node` objects.
+A new tree can be created from scratch without any parameter or a shallow/deep copy of another tree.
+When deep=True, a deepcopy operation is performed on feeding tree parameter and more memory
+is required to create the tree.
 """
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -41,8 +46,7 @@ __author__ = 'chenxm'
 
 def python_2_unicode_compatible(klass):
     """
-    (slightly modified from :
-        http://django.readthedocs.org/en/latest/_modules/django/utils/encoding.html)
+    (slightly modified from: http://django.readthedocs.org/en/latest/_modules/django/utils/encoding.html)
 
     A decorator that defines __unicode__ and __str__ methods under Python 2.
     Under Python 3 it does nothing.
@@ -87,7 +91,8 @@ class Tree(object):
         #: dictionary, identifier: Node object
         self._nodes = {}
 
-        #: identifier of the root node
+        #: Get or set the identifier of the root. This attribute can be accessed and modified
+        #: with ``.`` and ``=`` operator respectively.
         self.root = None
 
         if tree is not None:
@@ -131,6 +136,9 @@ class Tree(object):
         Print tree structure in hierarchy style.
 
         For example:
+
+        .. code-block:: bash
+
             Root
             |___ C01
             |    |___ C11
@@ -241,8 +249,9 @@ class Tree(object):
 
     def add_node(self, node, parent=None):
         """
-        Add a new node to tree.
-        The 'node' parameter refers to an instance of Class::Node
+        Add a new node object to the tree and make the parent as the root by default.
+
+        The 'node' parameter refers to an instance of Class::Node.
         """
         if not isinstance(node, self.node_class):
             raise OSError("First parameter must be object of {}".format(self.node_class))
@@ -272,7 +281,7 @@ class Tree(object):
 
     def all_nodes_itr(self):
         """
-        Returns all nodes in an iterator
+        Returns all nodes in an iterator.
         Added by William Rusnack
         """
         return self._nodes.values()
@@ -289,14 +298,17 @@ class Tree(object):
         return True if nid in self._nodes else False
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
-        """Create a child node for given @parent node."""
+        """
+        Create a child node for given @parent node. If ``identifier`` is absent,
+        a UUID will be generated automatically.
+        """
         node = self.node_class(tag=tag, identifier=identifier, data=data)
         self.add_node(node, parent)
         return node
 
     def depth(self, node=None):
         """
-        Get the maximum level of this tree or the level of the given node
+        Get the maximum level of this tree or the level of the given node.
 
         @param node Node instance or identifier
         @return int
@@ -325,8 +337,10 @@ class Tree(object):
         """
         Python generator to traverse the tree (or a subtree) with optional
         node filtering and sorting.
+
         Loosely based on an algorithm from 'Essential LISP' by John R. Anderson,
-        Albert T. Corbett, and Brian J. Reiser, page 239-241
+        Albert T. Corbett, and Brian J. Reiser, page 239-241.
+
         :param nid: Node identifier from which tree traversal will start.
             If None tree root will be used
         :param mode: Traversal mode, may be either DEPTH, WIDTH or ZIGZAG
@@ -388,15 +402,22 @@ class Tree(object):
 
     def filter_nodes(self, func):
         """
-        Filters all nodes by function
-        function is passed one node as an argument and that node is included if function returns true
-        returns a filter iterator of the node in python 3 or a list of the nodes in python 2
-        Added William Rusnack
+        Filters all nodes by function.
+
+        :param func: is passed one node as an argument and that node is included if function returns true,
+        :return: a filter iterator of the node in python 3 or a list of the nodes in python 2.
+
+        Added by William Rusnack.
         """
         return filter(func, self.all_nodes_itr())
 
     def get_node(self, nid):
-        """Return the node with `nid`. None returned if `nid` does not exist."""
+        """
+        Get the object of the node with ID of ``nid``.
+
+        An alternative way is using '[]' operation on the tree. But small difference exists between them:
+        ``get_node()`` will return None if ``nid`` is absent, whereas '[]' will raise ``KeyError``.
+        """
         if nid is None or not self.contains(nid):
             return None
         return self._nodes[nid]
@@ -418,7 +439,7 @@ class Tree(object):
         return fpointer
 
     def leaves(self, nid=None):
-        """Get leaves of the whole tree of a subtree."""
+        """Get leaves of the whole tree or a subtree."""
         leaves = []
         if nid is None:
             for node in self._nodes.values():
@@ -445,8 +466,8 @@ class Tree(object):
         """
         Delete a node by linking past it.
 
-        For example, if we have a -> b -> c and delete node b, we are left
-        with a -> c
+        For example, if we have `a -> b -> c` and delete node b, we are left
+        with `a -> c`.
         """
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
@@ -466,8 +487,7 @@ class Tree(object):
 
     def move_node(self, source, destination):
         """
-        Move a node indicated by @source parameter to be a child of
-        @destination.
+        Move node @source from its parent to another parent @destination.
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
@@ -480,6 +500,13 @@ class Tree(object):
         self.__update_bpointer(source, destination)
 
     def is_ancestor(self, ancestor, grandchild):
+        """
+        Check if the @ancestor the preceding nodes of @grandchild.
+
+        :param ancestor: the node identifier
+        :param grandchild: the node identifier
+        :return: True or False
+        """
         parent = self[grandchild].bpointer
         child = grandchild
         while parent is not None:
@@ -492,11 +519,11 @@ class Tree(object):
 
     @property
     def nodes(self):
-        """Return a dict form of nodes in a tree: {id: node_instance}"""
+        """Return a dict form of nodes in a tree: {id: node_instance}."""
         return self._nodes
 
     def parent(self, nid):
-        """Get parent node object of given id"""
+        """Get parent :class:`Node` object of given id."""
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
@@ -537,9 +564,13 @@ class Tree(object):
         """
         Use this function to get the identifiers allowing to go from the root
         nodes to each leaf.
-        Return a list of list of identifiers, root being not omitted.
 
-        For example :
+        :return: a list of list of identifiers, root being not omitted.
+
+        For example:
+
+        .. code-block:: python
+
             Harry
             |___ Bill
             |___ Jane
@@ -549,11 +580,15 @@ class Tree(object):
             |         |___ Mary
             |    |___ Mark
 
-        expected result :
-        [['harry', 'jane', 'diane', 'mary'],
-         ['harry', 'jane', 'mark'],
-         ['harry', 'jane', 'diane', 'george', 'jill'],
-         ['harry', 'bill']]
+        Expected result:
+
+        .. code-block:: python
+
+            [['harry', 'jane', 'diane', 'mary'],
+             ['harry', 'jane', 'mark'],
+             ['harry', 'jane', 'diane', 'george', 'jill'],
+             ['harry', 'bill']]
+
         """
         res = []
 
@@ -593,20 +628,23 @@ class Tree(object):
 
     def remove_subtree(self, nid):
         """
-        Return a subtree deleted from this tree. If nid is None, an
+        Get a subtree with ``nid`` being the root. If nid is None, an
         empty tree is returned.
+
         For the original tree, this method is similar to
         `remove_node(self,nid)`, because given node and its children
         are removed from the original tree in both methods.
         For the returned value and performance, these two methods are
         different:
 
-            `remove_node` returns the number of deleted nodes;
-            `remove_subtree` returns a subtree of deleted nodes;
+            * `remove_node` returns the number of deleted nodes;
+            * `remove_subtree` returns a subtree of deleted nodes;
 
         You are always suggested to use `remove_node` if your only to
         delete nodes from a tree, as the other one need memory
         allocation to store the new tree.
+
+        :return: a :class:`Tree` object.
         """
         st = Tree()
         if nid is None:
@@ -631,6 +669,8 @@ class Tree(object):
         """
         Traverse the tree branch along the branch from nid to its
         ancestors (until root).
+
+        :param filter: the function of one variable to act on the :class:`Node` object.
         """
         if nid is None:
             return
@@ -649,7 +689,9 @@ class Tree(object):
 
     def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
                   filter=None, key=None, reverse=False, line_type='ascii-ex', data_property=None):
-        """Update 20/05/13: Save tree into file for offline analysis"""
+        """
+        Save the tree into file for offline analysis.
+        """
 
         def _write_line(line, f):
             f.write(line + b'\n')
@@ -661,6 +703,28 @@ class Tree(object):
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
              key=None, reverse=False, line_type='ascii-ex', data_property=None):
+        """
+        Print the tree structure in hierarchy style.
+
+        You have three ways to output your tree data, i.e., stdout with ``show()``,
+        plain text file with ``save2file()``, and json string with ``to_json()``. The
+        former two use the same backend to generate a string of tree structure in a
+        text graph.
+
+        * Version >= 1.2.7a*: you can also specify the ``line_type`` parameter, such as 'ascii' (default), 'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical form.
+
+        :param nid: the reference node to start expanding.
+        :param level: the node level in the tree (root as level 0).
+        :param idhidden: whether hiding the node ID when printing.
+        :param filter: the function of one variable to act on the :class:`Node` object.
+            When this parameter is specified, the traversing will not continue to following
+            children of node whose condition does not pass the filter.
+        :param key: the ``key`` param for sorting :class:`Node` objects in the same level.
+        :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
+        :param line_type:
+        :param data_property: the property on the node data object to be printed.
+        :return: None
+        """
         self._reader = ""
 
         def write(line):
@@ -713,9 +777,10 @@ class Tree(object):
         Return a shallow COPY of subtree with nid being the new root.
         If nid is None, return an empty tree.
         If you are looking for a deepcopy, please create a new tree
-        with this shallow copy,
+        with this shallow copy, e.g.,
 
-        e.g.
+        .. code-block:: python
+
             new_tree = Tree(t.subtree(t.root), deep=True)
 
         This line creates a deep copy of the entire tree.
@@ -733,7 +798,7 @@ class Tree(object):
         return st
 
     def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
-        """transform self into a dict"""
+        """Transform the whole tree into a dict."""
 
         nid = self.root if (nid is None) else nid
         ntag = self[nid].tag
@@ -756,12 +821,13 @@ class Tree(object):
             return tree_dict
 
     def to_json(self, with_data=False, sort=True, reverse=False):
-        """Return the json string corresponding to self"""
+        """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
     def update_node(self, nid, **attrs):
         """
         Update node's attributes.
+
         :param nid: the identifier of modified node
         :param attrs: attribute pairs recognized by Node object
         :return: None

@@ -1,29 +1,21 @@
 treelib package
 ===============
 
-Submodules
-----------
+Module contents
+---------------
 
-treelib.exceptions module
--------------------------
-
-.. automodule:: treelib.exceptions
+.. automodule:: treelib
     :members:
     :undoc-members:
     :show-inheritance:
+
+Submodules
+----------
 
 treelib.node module
 -------------------
 
 .. automodule:: treelib.node
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-treelib.plugins module
-----------------------
-
-.. automodule:: treelib.plugins
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,11 +28,18 @@ treelib.tree module
     :undoc-members:
     :show-inheritance:
 
+treelib.plugins module
+----------------------
 
-Module contents
----------------
+.. automodule:: treelib.plugins
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-.. automodule:: treelib
+treelib.exceptions module
+-------------------------
+
+.. automodule:: treelib.exceptions
     :members:
     :undoc-members:
     :show-inheritance:

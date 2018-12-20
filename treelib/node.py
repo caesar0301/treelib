@@ -19,6 +19,9 @@
 # limitations under the License.
 """
 Node structure in treelib.
+
+A :class:`Node` object contains basic properties such as node identifier,
+node tag, parent node, children nodes etc., and some operations for a node.
 """
 import uuid
 
@@ -27,11 +30,11 @@ from .exceptions import NodePropertyError
 
 class Node(object):
     """
-    Nodes are elementary objects which are stored a `_nodes` dictionary of a Tree.
+    Nodes are elementary objects that are stored in the `_nodes` dictionary of a Tree.
     Use `data` attribute to store node-specific data.
     """
 
-    #: ADD, DELETE, INSERT constants :
+    #: Mode constants for routine `update_fpointer()`.
     (ADD, DELETE, INSERT, REPLACE) = list(range(4))
 
     def __init__(self, tag=None, identifier=None, expanded=True, data=None):
@@ -56,7 +59,7 @@ class Node(object):
         #: identifier(s) of the soons' node(s) :
         self._fpointer = list()
 
-        #: None or whatever given as a parameter
+        #: User payload associated with this node.
         self.data = data
 
     def __lt__(self, other):
@@ -71,7 +74,10 @@ class Node(object):
 
     @property
     def bpointer(self):
-        """Return the value of `_bpointer`."""
+        """
+        The parent ID of a node. This attribute can be
+        accessed and modified with ``.`` and ``=`` operator respectively.
+        """
         return self._bpointer
 
     @bpointer.setter
@@ -86,7 +92,12 @@ class Node(object):
 
     @property
     def fpointer(self):
-        """Return the value of `_fpointer`."""
+        """
+        With a getting operator, a list of IDs of node's children is obtained. With
+        a setting operator, the value can be list, set, or dict. For list or set,
+        it is converted to a list type by the package; for dict, the keys are
+        treated as the node IDs.
+        """
         return self._fpointer
 
     @fpointer.setter
@@ -105,7 +116,10 @@ class Node(object):
 
     @property
     def identifier(self):
-        """Return the value of `_identifier`."""
+        """
+        The unique ID of a node within the scope of a tree. This attribute can be
+        accessed and modified with ``.`` and ``=`` operator respectively.
+        """
         return self._identifier
 
     @identifier.setter
@@ -129,7 +143,10 @@ class Node(object):
 
     @property
     def tag(self):
-        """Return the value of `_tag`."""
+        """
+        The readable node name for human. This attribute can be accessed and
+        modified with ``.`` and ``=`` operator respectively.
+        """
         return self._tag
 
     @tag.setter
@@ -138,11 +155,14 @@ class Node(object):
         self._tag = value if value is not None else None
 
     def update_bpointer(self, nid):
-        """Update parent node."""
+        """Set the parent (indicated by the ``nid`` parameter) of a node."""
         self.bpointer = nid
 
     def update_fpointer(self, nid, mode=ADD, replace=None):
-        """Update all children nodes."""
+        """
+        Update the children list with different modes: addition (Node.ADD or
+        Node.INSERT) and deletion (Node.DELETE).
+        """
         if nid is None:
             return
 
