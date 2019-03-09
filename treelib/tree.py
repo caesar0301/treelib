@@ -29,14 +29,15 @@ is required to create the tree.
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import codecs
 import json
 import sys
 from copy import deepcopy
 
 try:
-    from StringIO import StringIO as BytesIO
+    from StringIO import StringIO
 except ImportError:
-    from io import BytesIO
+    from io import StringIO
 
 from .exceptions import *
 from .node import Node
@@ -215,7 +216,7 @@ class Tree(object):
             yield "", node
         else:
             leading = ''.join(map(lambda x: dt_vline + ' ' * 3
-            if not x else ' ' * 4, is_last[0:-1]))
+                                  if not x else ' ' * 4, is_last[0:-1]))
             lasting = dt_line_cor if is_last[-1] else dt_line_box
             yield leading + lasting, node
 
@@ -254,13 +255,15 @@ class Tree(object):
         The 'node' parameter refers to an instance of Class::Node.
         """
         if not isinstance(node, self.node_class):
-            raise OSError("First parameter must be object of {}".format(self.node_class))
+            raise OSError(
+                "First parameter must be object of {}".format(self.node_class))
 
         if node.identifier in self._nodes:
             raise DuplicatedNodeIdError("Can't create node "
                                         "with ID '%s'" % node.identifier)
 
-        pid = parent.identifier if isinstance(parent, self.node_class) else parent
+        pid = parent.identifier if isinstance(
+            parent, self.node_class) else parent
 
         if pid is None:
             if self.root is not None:
@@ -398,7 +401,8 @@ class Tree(object):
                         stack = stack_fw if direction else stack_bw
 
             else:
-                raise ValueError("Traversal mode '{}' is not supported".format(mode))
+                raise ValueError(
+                    "Traversal mode '{}' is not supported".format(mode))
 
     def filter_nodes(self, func):
         """
@@ -770,7 +774,8 @@ class Tree(object):
                 level = int(level)
                 return len([node for node in self.all_nodes_itr() if self.level(node.identifier) == level])
             except:
-                raise TypeError("level should be an integer instead of '%s'" % type(level))
+                raise TypeError(
+                    "level should be an integer instead of '%s'" % type(level))
 
     def subtree(self, nid):
         """
@@ -796,6 +801,39 @@ class Tree(object):
         for node_n in self.expand_tree(nid):
             st._nodes.update({self[node_n].identifier: self[node_n]})
         return st
+
+    def update_node(self, nid, **attrs):
+        """
+        Update node's attributes.
+
+        :param nid: the identifier of modified node
+        :param attrs: attribute pairs recognized by Node object
+        :return: None
+        """
+        cn = self[nid]
+        for attr, val in attrs.items():
+            if attr == 'identifier':
+                # Updating node id meets following contraints:
+                # * Update node identifier property
+                # * Update parent's followers
+                # * Update children's parents
+                # * Update tree registration of var _nodes
+                # * Update tree root if necessary
+                cn = self._nodes.pop(nid)
+                setattr(cn, 'identifier', val)
+                self._nodes[val] = cn
+
+                if cn.bpointer is not None:
+                    self[cn.bpointer].update_fpointer(
+                        nid=nid, replace=val, mode=self.node_class.REPLACE)
+
+                for fp in cn.fpointer:
+                    self[fp].update_bpointer(nid=val)
+
+                if self.root == nid:
+                    self.root = val
+            else:
+                setattr(cn, attr, val)
 
     def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
         """Transform the whole tree into a dict."""
@@ -824,34 +862,41 @@ class Tree(object):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
-    def update_node(self, nid, **attrs):
-        """
-        Update node's attributes.
+    def to_graphviz(self, filename=None, shape='circle', graph='digraph'):
+        """Exports the tree in the dot format of the graphviz software"""
+        nodes, connections = [], []
+        if self.nodes:
 
-        :param nid: the identifier of modified node
-        :param attrs: attribute pairs recognized by Node object
-        :return: None
-        """
-        cn = self[nid]
-        for attr, val in attrs.items():
-            if attr == 'identifier':
-                # Updating node id meets following contraints:
-                # * Update node identifier property
-                # * Update parent's followers
-                # * Update children's parents
-                # * Update tree registration of var _nodes
-                # * Update tree root if necessary
-                cn = self._nodes.pop(nid)
-                setattr(cn, 'identifier', val)
-                self._nodes[val] = cn
+            for n in self.expand_tree(mode=self.WIDTH):
+                nid = self[n].identifier
+                state = '"{}" [label="{}", shape={}]'.format(
+                    nid, self[n].tag, shape)
+                nodes.append(state)
 
-                if cn.bpointer is not None:
-                    self[cn.bpointer].update_fpointer(nid=nid, replace=val, mode=self.node_class.REPLACE)
+                for c in self.children(nid):
+                    cid = c.identifier
+                    connections.append('"{}" -> "{}"'.format(nid, cid))
 
-                for fp in cn.fpointer:
-                    self[fp].update_bpointer(nid=val)
+        # write nodes and connections to dot format
+        is_plain_file = filename is not None
+        if is_plain_file:
+            f = codecs.open(filename, 'w', 'utf-8')
+        else:
+            f = StringIO()
 
-                if self.root == nid:
-                    self.root = val
-            else:
-                setattr(cn, attr, val)
+        f.write(graph + ' tree {\n')
+        for n in nodes:
+            f.write('\t' + n + '\n')
+
+        if len(connections) > 0:
+            f.write('\n')
+
+        for c in connections:
+            f.write('\t' + c + '\n')
+
+        f.write('}')
+
+        if not is_plain_file:
+            print(f.getvalue())
+
+        f.close()
