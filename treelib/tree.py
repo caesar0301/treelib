@@ -869,13 +869,13 @@ class Tree(object):
 
             for n in self.expand_tree(mode=self.WIDTH):
                 nid = self[n].identifier
-                state = '"{}" [label="{}", shape={}]'.format(
+                state = '"{0}" [label="{1}", shape={2}]'.format(
                     nid, self[n].tag, shape)
                 nodes.append(state)
 
                 for c in self.children(nid):
                     cid = c.identifier
-                    connections.append('"{}" -> "{}"'.format(nid, cid))
+                    connections.append('"{0}" -> "{1}"'.format(nid, cid))
 
         # write nodes and connections to dot format
         is_plain_file = filename is not None
