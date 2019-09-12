@@ -296,6 +296,13 @@ class Tree(object):
         """
         return [self[i] for i in self.is_branch(nid)]
 
+    def children_itr(self, nid):
+        """
+        Return the children (Node) of nid as an iterator.
+        Empty iterator is returned if nid does not exist
+        """
+        return (self[i] for i in self.is_branch(nid))
+
     def contains(self, nid):
         """Check if the tree contains node of given id"""
         return True if nid in self._nodes else False
