@@ -97,6 +97,8 @@ class TreeCase(unittest.TestCase):
             children = self.tree.children(nid)
             for child in children:
                 self.assertEqual(child in self.tree.all_nodes(), True)
+            children_from_itr = list(self.tree.children_itr(nid))
+            self.assertEqual(children, children_from_itr)
         try:
             self.tree.is_branch("alien")
         except NodeIDAbsentError:
