@@ -107,6 +107,10 @@ class Tree(object):
                 if tree.identifier != self.identifier:
                     new_node.clone_pointers(tree.identifier, self.identifier)
 
+    def copy(self, identifier):
+        # method intended to be overloaded, to avoid copying whole subtree / remove_subtree methods
+        return self.__class__(identifier)
+
     @property
     def identifier(self):
         return self._identifier
@@ -664,7 +668,7 @@ class Tree(object):
 
         :return: a :class:`Tree` object.
         """
-        st = Tree(identifier=identifier)
+        st = self.copy(identifier)
         if nid is None:
             return st
 
@@ -806,7 +810,7 @@ class Tree(object):
 
         This line creates a deep copy of the entire tree.
         """
-        st = Tree(identifier=identifier)
+        st = self.copy(identifier)
         if nid is None:
             return st
 
