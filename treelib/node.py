@@ -23,6 +23,7 @@ Node structure in treelib.
 A :class:`Node` object contains basic properties such as node identifier,
 node tag, parent node, children nodes etc., and some operations for a node.
 """
+import copy
 import uuid
 from collections import defaultdict
 
@@ -56,7 +57,7 @@ class Node(object):
         self.expanded = expanded
 
         #: identifier of the parent's node :
-        self._bpointer = defaultdict(None) #defaultdict(lambda: None)
+        self._bpointer = {}
         #: identifier(s) of the soons' node(s) :
         self._fpointer = defaultdict(list)
 
@@ -120,7 +121,8 @@ class Node(object):
         former_bpointer = self.bpointer(former_tree_id)
         self.set_bpointer(new_tree_id, former_bpointer)
         former_fpointer = self.fpointer(former_tree_id)
-        self.set_fpointer(new_tree_id, former_fpointer)
+        # fpointer is a list and would be copied by reference without deepcopy
+        self.set_fpointer(new_tree_id, copy.deepcopy(former_fpointer))
 
     def reset_pointers(self, tree_id):
         self.set_bpointer(tree_id, None)
