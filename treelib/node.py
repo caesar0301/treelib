@@ -24,6 +24,7 @@ A :class:`Node` object contains basic properties such as node identifier,
 node tag, parent node, children nodes etc., and some operations for a node.
 """
 import uuid
+from collections import defaultdict
 
 from .exceptions import NodePropertyError
 
@@ -55,9 +56,9 @@ class Node(object):
         self.expanded = expanded
 
         #: identifier of the parent's node :
-        self._bpointer = None
+        self._bpointer = defaultdict(None) #defaultdict(lambda: None)
         #: identifier(s) of the soons' node(s) :
-        self._fpointer = list()
+        self._fpointer = defaultdict(list)
 
         #: User payload associated with this node.
         self.data = data
@@ -72,45 +73,38 @@ class Node(object):
         else:
             self._identifier = nid
 
-    @property
-    def bpointer(self):
+    def bpointer(self, tree_id):
         """
-        The parent ID of a node. This attribute can be
-        accessed and modified with ``.`` and ``=`` operator respectively.
+        The parent ID of a node in a given tree.
         """
-        return self._bpointer
+        return self._bpointer[tree_id]
 
-    @bpointer.setter
-    def bpointer(self, nid):
+    def update_bpointer(self, tree_id, nid):
+        self.set_bpointer(tree_id, nid)
+
+    def set_bpointer(self, tree_id, nid):
         """Set the value of `_bpointer`."""
-        if nid is not None:
-            self._bpointer = nid
-        else:
-            # print("WARNING: the bpointer of node %s " \
-            #      "is set to None" % self._identifier)
-            self._bpointer = None
+        self._bpointer[tree_id] = nid
 
-    @property
-    def fpointer(self):
+    def fpointer(self, tree_id):
         """
         With a getting operator, a list of IDs of node's children is obtained. With
         a setting operator, the value can be list, set, or dict. For list or set,
         it is converted to a list type by the package; for dict, the keys are
         treated as the node IDs.
         """
-        return self._fpointer
+        return self._fpointer[tree_id]
 
-    @fpointer.setter
-    def fpointer(self, value):
+    def set_fpointer(self, tree_id, value):
         """Set the value of `_fpointer`."""
         if value is None:
-            self._fpointer = list()
+            self._fpointer[tree_id] = list()
         elif isinstance(value, list):
-            self._fpointer = value
+            self._fpointer[tree_id] = value
         elif isinstance(value, dict):
-            self._fpointer = list(value.keys())
+            self._fpointer[tree_id] = list(value.keys())
         elif isinstance(value, set):
-            self._fpointer = list(value)
+            self._fpointer[tree_id] = list(value)
         else:  # TODO: add deprecated routine
             pass
 
@@ -122,6 +116,16 @@ class Node(object):
         """
         return self._identifier
 
+    def clone_pointers(self, former_tree_id, new_tree_id):
+        former_bpointer = self.bpointer(former_tree_id)
+        self.set_bpointer(new_tree_id, former_bpointer)
+        former_fpointer = self.fpointer(former_tree_id)
+        self.set_fpointer(new_tree_id, former_fpointer)
+
+    def reset_pointers(self, tree_id):
+        self.set_bpointer(tree_id, None)
+        self.set_fpointer(tree_id, [])
+
     @identifier.setter
     def identifier(self, value):
         """Set the value of `_identifier`."""
@@ -130,16 +134,16 @@ class Node(object):
         else:
             self._set_identifier(value)
 
-    def is_leaf(self):
+    def is_leaf(self, tree_id):
         """Return true if current node has no children."""
-        if len(self.fpointer) == 0:
+        if len(self.fpointer(tree_id)) == 0:
             return True
         else:
             return False
 
-    def is_root(self):
+    def is_root(self, tree_id):
         """Return true if self has no parent, i.e. as root."""
-        return self._bpointer is None
+        return self.bpointer(tree_id) is None
 
     @property
     def tag(self):
@@ -154,11 +158,7 @@ class Node(object):
         """Set the value of `_tag`."""
         self._tag = value if value is not None else None
 
-    def update_bpointer(self, nid):
-        """Set the parent (indicated by the ``nid`` parameter) of a node."""
-        self.bpointer = nid
-
-    def update_fpointer(self, nid, mode=ADD, replace=None):
+    def update_fpointer(self, tree_id, nid, mode=ADD, replace=None):
         """
         Update the children list with different modes: addition (Node.ADD or
         Node.INSERT) and deletion (Node.DELETE).
@@ -167,15 +167,15 @@ class Node(object):
             return
 
         if mode is self.ADD:
-            self._fpointer.append(nid)
+            self.fpointer(tree_id).append(nid)
 
         elif mode is self.DELETE:
-            if nid in self._fpointer:
-                self._fpointer.remove(nid)
+            if nid in self.fpointer(tree_id):
+                self.fpointer(tree_id).remove(nid)
 
         elif mode is self.INSERT:  # deprecate to ADD mode
             print("WARNING: INSERT is deprecated to ADD mode")
-            self.update_fpointer(nid)
+            self.update_fpointer(tree_id, nid)
 
         elif mode is self.REPLACE:
             if replace is None:
@@ -183,8 +183,8 @@ class Node(object):
                     'Argument "repalce" should be provided when mode is {}'.format(mode)
                 )
 
-            ind = self._fpointer.index(nid)
-            self._fpointer[ind] = replace
+            ind = self.fpointer(tree_id).index(nid)
+            self.fpointer(tree_id)[ind] = replace
 
     def __repr__(self):
         name = self.__class__.__name__
