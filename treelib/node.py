@@ -23,10 +23,10 @@ Node structure in treelib.
 A :class:`Node` object contains basic properties such as node identifier,
 node tag, parent node, children nodes etc., and some operations for a node.
 """
+from __future__ import unicode_literals
 import copy
 import uuid
 from collections import defaultdict
-
 from .exceptions import NodePropertyError
 
 
@@ -191,8 +191,8 @@ class Node(object):
     def __repr__(self):
         name = self.__class__.__name__
         kwargs = [
-            u"tag={0}".format(self.tag).encode('utf-8'),
-            u"identifier={0}".format(self.identifier).encode('utf-8'),
-            u"data={0}".format(self.data).encode('utf-8'),
+            "tag={0}".format(self.tag),
+            "identifier={0}".format(self.identifier),
+            "data={0}".format(self.data),
         ]
         return "%s(%s)" % (name, ", ".join(kwargs))

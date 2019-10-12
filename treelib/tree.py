@@ -101,7 +101,7 @@ class Tree(object):
 
         if tree is not None:
             self.root = tree.root
-            for nid, node in tree.nodes.iteritems():
+            for nid, node in tree.nodes.items():
                 new_node = deepcopy(node) if deep else node
                 self._nodes[nid] = new_node
                 if tree.identifier != self.identifier:
@@ -569,7 +569,7 @@ class Tree(object):
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
         if deep:
-            for nid, node in new_tree.nodes.iteritems():
+            for nid, node in new_tree.nodes.items():
                 new_node = deepcopy(new_tree[node])
                 new_node.clone_pointers(new_tree.identifier, self.identifier)
                 self._nodes.update({node: new_node})
