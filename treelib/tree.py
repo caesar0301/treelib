@@ -107,7 +107,7 @@ class Tree(object):
                 if tree.identifier != self.identifier:
                     new_node.clone_pointers(tree.identifier, self.identifier)
 
-    def get_instance(self, identifier):
+    def _get_instance(self, identifier, **kwargs):
         """Method intended to be overloaded, to avoid copying whole subtree / remove_subtree methods when creating
         classes inheriting from Tree. For instance:
         >>> class SuperTree(Tree):
@@ -115,10 +115,10 @@ class Tree(object):
         >>>         self.necessary_arg = necessary_arg
         >>>         super(SuperTree, self).__init__(tree=tree, deep=deep, identifier=identifier)
         >>>
-        >>>     def get_instance(self, identifier):
+        >>>     def _get_instance(self, identifier, **kwargs):
         >>>         return SuperTree(necessary_arg=self.necessary_arg, identifier=identifier)
         """
-        return Tree(identifier=identifier)
+        return self.__class__(identifier=identifier, **kwargs)
 
     @property
     def identifier(self):
@@ -677,7 +677,7 @@ class Tree(object):
 
         :return: a :class:`Tree` object.
         """
-        st = self.get_instance(identifier)
+        st = self._get_instance(identifier)
         if nid is None:
             return st
 
@@ -819,7 +819,7 @@ class Tree(object):
 
         This line creates a deep copy of the entire tree.
         """
-        st = self.get_instance(identifier)
+        st = self._get_instance(identifier)
         if nid is None:
             return st
 
