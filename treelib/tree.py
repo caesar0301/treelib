@@ -581,15 +581,14 @@ class Tree(object):
             # TODO: a deprecated routine is needed to avoid exception
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
-        if deep:
-            for nid, node in new_tree.nodes.items():
-                new_node = deepcopy(new_tree[node])
-                new_node.clone_pointers(new_tree.identifier, self.identifier)
-                self._nodes.update({node: new_node})
-        else:
-            self._nodes.update(new_tree._nodes)
-        self.__update_fpointer(nid, new_tree.root, self.node_class.ADD)
+        for cid, node in new_tree.nodes.items():
+            if deep:
+                node = deepcopy(new_tree[node])
+            self._nodes.update({cid: node})
+            node.clone_pointers(new_tree.identifier, self.identifier)
+
         self.__update_bpointer(new_tree.root, nid)
+        self.__update_fpointer(nid, new_tree.root, self.node_class.ADD)
 
     def paths_to_leaves(self):
         """

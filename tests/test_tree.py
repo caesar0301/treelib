@@ -219,7 +219,28 @@ class TreeCase(unittest.TestCase):
         new_tree.create_node("Mark", "mark", parent="jill")
         self.tree.paste("jane", new_tree)
         self.assertEqual("jill" in self.tree.is_branch("jane"), True)
+        self.tree.show()
+        self.assertEqual(
+            self.tree._reader,
+            u'''Hárry
+├── Bill
+│   └── George
+└── Jane
+    ├── Diane
+    └── Jill
+        └── Mark
+'''
+        )
         self.tree.remove_node("jill")
+        self.assertEqual(
+            self.tree._reader,
+            u'''Hárry
+├── Bill
+│   └── George
+└── Jane
+    └── Diane
+'''
+        )
 
     def test_rsearch(self):
         for nid in ["hárry", "jane", "diane"]:
