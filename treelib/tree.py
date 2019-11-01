@@ -103,18 +103,29 @@ class Tree(object):
                 if tree.identifier != self.identifier:
                     new_node.clone_pointers(tree.identifier, self.identifier)
 
-    def _get_instance(self, identifier, **kwargs):
-        """Method intended to be overloaded, to avoid copying whole subtree / remove_subtree methods when creating
-        classes inheriting from Tree. For instance:
-        >>> class SuperTree(Tree):
-        >>>     def __init__(self, necessary_arg, tree=None, deep=False, identifier=None):
-        >>>         self.necessary_arg = necessary_arg
-        >>>         super(SuperTree, self).__init__(tree=tree, deep=deep, identifier=identifier)
+    def _clone(self, identifier=None, with_tree=False, deep=False):
+        """Clone current instance, with or without tree.
+
+        Method intended to be overloaded, to avoid rewriting whole "subtree" and "remove_subtree" methods when
+        inheriting from Tree.
+        >>> class TreeWithComposition(Tree):
+        >>>     def __init__(self, tree_description, tree=None, deep=False, identifier=None):
+        >>>         self.tree_description = tree_description
+        >>>         super(TreeWithComposition, self).__init__(tree=tree, deep=deep, identifier=identifier)
         >>>
-        >>>     def _get_instance(self, identifier, **kwargs):
-        >>>         return SuperTree(necessary_arg=self.necessary_arg, identifier=identifier)
+        >>>     def _clone(self, identifier=None, with_tree=False, deep=False):
+        >>>         return TreeWithComposition(
+        >>>             identifier=identifier,
+        >>>             deep=deep,
+        >>>             tree=self if with_tree else None,
+        >>>             tree_description=self.tree_description
+        >>>         )
+        >>> my_custom_tree = TreeWithComposition(tree_description="smart tree")
+        >>> subtree = my_custom_tree.subtree()
+        >>> subtree.tree_description
+        "smart tree"
         """
-        return self.__class__(identifier=identifier, **kwargs)
+        return self.__class__(identifier=identifier, tree=self if with_tree else None, deep=deep)
 
     @property
     def identifier(self):
@@ -673,7 +684,7 @@ class Tree(object):
 
         :return: a :class:`Tree` object.
         """
-        st = self._get_instance(identifier)
+        st = self._clone(identifier)
         if nid is None:
             return st
 
@@ -815,7 +826,7 @@ class Tree(object):
 
         This line creates a deep copy of the entire tree.
         """
-        st = self._get_instance(identifier)
+        st = self._clone(identifier)
         if nid is None:
             return st
 
