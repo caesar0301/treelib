@@ -742,7 +742,7 @@ class Tree(object):
                              key, reverse, line_type, data_property, func=handler)
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False, line_type='ascii-ex', data_property=None):
+             key=None, reverse=False, line_type='ascii-ex', data_property=None, stdout=True):
         """
         Print the tree structure in hierarchy style.
 
@@ -776,7 +776,10 @@ class Tree(object):
         except NodeIDAbsentError:
             print('Tree is empty')
 
-        print(self._reader)
+        if stdout:
+            print(self._reader)
+        else:
+            return self._reader
 
     def siblings(self, nid):
         """
