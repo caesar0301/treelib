@@ -852,7 +852,7 @@ class Tree(object):
 
             for elem in queue:
                 tree_dict[ntag]["children"].append(
-                    self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse))
+                    self.to_dict(elem.identifier, key=key, with_data=with_data, sort=sort, reverse=reverse))
             if len(tree_dict[ntag]["children"]) == 0:
                 tree_dict = self[nid].tag if not with_data else \
                     {ntag: {"data": self[nid].data}}
