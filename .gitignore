@@ -1,5 +1,6 @@
 *.py[cod]
 .idea
+.python-version
 
 # C extensions
 *.so
