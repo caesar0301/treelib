@@ -1,3 +1,6 @@
+Oct 13 2019 V1.5.6
+Add ability to independently mutate multiple shallow copies of same initial tree.
+
 Mar 27, 2014 V1.2.6
 Node identifier supports multiple data types beyond int and str.
 Finish depth() and leaves() routines.

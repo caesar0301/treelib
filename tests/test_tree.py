@@ -26,10 +26,10 @@ def encode(value):
 
 class TreeCase(unittest.TestCase):
     def setUp(self):
-        tree = Tree()
-        tree.create_node("Hárry", "hárry")
-        tree.create_node("Jane", "jane", parent="hárry")
-        tree.create_node("Bill", "bill", parent="hárry")
+        tree = Tree(identifier="tree 1")
+        tree.create_node(u"Hárry", u"hárry")
+        tree.create_node("Jane", "jane", parent=u"hárry")
+        tree.create_node("Bill", "bill", parent=u"hárry")
         tree.create_node("Diane", "diane", parent="jane")
         tree.create_node("George", "george", parent="bill")
         # Hárry
@@ -38,15 +38,25 @@ class TreeCase(unittest.TestCase):
         #   |-- Bill
         #       |-- George
         self.tree = tree
-        self.copytree = Tree(self.tree, True)
+        self.copytree = Tree(self.tree, deep=True)
 
     def test_tree(self):
         self.assertEqual(isinstance(self.tree, Tree), True)
         self.assertEqual(isinstance(self.copytree, Tree), True)
 
     def test_is_root(self):
+        # retro-compatibility
         self.assertTrue(self.tree._nodes['hárry'].is_root())
         self.assertFalse(self.tree._nodes['jane'].is_root())
+
+    def test_is_root_in_tree(self):
+        subtree = self.tree.subtree("jane", identifier="subtree 2")
+        # harry is root of tree 1 but not present in subtree 2
+        self.assertTrue(self.tree._nodes['hárry'].is_root_in_tree("tree 1"))
+        self.assertNotIn('hárry', subtree._nodes)
+        # jane is not root of tree 1 but is root of subtree 2
+        self.assertFalse(self.tree._nodes['jane'].is_root_in_tree("tree 1"))
+        self.assertTrue(subtree._nodes['jane'].is_root_in_tree("subtree 2"))
 
     def test_paths_to_leaves(self):
         paths = self.tree.paths_to_leaves()
@@ -62,7 +72,7 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree.contains("jane"), True)
         self.assertEqual("jane" in self.tree, True)
         self.assertEqual(self.tree.contains("alien"), False)
-        self.tree.create_node("Alien","alien", parent="jane");
+        self.tree.create_node("Alien", "alien", parent="jane")
         self.assertEqual(self.tree.contains("alien"), True)
         self.tree.remove_node("alien")
 
@@ -111,7 +121,7 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree.get_node("jill") is None, True)
         self.assertEqual(self.tree.get_node("mark") is None, True)
 
-    def test_depth(self):
+    def test_depth_in_tree(self):
         # Try getting the level of this tree
         self.assertEqual(self.tree.depth(), 2)
         self.tree.create_node("Jill", "jill", parent = "george")
@@ -145,13 +155,24 @@ class TreeCase(unittest.TestCase):
         self.tree.remove_node("jill")
 
     def test_leaves(self):
+        # retro-compatibility
         leaves = self.tree.leaves()
         for nid in self.tree.expand_tree():
-            self.assertEqual((self.tree[nid].is_leaf()) == (self.tree[nid] \
-                                                            in leaves), True)
+            self.assertEqual((self.tree[nid].is_leaf()) == (self.tree[nid] in leaves), True)
         leaves = self.tree.leaves(nid='jane')
         for nid in self.tree.expand_tree(nid='jane'):
             self.assertEqual(self.tree[nid].is_leaf() == (self.tree[nid] in leaves), True)
+
+    def test_leaves_in_tree(self):
+        leaves = self.tree.leaves()
+        for nid in self.tree.expand_tree():
+            self.assertEqual(
+                (self.tree[nid].is_leaf_in_tree("tree 1")) == (self.tree[nid] in leaves),
+                True
+            )
+        leaves = self.tree.leaves(nid='jane')
+        for nid in self.tree.expand_tree(nid='jane'):
+            self.assertEqual(self.tree[nid].is_leaf_in_tree("tree 1") == (self.tree[nid] in leaves), True)
 
     def test_link_past_node(self):
         self.tree.create_node("Jill", "jill", parent="hárry")
@@ -212,7 +233,31 @@ class TreeCase(unittest.TestCase):
         new_tree.create_node("Mark", "mark", parent="jill")
         self.tree.paste("jane", new_tree)
         self.assertEqual("jill" in self.tree.is_branch("jane"), True)
+        self.tree.show()
+        self.assertEqual(
+            self.tree._reader,
+            u'''Hárry
+├── Bill
+│   └── George
+└── Jane
+    ├── Diane
+    └── Jill
+        └── Mark
+'''
+        )
         self.tree.remove_node("jill")
+        self.assertNotIn('jill', self.tree.nodes.keys())
+        self.assertNotIn('mark', self.tree.nodes.keys())
+        self.tree.show()
+        self.assertEqual(
+            self.tree._reader,
+            u'''Hárry
+├── Bill
+│   └── George
+└── Jane
+    └── Diane
+'''
+        )
 
     def test_rsearch(self):
         for nid in ["hárry", "jane", "diane"]:
@@ -229,7 +274,7 @@ class TreeCase(unittest.TestCase):
 
     def test_remove_subtree(self):
         subtree_shallow = self.tree.remove_subtree("jane")
-        self.assertEqual("jane" not in self.tree.is_branch("hárry"), True)
+        self.assertEqual("jane" not in self.tree.is_branch(u"hárry"), True)
         self.tree.paste("hárry", subtree_shallow)
 
     def test_to_json(self):
@@ -326,7 +371,7 @@ Hárry
         tests: Tree.filter_nodes
         Added by: William Rusnack
         """
-        new_tree = Tree()
+        new_tree = Tree(identifier="tree 1")
 
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: True)), ())
 
@@ -335,8 +380,8 @@ Hárry
         nodes.append(new_tree.create_node('second', parent=new_tree.root))
 
         self.assertEqual(tuple(new_tree.filter_nodes(lambda n: False)), ())
-        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: n.is_root())), (nodes[0],))
-        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: not n.is_root())), (nodes[1],))
+        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: n.is_root_in_tree("tree 1"))), (nodes[0],))
+        self.assertEqual(tuple(new_tree.filter_nodes(lambda n: not n.is_root_in_tree("tree 1"))), (nodes[1],))
         self.assertTrue(set(new_tree.filter_nodes(lambda n: True)), set(nodes))
 
     def test_loop(self):
@@ -375,7 +420,7 @@ Hárry
         self.assertTrue(tree.get_node("xyz").identifier == 'xyz')
 
     def test_modify_node_identifier_root(self):
-        tree = Tree()
+        tree = Tree(identifier="tree 3")
         tree.create_node("Harry", "harry")
         tree.create_node("Jane", "jane", parent="harry")
         tree.update_node(tree['harry'].identifier, identifier='xyz', tag='XYZ')
@@ -397,3 +442,27 @@ Hárry
         tree = Tree(node_class=SubNode)
         node = tree.create_node()
         self.assertTrue(isinstance(node, SubNode))
+
+    def test_shallow_copy_hermetic_pointers(self):
+        # tree 1
+        # Hárry
+        #   └── Jane
+        #       └── Diane
+        #   └── Bill
+        #       └── George
+        tree2 = self.tree.subtree(nid='jane', identifier='tree 2')
+        # tree 2
+        # Jane
+        #   └── Diane
+
+        # check that in shallow copy, instances are the same
+        self.assertIs(self.tree['jane'], tree2['jane'])
+        self.assertEqual(self.tree['jane']._bpointer, {'tree 1': u"hárry", 'tree 2': None})
+        self.assertEqual(dict(self.tree['jane']._fpointer), {'tree 1': ['diane'], 'tree 2': ['diane']})
+
+        # when creating new node on subtree, check that it has no impact on initial tree
+        tree2.create_node("Jill", "jill", parent="diane")
+        self.assertIn('jill', tree2)
+        self.assertIn('jill', tree2.is_branch("diane"))
+        self.assertNotIn('jill', self.tree)
+        self.assertNotIn('jill', self.tree.is_branch("diane"))
