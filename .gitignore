@@ -1,5 +1,6 @@
 *.py[cod]
 .idea
+env/*
 .python-version
 
 env/*

@@ -24,11 +24,14 @@ A :class:`Node` object contains basic properties such as node identifier,
 node tag, parent node, children nodes etc., and some operations for a node.
 """
 from __future__ import unicode_literals
+
 import copy
 import uuid
 from collections import defaultdict
-from .exceptions import NodePropertyError
 from warnings import warn
+
+from .exceptions import NodePropertyError
+from .misc import deprecated
 
 
 class Node(object):
@@ -58,22 +61,22 @@ class Node(object):
         self.expanded = expanded
 
         #: identifier of the parent's node :
-        self._bpointer = {}
+        self._predecessor = {}
         #: identifier(s) of the soons' node(s) :
-        self._fpointer = defaultdict(list)
+        self._successors = defaultdict(list)
 
         #: User payload associated with this node.
         self.data = data
 
-        # for retro-compatilibity on bpointer/fpointer
-        self.initial_tree_id = None
+        # for retro-compatibility on bpointer/fpointer
+        self._initial_tree_id = None
 
     def __lt__(self, other):
         return self.tag < other.tag
 
     def set_initial_tree_id(self, tree_id):
-        if self.initial_tree_id is None:
-            self.initial_tree_id = tree_id
+        if self._initial_tree_id is None:
+            self._initial_tree_id = tree_id
 
     def _set_identifier(self, nid):
         """Initialize self._set_identifier"""
@@ -83,66 +86,79 @@ class Node(object):
             self._identifier = nid
 
     @property
+    @deprecated(alias='node.predecessor')
     def bpointer(self):
-        """Use bpointer_in_tree method, this property is deprecated and only kept for retro-compatilibity. Parents of 
+        """Use predecessor method, this property is deprecated and only kept for retro-compatilibity. Parents of
         a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning 
         bpointer of first declared tree.
         """
-        warn('treelib.Node bpointer property is deprecated. Consider using bpointer_in_tree instead.')
-        if self.initial_tree_id not in self._bpointer.keys():
+        if self._initial_tree_id not in self._predecessor.keys():
             return None
-        return self._bpointer[self.initial_tree_id]
-
-    def bpointer_in_tree(self, tree_id):
-        """
-        The parent ID of a node in a given tree.
-        """
-        return self._bpointer[tree_id]
+        return self._predecessor[self._initial_tree_id]
 
     @bpointer.setter
+    @deprecated(alias='node.set_predecessor')
     def bpointer(self, value):
-        warn('treelib.Node bpointer setter is deprecated. Consider using update_bpointer_in_tree instead.')
-        self.update_bpointer_in_tree(self.initial_tree_id, value)
+        self.set_predecessor(value, self._initial_tree_id)
 
+    @deprecated(alias='node.set_predecessor')
     def update_bpointer(self, nid):
-        warn('treelib.Node update_bpointer method is deprecated. Consider using update_bpointer_in_tree instead.')
-        self.update_bpointer_in_tree(self.initial_tree_id, nid)
-
-    def update_bpointer_in_tree(self, tree_id, nid):
-        """Set the value of `_bpointer`."""
-        self._bpointer[tree_id] = nid
+        self.set_predecessor(nid, self._initial_tree_id)
 
     @property
+    @deprecated(alias='node.successors')
     def fpointer(self):
-        """Use fpointer_in_tree method, this property is deprecated and only kept for retro-compatilibity. Children of
+        """Use successors method, this property is deprecated and only kept for retro-compatilibity. Children of
         a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning
         fpointer of first declared tree.
         """
-        warn('treelib.Node fpointer property is deprecated. Consider using fpointer_in_tree instead.')
-        if self.initial_tree_id not in self._fpointer:
+        if self._initial_tree_id not in self._successors:
             return []
-        return self._fpointer[self.initial_tree_id]
+        return self._successors[self._initial_tree_id]
 
-    def fpointer_in_tree(self, tree_id):
+    @fpointer.setter
+    @deprecated(alias='node.update_successors')
+    def fpointer(self, value):
+        self.set_successors(value, tree_id=self._initial_tree_id)
+
+    @deprecated(alias='node.update_successors')
+    def update_fpointer(self, nid, mode=ADD, replace=None):
+        """Deprecated"""
+        self.update_successors(nid, mode, replace, self._initial_tree_id)
+
+    def predecessor(self, tree_id):
+        """
+        The parent ID of a node in a given tree.
+        """
+        return self._predecessor[tree_id]
+
+    def set_predecessor(self, nid, tree_id):
+        """Set the value of `_predecessor`."""
+        self._predecessor[tree_id] = nid
+
+    def successors(self, tree_id):
         """
         With a getting operator, a list of IDs of node's children is obtained. With
         a setting operator, the value can be list, set, or dict. For list or set,
         it is converted to a list type by the package; for dict, the keys are
         treated as the node IDs.
         """
-        return self._fpointer[tree_id]
+        return self._successors[tree_id]
 
-    @fpointer.setter
-    def fpointer(self, value):
-        warn('treelib.Node fpointer setter is deprecated. Consider using update_fpointer_in_tree instead.')
-        self.set_fpointer_in_tree(self.initial_tree_id, value)
+    def set_successors(self, value, tree_id=None):
+        """Set the value of `_successors`."""
+        if value is None:
+            self._successors[tree_id] = list()
+        elif isinstance(value, list):
+            self._successors[tree_id] = value
+        elif isinstance(value, dict):
+            self._successors[tree_id] = list(value.keys())
+        elif isinstance(value, set):
+            self._successors[tree_id] = list(value)
+        else:  # TODO: add deprecated routine
+            pass
 
-    def update_fpointer(self, nid, mode=ADD, replace=None):
-        """Deprecated"""
-        warn('treelib.Node update_fpointer method is deprecated. Consider using update_fpointer_in_tree instead.')
-        self.update_fpointer_in_tree(self.initial_tree_id, nid, mode, replace)
-
-    def update_fpointer_in_tree(self, tree_id, nid, mode=ADD, replace=None):
+    def update_successors(self, nid, mode=ADD, replace=None, tree_id=None):
         """
         Update the children list with different modes: addition (Node.ADD or
         Node.INSERT) and deletion (Node.DELETE).
@@ -151,17 +167,17 @@ class Node(object):
             return
 
         if mode is self.ADD:
-            self.fpointer_in_tree(tree_id).append(nid)
+            self.successors(tree_id).append(nid)
 
         elif mode is self.DELETE:
-            if nid in self.fpointer_in_tree(tree_id):
-                self.fpointer_in_tree(tree_id).remove(nid)
+            if nid in self.successors(tree_id):
+                self.successors(tree_id).remove(nid)
             else:
                 warn('Nid %s wasn\'t present in fpointer' % nid)
 
         elif mode is self.INSERT:  # deprecate to ADD mode
             warn("WARNING: INSERT is deprecated to ADD mode")
-            self.update_fpointer_in_tree(tree_id, nid)
+            self.update_successors(nid, tree_id=tree_id)
 
         elif mode is self.REPLACE:
             if replace is None:
@@ -169,25 +185,8 @@ class Node(object):
                     'Argument "repalce" should be provided when mode is {}'.format(mode)
                 )
 
-            ind = self.fpointer_in_tree(tree_id).index(nid)
-            self.fpointer_in_tree(tree_id)[ind] = replace
-
-    def set_fpointer(self, value):
-        warn('treelib.Node set_fpointer method is deprecated. Consider using set_fpointer_in_tree instead.')
-        self.set_fpointer_in_tree(self.initial_tree_id, value)
-
-    def set_fpointer_in_tree(self, tree_id, value):
-        """Set the value of `_fpointer`."""
-        if value is None:
-            self._fpointer[tree_id] = list()
-        elif isinstance(value, list):
-            self._fpointer[tree_id] = value
-        elif isinstance(value, dict):
-            self._fpointer[tree_id] = list(value.keys())
-        elif isinstance(value, set):
-            self._fpointer[tree_id] = list(value)
-        else:  # TODO: add deprecated routine
-            pass
+            ind = self.successors(tree_id).index(nid)
+            self.successors(tree_id)[ind] = replace
 
     @property
     def identifier(self):
@@ -198,15 +197,15 @@ class Node(object):
         return self._identifier
 
     def clone_pointers(self, former_tree_id, new_tree_id):
-        former_bpointer = self.bpointer_in_tree(former_tree_id)
-        self.update_bpointer_in_tree(new_tree_id, former_bpointer)
-        former_fpointer = self.fpointer_in_tree(former_tree_id)
+        former_bpointer = self.predecessor(former_tree_id)
+        self.set_predecessor(former_bpointer, new_tree_id)
+        former_fpointer = self.successors(former_tree_id)
         # fpointer is a list and would be copied by reference without deepcopy
-        self.set_fpointer_in_tree(new_tree_id, copy.deepcopy(former_fpointer))
+        self.set_successors(copy.deepcopy(former_fpointer), tree_id=new_tree_id)
 
     def reset_pointers(self, tree_id):
-        self.update_bpointer_in_tree(tree_id, None)
-        self.set_fpointer_in_tree(tree_id, [])
+        self.set_predecessor(None, tree_id)
+        self.set_successors([], tree_id=tree_id)
 
     @identifier.setter
     def identifier(self, value):
@@ -216,28 +215,30 @@ class Node(object):
         else:
             self._set_identifier(value)
 
-    def is_leaf(self):
-        warn('treelib.Node is_leaf method is deprecated. Consider using is_leaf_in_tree instead.')
-        if self.initial_tree_id not in self._fpointer.keys():
-            return True
-        return self.is_leaf_in_tree(self.initial_tree_id)
-
-    def is_leaf_in_tree(self, tree_id):
+    def is_leaf(self, tree_id=None):
         """Return true if current node has no children."""
-        if len(self.fpointer_in_tree(tree_id)) == 0:
+        if tree_id is None:
+            # for retro-compatilibity
+            if self._initial_tree_id not in self._successors.keys():
+                return True
+            else:
+                tree_id = self._initial_tree_id
+
+        if len(self.successors(tree_id)) == 0:
             return True
         else:
             return False
 
-    def is_root(self):
-        warn('treelib.Node is_root method is deprecated. Consider using is_root_in_tree instead.')
-        if self.initial_tree_id not in self._bpointer.keys():
-            return True
-        return self.is_root_in_tree(self.initial_tree_id)
-
-    def is_root_in_tree(self, tree_id):
+    def is_root(self, tree_id=None):
         """Return true if self has no parent, i.e. as root."""
-        return self.bpointer_in_tree(tree_id) is None
+        if tree_id is None:
+            # for retro-compatilibity
+            if self._initial_tree_id not in self._predecessor.keys():
+                return True
+            else:
+                tree_id = self._initial_tree_id
+
+        return self.predecessor(tree_id) is None
 
     @property
     def tag(self):
