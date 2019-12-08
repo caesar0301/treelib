@@ -899,7 +899,7 @@ class Tree(object):
 
                 if cn.predecessor(self._identifier) is not None:
                     self[cn.predecessor(self._identifier)].update_successors(
-                        nid, val, self.node_class.REPLACE,
+                        nid, mode=self.node_class.REPLACE, replace=val,
                         tree_id=self._identifier
                     )
 

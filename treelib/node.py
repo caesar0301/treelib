@@ -147,16 +147,19 @@ class Node(object):
 
     def set_successors(self, value, tree_id=None):
         """Set the value of `_successors`."""
-        if value is None:
-            self._successors[tree_id] = list()
-        elif isinstance(value, list):
-            self._successors[tree_id] = value
-        elif isinstance(value, dict):
-            self._successors[tree_id] = list(value.keys())
-        elif isinstance(value, set):
-            self._successors[tree_id] = list(value)
-        else:  # TODO: add deprecated routine
-            pass
+        setter_lookup = {
+            'NoneType': lambda x: list(),
+            'list': lambda x: x,
+            'dict': lambda x: list(x.keys()),
+            'set': lambda x: list(x)
+        }
+
+        t = value.__class__.__name__
+        if t in setter_lookup:
+            f_setter = setter_lookup[t]
+            self._successors[tree_id] = f_setter(value)
+        else:
+            raise NotImplementedError('Unsupported value type %s' % t)
 
     def update_successors(self, nid, mode=ADD, replace=None, tree_id=None):
         """
@@ -166,27 +169,40 @@ class Node(object):
         if nid is None:
             return
 
-        if mode is self.ADD:
+        def _manipulator_append():
             self.successors(tree_id).append(nid)
 
-        elif mode is self.DELETE:
+        def _manipulator_delete():
             if nid in self.successors(tree_id):
                 self.successors(tree_id).remove(nid)
             else:
                 warn('Nid %s wasn\'t present in fpointer' % nid)
 
-        elif mode is self.INSERT:  # deprecate to ADD mode
+        def _manipulator_insert():
             warn("WARNING: INSERT is deprecated to ADD mode")
             self.update_successors(nid, tree_id=tree_id)
 
-        elif mode is self.REPLACE:
+        def _manipulator_replace():
             if replace is None:
                 raise NodePropertyError(
                     'Argument "repalce" should be provided when mode is {}'.format(mode)
                 )
-
             ind = self.successors(tree_id).index(nid)
             self.successors(tree_id)[ind] = replace
+
+        manipulator_lookup = {
+            self.ADD: ('_manipulator_append', []),
+            self.DELETE: ('_manipulator_delete', []),
+            self.INSERT: ('_manipulator_insert', []),
+            self.REPLACE: ('_manipulator_replace', [])
+        }
+
+        if mode not in manipulator_lookup:
+            raise NotImplementedError('Unsupported node updating mode %s' % str(mode))
+
+        f_name, args = manipulator_lookup.get(mode)
+        f = locals()[f_name]
+        return f()
 
     @property
     def identifier(self):
