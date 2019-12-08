@@ -17,8 +17,8 @@ class NodeCase(unittest.TestCase):
         self.assertEqual(self.node1.fpointer, [])
 
         self.assertEqual(self.node1.expanded, True)
-        self.assertEqual(self.node1._bpointer, {})
-        self.assertEqual(self.node1._fpointer, defaultdict(list))
+        self.assertEqual(self.node1._predecessor, {})
+        self.assertEqual(self.node1._successors, defaultdict(list))
         self.assertEqual(self.node1.data, None)
 
     def test_set_tag(self):
@@ -44,11 +44,11 @@ class NodeCase(unittest.TestCase):
         self.assertEqual(self.node1.fpointer, [])
 
     def test_set_fpointer_in_tree(self):
-        self.node1.update_fpointer_in_tree("tree 1", "identifier 2")
-        self.assertEqual(self.node1.fpointer_in_tree("tree 1"), ['identifier 2'])
-        self.assertEqual(self.node1._fpointer["tree 1"], ['identifier 2'])
-        self.node1.set_fpointer_in_tree("tree 1", [])
-        self.assertEqual(self.node1._fpointer["tree 1"], [])
+        self.node1.update_successors("identifier 2", tid="tree 1")
+        self.assertEqual(self.node1.successors("tree 1"), ['identifier 2'])
+        self.assertEqual(self.node1._successors["tree 1"], ['identifier 2'])
+        self.node1.set_successors([], tree_id="tree 1")
+        self.assertEqual(self.node1._successors["tree 1"], [])
 
     def test_set_bpointer(self):
         # retro-compatibility
@@ -58,11 +58,11 @@ class NodeCase(unittest.TestCase):
         self.assertEqual(self.node2.bpointer, None)
 
     def test_set_bpointer_in_tree(self):
-        self.node2.update_bpointer_in_tree("tree 1", "identifier 1")
-        self.assertEqual(self.node2.bpointer_in_tree("tree 1"), 'identifier 1')
-        self.assertEqual(self.node2._bpointer["tree 1"], 'identifier 1')
-        self.node2.update_bpointer_in_tree("tree 1", None)
-        self.assertEqual(self.node2.bpointer_in_tree("tree 1"), None)
+        self.node2.set_predecessor("tree 1", "identifier 1")
+        self.assertEqual(self.node2.predecessor("tree 1"), 'identifier 1')
+        self.assertEqual(self.node2._predecessor["tree 1"], 'identifier 1')
+        self.node2.set_predecessor("tree 1", None)
+        self.assertEqual(self.node2.predecessor("tree 1"), None)
 
     def test_set_is_leaf(self):
         self.node1.update_fpointer("identifier 2")
@@ -71,10 +71,10 @@ class NodeCase(unittest.TestCase):
         self.assertEqual(self.node2.is_leaf(), True)
 
     def test_set_is_leaf_in_tree(self):
-        self.node1.update_fpointer_in_tree("tree 1", "identifier 2")
-        self.node2.update_bpointer_in_tree("tree 1", "identifier 1")
-        self.assertEqual(self.node1.is_leaf_in_tree("tree 1"), False)
-        self.assertEqual(self.node2.is_leaf_in_tree("tree 1"), True)
+        self.node1.update_successors("identifier 2", tid="tree 1")
+        self.node2.set_predecessor("tree 1", "identifier 1")
+        self.assertEqual(self.node1.is_leaf("tree 1"), False)
+        self.assertEqual(self.node2.is_leaf("tree 1"), True)
 
     def test_data(self):
 
