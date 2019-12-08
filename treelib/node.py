@@ -31,6 +31,7 @@ from collections import defaultdict
 from warnings import warn
 
 from .exceptions import NodePropertyError
+from .misc import deprecated
 
 
 class Node(object):
@@ -85,44 +86,44 @@ class Node(object):
             self._identifier = nid
 
     @property
+    @deprecated(alias='node.predecessor')
     def bpointer(self):
         """Use predecessor method, this property is deprecated and only kept for retro-compatilibity. Parents of
         a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning 
         bpointer of first declared tree.
         """
-        warn('treelib.Node bpointer property is deprecated. Consider using predecessor instead.')
         if self._initial_tree_id not in self._predecessor.keys():
             return None
         return self._predecessor[self._initial_tree_id]
 
     @bpointer.setter
+    @deprecated(alias='node.set_predecessor')
     def bpointer(self, value):
-        warn('treelib.Node bpointer setter is deprecated. Consider using set_predecessor instead.')
         self.set_predecessor(self._initial_tree_id, value)
 
+    @deprecated(alias='node.set_predecessor')
     def update_bpointer(self, nid):
-        warn('treelib.Node update_bpointer method is deprecated. Consider using set_predecessor instead.')
         self.set_predecessor(self._initial_tree_id, nid)
 
     @property
+    @deprecated(alias='node.successors')
     def fpointer(self):
         """Use successors method, this property is deprecated and only kept for retro-compatilibity. Children of
         a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning
         fpointer of first declared tree.
         """
-        warn('treelib.Node fpointer property is deprecated. Consider using successors instead.')
         if self._initial_tree_id not in self._successors:
             return []
         return self._successors[self._initial_tree_id]
 
     @fpointer.setter
+    @deprecated(alias='node.update_successors')
     def fpointer(self, value):
-        warn('treelib.Node fpointer setter is deprecated. Consider using update_successors instead.')
         self.set_successors(value, tree_id=self._initial_tree_id)
 
+    @deprecated(alias='node.update_successors')
     def update_fpointer(self, nid, mode=ADD, replace=None):
         """Deprecated"""
-        warn('treelib.Node update_fpointer method is deprecated. Consider using update_successors instead.')
         self.update_successors(nid, mode, replace, self._initial_tree_id)
 
     def predecessor(self, tree_id):
