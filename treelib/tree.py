@@ -29,6 +29,8 @@ is required to create the tree.
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from builtins import str as text
+
 import codecs
 import json
 import sys
@@ -616,7 +618,7 @@ class Tree(object):
         set_joint = set(new_tree._nodes) & set(self._nodes)  # joint keys
         if set_joint:
             # TODO: a deprecated routine is needed to avoid exception
-            raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
+            raise ValueError('Duplicated nodes %s exists.' % list(map(text, set_joint)))
 
         for cid, node in new_tree.nodes.items():
             if deep:

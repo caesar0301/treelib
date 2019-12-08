@@ -475,3 +475,33 @@ Hárry
         self.assertIn('jill', tree2.is_branch("diane"))
         self.assertNotIn('jill', self.tree)
         self.assertNotIn('jill', self.tree.is_branch("diane"))
+
+    def test_paste_duplicate_nodes(self):
+        t1 = Tree()
+        t1.create_node(identifier='A')
+        t2 = Tree()
+        t2.create_node(identifier='A')
+        t2.create_node(identifier='B', parent='A')
+
+        with self.assertRaises(ValueError) as e:
+            t1.paste('A', t2)
+        self.assertEqual(e.exception.args, ("Duplicated nodes ['A'] exists.",))
+
+    def test_shallow_paste(self):
+        t1 = Tree()
+        n1 = t1.create_node(identifier='A')
+
+        t2 = Tree()
+        n2 = t2.create_node(identifier='B')
+
+        t3 = Tree()
+        n3 = t3.create_node(identifier='C')
+
+        t1.paste(n1.identifier, t2)
+        self.assertEqual(t1.paths_to_leaves(), [['A', 'B']])
+        t1.paste(n1.identifier, t3)
+        self.assertEqual(t1.paths_to_leaves(), [['A', 'C'], ['A', 'B']])
+
+        self.assertEqual(t1.level(n1.identifier), 0)
+        self.assertEqual(t1.level(n2.identifier), 1)
+        self.assertEqual(t1.level(n3.identifier), 1)
