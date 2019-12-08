@@ -191,16 +191,16 @@ class Node(object):
             self.successors(tree_id)[ind] = replace
 
         manipulator_lookup = {
-            self.ADD: ('_manipulator_append', []),
-            self.DELETE: ('_manipulator_delete', []),
-            self.INSERT: ('_manipulator_insert', []),
-            self.REPLACE: ('_manipulator_replace', [])
+            self.ADD: '_manipulator_append',
+            self.DELETE: '_manipulator_delete',
+            self.INSERT: '_manipulator_insert',
+            self.REPLACE: '_manipulator_replace'
         }
 
         if mode not in manipulator_lookup:
             raise NotImplementedError('Unsupported node updating mode %s' % str(mode))
 
-        f_name, args = manipulator_lookup.get(mode)
+        f_name = manipulator_lookup.get(mode)
         f = locals()[f_name]
         return f()
 
