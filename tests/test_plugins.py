@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import unittest
-
+import codecs
 import os
+import unittest
 
 from treelib import Tree
 from treelib.plugins import *
