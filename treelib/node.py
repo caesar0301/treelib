@@ -68,7 +68,7 @@ class Node(object):
         #: User payload associated with this node.
         self.data = data
 
-        # for retro-compatilibity on bpointer/fpointer
+        # for retro-compatibility on bpointer/fpointer
         self._initial_tree_id = None
 
     def __lt__(self, other):
@@ -99,11 +99,11 @@ class Node(object):
     @bpointer.setter
     @deprecated(alias='node.set_predecessor')
     def bpointer(self, value):
-        self.set_predecessor(self._initial_tree_id, value)
+        self.set_predecessor(value, self._initial_tree_id)
 
     @deprecated(alias='node.set_predecessor')
     def update_bpointer(self, nid):
-        self.set_predecessor(self._initial_tree_id, nid)
+        self.set_predecessor(nid, self._initial_tree_id)
 
     @property
     @deprecated(alias='node.successors')
@@ -132,7 +132,7 @@ class Node(object):
         """
         return self._predecessor[tree_id]
 
-    def set_predecessor(self, tree_id, nid):
+    def set_predecessor(self, nid, tree_id):
         """Set the value of `_predecessor`."""
         self._predecessor[tree_id] = nid
 
@@ -158,7 +158,7 @@ class Node(object):
         else:  # TODO: add deprecated routine
             pass
 
-    def update_successors(self, nid, mode=ADD, replace=None, tid=None):
+    def update_successors(self, nid, mode=ADD, replace=None, tree_id=None):
         """
         Update the children list with different modes: addition (Node.ADD or
         Node.INSERT) and deletion (Node.DELETE).
@@ -167,17 +167,17 @@ class Node(object):
             return
 
         if mode is self.ADD:
-            self.successors(tid).append(nid)
+            self.successors(tree_id).append(nid)
 
         elif mode is self.DELETE:
-            if nid in self.successors(tid):
-                self.successors(tid).remove(nid)
+            if nid in self.successors(tree_id):
+                self.successors(tree_id).remove(nid)
             else:
                 warn('Nid %s wasn\'t present in fpointer' % nid)
 
         elif mode is self.INSERT:  # deprecate to ADD mode
             warn("WARNING: INSERT is deprecated to ADD mode")
-            self.update_successors(nid, tid=tid)
+            self.update_successors(nid, tree_id=tree_id)
 
         elif mode is self.REPLACE:
             if replace is None:
@@ -185,8 +185,8 @@ class Node(object):
                     'Argument "repalce" should be provided when mode is {}'.format(mode)
                 )
 
-            ind = self.successors(tid).index(nid)
-            self.successors(tid)[ind] = replace
+            ind = self.successors(tree_id).index(nid)
+            self.successors(tree_id)[ind] = replace
 
     @property
     def identifier(self):
@@ -198,13 +198,13 @@ class Node(object):
 
     def clone_pointers(self, former_tree_id, new_tree_id):
         former_bpointer = self.predecessor(former_tree_id)
-        self.set_predecessor(new_tree_id, former_bpointer)
+        self.set_predecessor(former_bpointer, new_tree_id)
         former_fpointer = self.successors(former_tree_id)
         # fpointer is a list and would be copied by reference without deepcopy
         self.set_successors(copy.deepcopy(former_fpointer), tree_id=new_tree_id)
 
     def reset_pointers(self, tree_id):
-        self.set_predecessor(tree_id, None)
+        self.set_predecessor(None, tree_id)
         self.set_successors([], tree_id=tree_id)
 
     @identifier.setter

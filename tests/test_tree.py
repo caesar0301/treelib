@@ -49,7 +49,7 @@ class TreeCase(unittest.TestCase):
         self.assertTrue(self.tree._nodes['hárry'].is_root())
         self.assertFalse(self.tree._nodes['jane'].is_root())
 
-    def test_is_root_in_tree(self):
+    def test_tree_wise_is_root(self):
         subtree = self.tree.subtree("jane", identifier="subtree 2")
         # harry is root of tree 1 but not present in subtree 2
         self.assertTrue(self.tree._nodes['hárry'].is_root("tree 1"))
@@ -121,7 +121,7 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(self.tree.get_node("jill") is None, True)
         self.assertEqual(self.tree.get_node("mark") is None, True)
 
-    def test_depth_in_tree(self):
+    def test_tree_wise_depth(self):
         # Try getting the level of this tree
         self.assertEqual(self.tree.depth(), 2)
         self.tree.create_node("Jill", "jill", parent = "george")
@@ -163,7 +163,7 @@ class TreeCase(unittest.TestCase):
         for nid in self.tree.expand_tree(nid='jane'):
             self.assertEqual(self.tree[nid].is_leaf() == (self.tree[nid] in leaves), True)
 
-    def test_leaves_in_tree(self):
+    def test_tree_wise_leaves(self):
         leaves = self.tree.leaves()
         for nid in self.tree.expand_tree():
             self.assertEqual(
