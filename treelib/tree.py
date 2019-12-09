@@ -29,7 +29,10 @@ is required to create the tree.
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from builtins import str as text
+try:
+    from builtins import str as text
+except ImportError:
+    from __builtin__ import str as text
 
 import codecs
 import json

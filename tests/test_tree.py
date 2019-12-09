@@ -498,9 +498,9 @@ Hárry
         n3 = t3.create_node(identifier='C')
 
         t1.paste(n1.identifier, t2)
-        self.assertEqual(t1.paths_to_leaves(), [['A', 'B']])
+        self.assertEqual(t1.to_dict(), {'A': {'children': ['B']}})
         t1.paste(n1.identifier, t3)
-        self.assertEqual(t1.paths_to_leaves(), [['A', 'C'], ['A', 'B']])
+        self.assertEqual(t1.to_dict(), {'A': {'children': ['B', 'C']}})
 
         self.assertEqual(t1.level(n1.identifier), 0)
         self.assertEqual(t1.level(n2.identifier), 1)
