@@ -3,7 +3,6 @@
 env/*
 .python-version
 
-env/*
 # C extensions
 *.so
 
