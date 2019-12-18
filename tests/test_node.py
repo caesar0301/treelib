@@ -87,3 +87,59 @@ class NodeCase(unittest.TestCase):
 
         self.node1.data = Flower("red")
         self.assertEqual(self.node1.data.color, "red")
+
+    def test_simple_node_serialization(self):
+        # serialization
+        n = Node(identifier='id', tag='some_tag', expanded=True, data=2)
+        self.assertEqual(
+            n.serialize(),
+            {'identifier': 'id', 'tag': 'some_tag', 'expanded': True, 'data':None}
+        )
+        # deserialization
+        sn = Node.deserialize({'identifier': 'id', 'tag': 'some_tag', 'expanded': True, 'data': None})
+        self.assertIsInstance(sn, Node)
+        self.assertEqual(sn.tag, 'some_tag')
+        self.assertEqual(sn.identifier, 'id')
+        self.assertEqual(sn.expanded, True)
+        # no data serialization was provided in this class
+        self.assertEqual(sn.data, None)
+
+    def test_custom_node_serialization(self):
+        class Flower(object):
+            def __init__(self, color):
+                self.color = color
+
+        class CustomNode(Node):
+            def _serialize_data(self, **kwargs):
+                return {'flower_color': self.data.color}
+
+            @classmethod
+            def _deserialize_data(cls, d, **kwargs):
+                return Flower(color=d['flower_color'])
+
+        # serialization
+        cn = CustomNode(tag='blue_flower', identifier='id2', data=Flower(color='blue'))
+
+        self.assertEqual(
+            cn.serialize(),
+            {
+                'identifier': 'id2',
+                'tag': 'blue_flower',
+                'expanded': True,
+                'data': {'flower_color': 'blue'}
+            }
+        )
+        # deserialization
+        csn = CustomNode.deserialize({
+            'identifier': 'id2',
+            'tag': 'blue_flower',
+            'expanded': True,
+            'data': {'flower_color': 'blue'}
+        })
+
+        self.assertIsInstance(csn, CustomNode)
+        self.assertEqual(csn.tag, 'blue_flower')
+        self.assertEqual(csn.identifier, 'id2')
+        self.assertEqual(csn.expanded, True)
+        self.assertIsInstance(csn.data, Flower)
+        self.assertEqual(csn.data.color, 'blue')

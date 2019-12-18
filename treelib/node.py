@@ -71,6 +71,36 @@ class Node(object):
         # for retro-compatibility on bpointer/fpointer
         self._initial_tree_id = None
 
+    def serialize(self, **kwargs):
+        """Method intended to be overidden in case of inheritance.
+        Serialize a Node instance into a python dictionnary."""
+        return {
+            'tag': self.tag,
+            'identifier': self.identifier,
+            'expanded': self.expanded,
+            'data': self._serialize_data(**kwargs)
+        }
+
+    def _serialize_data(self, **kwargs):
+        """Method intended to be overidden in case of inheritance.
+        Serialize a Node instance data into a python dictionnary."""
+        return None
+
+    @classmethod
+    def _deserialize_data(cls, d, **kwargs):
+        """Method intended to be overidden in case of inheritance.
+        Serialize a python dictionnary into a Node instance data."""
+        return None
+
+    @classmethod
+    def deserialize(cls, d, **kwargs):
+        """Method intended to be overidden in case of inheritance.
+        Deserialize a python dictionnary into a Node"""
+        assert isinstance(d, dict)
+        init_kwargs = d.copy()
+        data = cls._deserialize_data(init_kwargs.pop('data'), **kwargs)
+        return cls(data=data, **init_kwargs)
+
     def __lt__(self, other):
         return self.tag < other.tag
 

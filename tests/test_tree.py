@@ -6,6 +6,8 @@ import sys
 
 import os
 
+from tests import CustomTree, CustomNode
+
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
@@ -544,3 +546,145 @@ Hárry
         t.create_node(identifier="root-B")
         self.assertEqual(len(t.nodes.keys()), 1)
         self.assertEqual(t.root, 'root-B')
+
+    def test_simple_tree_serialization(self):
+        # serialization
+        t = Tree(identifier='tree_id')
+        t.create_node(tag='root', identifier="r")
+        t.create_node(tag='A', identifier="a", parent="r")
+        t.create_node(tag='B', identifier="b", parent="r")
+        t.create_node(tag='A1', identifier="a1", parent="a")
+
+        expected_serialized = {
+            "hierarchy": {
+                "r": [
+                    {
+                        "a": [
+                            "a1"
+                        ]
+                    },
+                    "b"
+                ]
+            },
+            "metadata": {
+                "identifier": "tree_id",
+                "node_class_path": "treelib.node.Node",
+                "tree_class_path": "treelib.tree.Tree",
+                "treelib_version": "1.6.1"
+            },
+            "nodes": {
+                "a": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "a",
+                    "tag": "A"
+                },
+                "a1": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "a1",
+                    "tag": "A1"
+                },
+                "b": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "b",
+                    "tag": "B"
+                },
+                "r": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "r",
+                    "tag": "root"
+                }
+            }
+        }
+
+        self.assertEqual(
+            t.serialize(),
+            expected_serialized
+        )
+
+        # deserialization
+        t2 = Tree.deserialize(expected_serialized)
+        self.assertIsInstance(t2, Tree)
+        self.assertEqual(set(t2.nodes.keys()), {'r', 'a', 'b', 'a1'})
+        for n in t2.nodes.values():
+            self.assertIsInstance(n, Node)
+        t2.show()
+        self.assertEqual(t2._reader, """root
+├── A
+│   └── A1
+└── B
+""")
+
+    def test_custom_tree_serialization(self):
+        # serialization
+        t = CustomTree(identifier='tree_id', cool_stuff='cool')
+        t.add_node(CustomNode(identifier='r'))
+        t.add_node(CustomNode(identifier='a'), parent='r')
+        t.add_node(CustomNode(identifier='b'), parent='r')
+        t.add_node(CustomNode(identifier='a1'), parent='a')
+
+        expected_serialized = {
+            "hierarchy": {
+                "r": [
+                    {
+                        "a": [
+                            "a1"
+                        ]
+                    },
+                    "b"
+                ]
+            },
+            "metadata": {
+                "identifier": "tree_id",
+                "node_class_path": "tests.CustomNode",
+                "stored_cool_stuff": "cool",
+                "tree_class_path": "tests.CustomTree",
+                "treelib_version": "1.6.1"
+            },
+            "nodes": {
+                "a": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "a",
+                    "tag": "a"
+                },
+                "a1": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "a1",
+                    "tag": "a1"
+                },
+                "b": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "b",
+                    "tag": "b"
+                },
+                "r": {
+                    "data": None,
+                    "expanded": True,
+                    "identifier": "r",
+                    "tag": "r"
+                }
+            }
+        }
+
+        self.assertEqual(
+            t.serialize(),
+            expected_serialized
+        )
+
+        # deserialization
+        t2 = CustomTree.deserialize(expected_serialized)
+        self.assertEqual(set(t2.nodes.keys()), {'r', 'a', 'b', 'a1'})
+        for n in t2.nodes.values():
+            self.assertIsInstance(n, CustomNode)
+        t2.show()
+        self.assertEqual(t2._reader, """r
+├── a
+│   └── a1
+└── b
+""")

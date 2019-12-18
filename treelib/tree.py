@@ -39,6 +39,7 @@ import json
 import sys
 import uuid
 from copy import deepcopy
+from warnings import warn
 
 try:
     from StringIO import StringIO
@@ -47,6 +48,7 @@ except ImportError:
 
 from .exceptions import *
 from .node import Node
+from treelib import __version__
 
 __author__ = 'chenxm'
 
@@ -107,6 +109,76 @@ class Tree(object):
                 self._nodes[nid] = new_node
                 if tree.identifier != self._identifier:
                     new_node.clone_pointers(tree.identifier, self._identifier)
+
+    def serialize(self, **kwargs):
+        """Serialize a Tree instance into a python dictionnary."""
+        return {
+            'metadata': self._serialize_tree_metadata(**kwargs),
+            'hierarchy': self._serialize_hierarchy(nid=None),
+            'nodes': {n.identifier: n.serialize(**kwargs) for n in self.nodes.values()},
+        }
+
+    @classmethod
+    def deserialize(cls, d, **kwargs):
+        """Serialize a python dictionnary into a Tree instance"""
+        assert isinstance(d, dict)
+        assert set(d.keys()) == {'metadata', 'hierarchy', 'nodes'}
+        tree = cls._deserialize_tree_metadata(d['metadata'], **kwargs)
+        nodes = {nid: tree.node_class.deserialize(n, **kwargs) for nid, n in d['nodes'].items()}
+        tree._deserialize_hierarchy(d['hierarchy'], nodes)
+        return tree
+
+    def _serialize_tree_metadata(self, **kwargs):
+        """Method intended to be overidden in case of inheritance.
+        Serialize a Tree instance metadata into a python dictionnary."""
+        return {
+            'identifier': self.identifier,
+            'tree_class_path': '.'.join([self.__class__.__module__, self.__class__.__name__]),
+            'node_class_path': '.'.join([self.node_class.__module__, self.node_class.__name__]),
+            'treelib_version': __version__
+        }
+
+    def _deserialize_hierarchy(self, hierarchy, nodes, pid=None):
+        if isinstance(hierarchy, dict):
+            for nid, children in hierarchy.items():
+                self.add_node(nodes[nid], parent=pid)
+                for child in children:
+                    self._deserialize_hierarchy(child, nodes, pid=nid)
+        else:
+            self.add_node(nodes[hierarchy], parent=pid)
+
+    def _serialize_hierarchy(self, nid, filter_expanded=True):
+        nid = self.root if (nid is None) else nid
+        tree_dict = {nid: []}
+        if not filter_expanded or self[nid].expanded:
+            queue = [self[i] for i in self[nid].successors(self._identifier)]
+            for elem in queue:
+                tree_dict[nid].append(self._serialize_hierarchy(nid=elem.identifier, filter_expanded=filter_expanded))
+        if len(tree_dict[nid]) == 0:
+            return nid
+        return tree_dict
+
+    @classmethod
+    def _deserialize_tree_metadata(cls, d, **kwargs):
+        """Deserialize a python dictionnary into tree metadata"""
+        assert isinstance(d, dict)
+        init_kwargs = d.copy()
+        node_class_path = init_kwargs.pop('node_class_path')
+        current_node_class_path = '.'.join([cls.node_class.__module__, cls.node_class.__name__])
+        if current_node_class_path != node_class_path:
+            warn('Deserializing a tree serialized based on <%s> node class, whereas currently used is <%s>' % (
+                node_class_path, current_node_class_path))
+        tree_class_path = init_kwargs.pop('tree_class_path')
+        current_tree_class_path = '.'.join([cls.__module__, cls.__name__])
+        if current_tree_class_path != tree_class_path:
+            warn('Deserializing a tree serialized with <%s> class, whereas currently used is <%s>' % (
+                tree_class_path, current_tree_class_path))
+        if 'treelib_version' in init_kwargs:
+            v = init_kwargs.pop('treelib_version')
+            if v != __version__:
+                warn('Deserializing a tree serialized with treelib %s version, whereas currently used is %s' %
+                     v, __version__)
+        return cls(**init_kwargs)
 
     def _clone(self, identifier=None, with_tree=False, deep=False):
         """Clone current instance, with or without tree.
