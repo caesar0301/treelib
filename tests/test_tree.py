@@ -505,3 +505,15 @@ Hárry
         self.assertEqual(t1.level(n1.identifier), 0)
         self.assertEqual(t1.level(n2.identifier), 1)
         self.assertEqual(t1.level(n3.identifier), 1)
+
+    def test_root_removal(self):
+        t = Tree()
+        t.create_node(identifier="root-A")
+        self.assertEqual(len(t.nodes.keys()), 1)
+        self.assertEqual(t.root, 'root-A')
+        t.remove_node(identifier="root-A")
+        self.assertEqual(len(t.nodes.keys()), 0)
+        self.assertEqual(t.root, None)
+        t.create_node(identifier="root-B")
+        self.assertEqual(len(t.nodes.keys()), 1)
+        self.assertEqual(t.root, 'root-B')
