@@ -673,9 +673,6 @@ class Tree(object):
         """Remove a node indicated by 'identifier' with all its successors.
         Return the number of removed nodes.
         """
-        if identifier is None:
-            return 0
-
         if not self.contains(identifier):
             raise NodeIDAbsentError("Node '%s' "
                                     "is not in the tree" % identifier)
@@ -686,6 +683,8 @@ class Tree(object):
         removed = list(self.expand_tree(identifier))
 
         for id_ in removed:
+            if id_ == self.root:
+                self.root = None
             self.__update_bpointer(id_, None)
             for cid in self[id_].successors(self._identifier) or []:
                 self.__update_fpointer(id_, cid, self.node_class.DELETE)
