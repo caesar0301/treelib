@@ -268,6 +268,33 @@ class TreeCase(unittest.TestCase):
 '''
         )
 
+    def test_paste_at_root_level(self):
+        t1 = Tree()
+        t1.create_node(tag='root', identifier='r')
+        t1.create_node(tag='A', identifier='a', parent='r')
+        t1.create_node(tag='B', identifier='b', parent='r')
+        t1.create_node(tag='A1', identifier='a1', parent='a')
+
+        t2 = Tree()
+        t2.create_node(tag='root2', identifier='r2')
+        t2.create_node(tag='C', identifier='c', parent='r2')
+        t2.create_node(tag='D', identifier='d', parent='r2')
+        t2.create_node(tag='D1', identifier='d1', parent='d')
+
+        t1.paste(nid=None, new_tree=t2)
+        self.assertEqual(t1.root, 'r')
+        self.assertNotIn('r2', t1._nodes.keys())
+        self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b', 'c', 'd', 'd1'})
+        t1.show()
+        self.assertEqual(t1._reader, '''root
+├── A
+│   └── A1
+├── B
+├── C
+└── D
+    └── D1
+''')
+
     def test_rsearch(self):
         for nid in ["hárry", "jane", "diane"]:
             self.assertEqual(nid in self.tree.rsearch("diane"), True)

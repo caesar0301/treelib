@@ -613,7 +613,10 @@ class Tree(object):
         """
         assert isinstance(new_tree, Tree)
         if nid is None:
-            raise OSError("First parameter can't be None")
+            # merge at root level
+            for child in new_tree.children(new_tree.root):
+                self.paste(nid=self.root, new_tree=new_tree.subtree(child.identifier), deep=deep)
+            return
 
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
