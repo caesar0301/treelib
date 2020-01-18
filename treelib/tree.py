@@ -732,12 +732,14 @@ class Tree(object):
         parent = self[nid].predecessor(self._identifier)
 
         removed = list(self.expand_tree(nid))
-        for id in removed:
-            st._nodes.update({id: self._nodes.pop(id)})
-            st[id].clone_pointers(self._identifier, st.identifier)
-            st[id].reset_pointers(self._identifier)
-            if id == nid:
-                st[id].set_predecessor(None, st.identifier)
+        for id_ in removed:
+            if id_ == self.root:
+                self.root = None
+            st._nodes.update({id_: self._nodes.pop(id_)})
+            st[id_].clone_pointers(self._identifier, st.identifier)
+            st[id_].reset_pointers(self._identifier)
+            if id_ == nid:
+                st[id_].set_predecessor(None, st.identifier)
         self.__update_fpointer(parent, nid, self.node_class.DELETE)
         return st
 

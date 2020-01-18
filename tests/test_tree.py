@@ -313,6 +313,11 @@ class TreeCase(unittest.TestCase):
         self.assertEqual("jane" not in self.tree.is_branch(u"hárry"), True)
         self.tree.paste("hárry", subtree_shallow)
 
+    def test_remove_subtree_whole_tree(self):
+        self.tree.remove_subtree(u"hárry")
+        self.assertIsNone(self.tree.root)
+        self.assertEqual(len(self.tree.nodes.keys()), 0)
+
     def test_to_json(self):
         self.assertEqual.__self__.maxDiff = None
         self.tree.to_json()
