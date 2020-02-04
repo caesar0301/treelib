@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import contextlib
+
 import sys
 
 import os
 
 try:
-    from StringIO import StringIO as BytesIO
+    from StringIO import StringIO
 except ImportError:
-    from io import BytesIO
+    from io import StringIO
 import unittest
 from treelib import Tree, Node
 from treelib.tree import NodeIDAbsentError, LoopError
@@ -242,31 +244,38 @@ class TreeCase(unittest.TestCase):
         new_tree.create_node("Mark", "mark", parent="jill")
         self.tree.paste("jane", new_tree)
         self.assertEqual("jill" in self.tree.is_branch("jane"), True)
-        self.tree.show()
+        f = StringIO()
+        with contextlib.redirect_stdout(f):
+            self.tree.show()
         self.assertEqual(
-            self.tree._reader,
-            u'''Hárry
+            f.getvalue(),
+u'''Hárry
 ├── Bill
 │   └── George
 └── Jane
     ├── Diane
     └── Jill
         └── Mark
+
 '''
         )
+        f.close()
         self.tree.remove_node("jill")
         self.assertNotIn('jill', self.tree.nodes.keys())
         self.assertNotIn('mark', self.tree.nodes.keys())
-        self.tree.show()
+        f = StringIO()
+        with contextlib.redirect_stdout(f):
+            self.tree.show(end='\n')
         self.assertEqual(
-            self.tree._reader,
-            u'''Hárry
+            f.getvalue(),
+u'''Hárry
 ├── Bill
 │   └── George
 └── Jane
     └── Diane
 '''
         )
+        f.close()
 
     def test_paste_at_root_level(self):
         t1 = Tree()
@@ -285,15 +294,22 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(t1.root, 'r')
         self.assertNotIn('r2', t1._nodes.keys())
         self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b', 'c', 'd', 'd1'})
-        t1.show()
-        self.assertEqual(t1._reader, '''root
+        f = StringIO()
+        with contextlib.redirect_stdout(f):
+            t1.show()
+        self.assertEqual(
+            f.getvalue(),
+'''root
 ├── A
 │   └── A1
 ├── B
 ├── C
 └── D
     └── D1
-''')
+
+'''
+        )
+        f.close()
 
     def test_rsearch(self):
         for nid in ["hárry", "jane", "diane"]:
@@ -340,19 +356,15 @@ class TreeCase(unittest.TestCase):
     def test_show_data_property(self):
         new_tree = Tree()
 
-        sys.stdout = open(os.devnull, "w")  # stops from printing to console
+        with open(os.devnull, 'w') as f:
+            with contextlib.redirect_stdout(f):
+                new_tree.show()
 
-        try:
-            new_tree.show()
-
-            class Flower(object):
-                def __init__(self, color):
-                    self.color = color
-            new_tree.create_node("Jill", "jill", data=Flower("white"))
-            new_tree.show(data_property="color")
-        finally:
-            sys.stdout.close()
-            sys.stdout = sys.__stdout__  # stops from printing to console
+                class Flower(object):
+                    def __init__(self, color):
+                        self.color = color
+                new_tree.create_node("Jill", "jill", data=Flower("white"))
+                new_tree.show(data_property="color")
 
     def test_level(self):
         self.assertEqual(self.tree.level('hárry'),  0)
@@ -382,13 +394,9 @@ Hárry
         if sys.version_info[0] < 3:
             reload(sys)
             sys.setdefaultencoding('utf-8')
-        sys.stdout = open(os.devnull, "w")  # stops from printing to console
-
-        try:
-            self.tree.show()
-        finally:
-            sys.stdout.close()
-            sys.stdout = sys.__stdout__  # stops from printing to console
+        with open(os.devnull, "w") as f:
+            with contextlib.redirect_stdout(f):
+                self.tree.show()
 
     def tearDown(self):
         self.tree = None
