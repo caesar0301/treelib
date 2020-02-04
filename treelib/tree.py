@@ -780,7 +780,8 @@ class Tree(object):
                              key, reverse, line_type, data_property, func=handler)
 
     def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False, line_type='ascii-ex', data_property=None, stdout=True):
+             key=None, reverse=False, line_type='ascii-ex', data_property=None,
+             end='\n\n'):
         """
         Print the tree structure in hierarchy style.
 
@@ -801,12 +802,15 @@ class Tree(object):
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
         :param data_property: the property on the node data object to be printed.
+        :param end: the string to append to the final line of the output. By
+            default, an extra newline is printed; pass '\n' if this is not
+            desired.
         :return: None
         """
-        self._reader = ""
+        self._reader = []
 
         def write(line):
-            self._reader += line.decode('utf-8') + "\n"
+            self._reader.append(line.decode('utf-8'))
 
         try:
             self.__print_backend(nid, level, idhidden, filter,
@@ -814,10 +818,7 @@ class Tree(object):
         except NodeIDAbsentError:
             print('Tree is empty')
 
-        if stdout:
-            print(self._reader)
-        else:
-            return self._reader
+        print('\n'.join(self._reader), end=end)
 
     def siblings(self, nid):
         """
