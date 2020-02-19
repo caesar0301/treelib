@@ -604,6 +604,45 @@ class Tree(object):
 
         return self[pid]
 
+    def merge(self, nid, new_tree, deep=False):
+        """Patch @new_tree on current tree by pasting new_tree root children on current tree @nid node.
+
+        Consider the following tree:
+        >>> current.show()
+        root
+        ├── A
+        └── B
+        >>> new_tree.show()
+        root2
+        ├── C
+        └── D
+            └── D1
+        Merging new_tree on B node:
+        >>>current.merge('B', new_tree)
+        >>>current.show()
+        root
+        ├── A
+        └── B
+            ├── C
+            └── D
+                └── D1
+
+        Note: if current tree is empty and nid is None, the new_tree root will be used as root on current tree. In all
+        other cases new_tree root is not pasted.
+        """
+        if new_tree.root is None:
+            return
+
+        if nid is None:
+            if self.root is None:
+                new_tree_root = new_tree[new_tree.root]
+                self.add_node(new_tree_root)
+                nid = new_tree.root
+            else:
+                raise ValueError('Must define "nid" under which new tree is merged.')
+        for child in new_tree.children(new_tree.root):
+            self.paste(nid=nid, new_tree=new_tree.subtree(child.identifier), deep=deep)
+
     def paste(self, nid, new_tree, deep=False):
         """
         Paste a @new_tree to the original one by linking the root
@@ -612,18 +651,18 @@ class Tree(object):
         Update: add @deep copy of pasted tree.
         """
         assert isinstance(new_tree, Tree)
-        if nid is None:
-            # merge at root level
-            for child in new_tree.children(new_tree.root):
-                self.paste(nid=self.root, new_tree=new_tree.subtree(child.identifier), deep=deep)
+
+        if new_tree.root is None:
             return
+
+        if nid is None:
+            raise ValueError('Must define "nid" under which new tree is pasted.')
 
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
         set_joint = set(new_tree._nodes) & set(self._nodes)  # joint keys
         if set_joint:
-            # TODO: a deprecated routine is needed to avoid exception
             raise ValueError('Duplicated nodes %s exists.' % list(map(text, set_joint)))
 
         for cid, node in new_tree.nodes.items():
