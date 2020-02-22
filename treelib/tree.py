@@ -240,20 +240,17 @@ class Tree(object):
         return self.__get_iter(nid, level, filter_, key, reverse, dt, [])
 
     def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last):
-        dt_vline, dt_line_box, dt_line_cor = dt
+        dt_vertical_line, dt_line_box, dt_line_corner = dt
 
-        nid = self.root if (nid is None) else nid
-        if not self.contains(nid):
-            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
-
+        nid = self.root if nid is None else nid
         node = self[nid]
 
         if level == self.ROOT:
             yield "", node
         else:
-            leading = ''.join(map(lambda x: dt_vline + ' ' * 3
+            leading = ''.join(map(lambda x: dt_vertical_line + ' ' * 3
             if not x else ' ' * 4, is_last[0:-1]))
-            lasting = dt_line_cor if is_last[-1] else dt_line_box
+            lasting = dt_line_corner if is_last[-1] else dt_line_box
             yield leading + lasting, node
 
         if filter_(node) and node.expanded:
