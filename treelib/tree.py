@@ -154,10 +154,6 @@ class Tree(object):
         """Return len(_nodes)"""
         return len(self._nodes)
 
-    def __setitem__(self, key, item):
-        """Set _nodes[key]"""
-        self._nodes.update({key: item})
-
     def __str__(self):
         self._reader = ""
 
