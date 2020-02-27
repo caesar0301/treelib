@@ -40,6 +40,36 @@ class TreeCase(unittest.TestCase):
         self.tree = tree
         self.copytree = Tree(self.tree, deep=True)
 
+    @staticmethod
+    def get_t1():
+        """
+        root
+        ├── A
+        │   └── A1
+        └── B
+        """
+        t = Tree(identifier='t1')
+        t.create_node(tag='root', identifier='r')
+        t.create_node(tag='A', identifier='a', parent='r')
+        t.create_node(tag='B', identifier='b', parent='r')
+        t.create_node(tag='A1', identifier='a1', parent='a')
+        return t
+
+    @staticmethod
+    def get_t2():
+        """
+        root2
+        ├── C
+        └── D
+            └── D1
+        """
+        t = Tree(identifier='t2')
+        t.create_node(tag='root2', identifier='r2')
+        t.create_node(tag='C', identifier='c', parent='r2')
+        t.create_node(tag='D', identifier='d', parent='r2')
+        t.create_node(tag='D1', identifier='d1', parent='d')
+        return t
+
     def test_tree(self):
         self.assertEqual(isinstance(self.tree, Tree), True)
         self.assertEqual(isinstance(self.copytree, Tree), True)
@@ -268,31 +298,134 @@ class TreeCase(unittest.TestCase):
 '''
         )
 
-    def test_paste_at_root_level(self):
-        t1 = Tree()
-        t1.create_node(tag='root', identifier='r')
-        t1.create_node(tag='A', identifier='a', parent='r')
-        t1.create_node(tag='B', identifier='b', parent='r')
-        t1.create_node(tag='A1', identifier='a1', parent='a')
+    def test_merge(self):
 
-        t2 = Tree()
-        t2.create_node(tag='root2', identifier='r2')
-        t2.create_node(tag='C', identifier='c', parent='r2')
-        t2.create_node(tag='D', identifier='d', parent='r2')
-        t2.create_node(tag='D1', identifier='d1', parent='d')
+        # merge on empty initial tree
+        t1 = Tree(identifier='t1')
+        t2 = self.get_t2()
+        t1.merge(nid=None, new_tree=t2)
 
-        t1.paste(nid=None, new_tree=t2)
+        self.assertEqual(t1.identifier, 't1')
+        self.assertEqual(t1.root, 'r2')
+        self.assertEqual(set(t1._nodes.keys()), {'r2', 'c', 'd', 'd1'})
+        self.assertEqual(t1.show(stdout=False), '''root2
+├── C
+└── D
+    └── D1
+''')
+
+        # merge empty new_tree (on root)
+        t1 = self.get_t1()
+        t2 = Tree(identifier='t2')
+        t1.merge(nid='r', new_tree=t2)
+
+        self.assertEqual(t1.identifier, 't1')
+        self.assertEqual(t1.root, 'r')
+        self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b'})
+        self.assertEqual(t1.show(stdout=False), '''root
+├── A
+│   └── A1
+└── B
+''')
+
+        # merge at root
+        t1 = self.get_t1()
+        t2 = self.get_t2()
+        t1.merge(nid='r', new_tree=t2)
+
+        self.assertEqual(t1.identifier, 't1')
         self.assertEqual(t1.root, 'r')
         self.assertNotIn('r2', t1._nodes.keys())
         self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b', 'c', 'd', 'd1'})
-        t1.show()
-        self.assertEqual(t1._reader, '''root
+        self.assertEqual(t1.show(stdout=False), '''root
 ├── A
 │   └── A1
 ├── B
 ├── C
 └── D
     └── D1
+''')
+
+        # merge on node
+        t1 = self.get_t1()
+        t2 = self.get_t2()
+        t1.merge(nid='b', new_tree=t2)
+        self.assertEqual(t1.identifier, 't1')
+        self.assertEqual(t1.root, 'r')
+        self.assertNotIn('r2', t1._nodes.keys())
+        self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b', 'c', 'd', 'd1'})
+        self.assertEqual(t1.show(stdout=False), '''root
+├── A
+│   └── A1
+└── B
+    ├── C
+    └── D
+        └── D1
+''')
+
+    def test_paste(self):
+
+        # paste under root
+        t1 = self.get_t1()
+        t2 = self.get_t2()
+        t1.paste(nid='r', new_tree=t2)
+        self.assertEqual(t1.identifier, 't1')
+        self.assertEqual(t1.root, 'r')
+        self.assertEqual(t1.parent('r2').identifier, 'r')
+        self.assertEqual(set(t1._nodes.keys()), {'r', 'r2', 'a', 'a1', 'b', 'c', 'd', 'd1'})
+        self.assertEqual(t1.show(stdout=False), """root
+├── A
+│   └── A1
+├── B
+└── root2
+    ├── C
+    └── D
+        └── D1
+""")
+
+        # paste under non-existing node
+        t1 = self.get_t1()
+        t2 = self.get_t2()
+        with self.assertRaises(NodeIDAbsentError) as e:
+            t1.paste(nid='not_existing', new_tree=t2)
+        self.assertEqual(e.exception.args[0], 'Node \'not_existing\' is not in the tree')
+
+        # paste under None nid
+        t1 = self.get_t1()
+        t2 = self.get_t2()
+        with self.assertRaises(ValueError) as e:
+            t1.paste(nid=None, new_tree=t2)
+        self.assertEqual(e.exception.args[0], 'Must define "nid" under which new tree is pasted.')
+
+        # paste under node
+        t1 = self.get_t1()
+        t2 = self.get_t2()
+        t1.paste(nid='b', new_tree=t2)
+        self.assertEqual(t1.identifier, 't1')
+        self.assertEqual(t1.root, 'r')
+        self.assertEqual(t1.parent('b').identifier, 'r')
+        self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b', 'c', 'd', 'd1', 'r2'})
+        self.assertEqual(t1.show(stdout=False), '''root
+├── A
+│   └── A1
+└── B
+    └── root2
+        ├── C
+        └── D
+            └── D1
+''')
+        # paste empty new_tree (under root)
+        t1 = self.get_t1()
+        t2 = Tree(identifier='t2')
+        t1.paste(nid='r', new_tree=t2)
+
+        self.assertEqual(t1.identifier, 't1')
+        self.assertEqual(t1.root, 'r')
+        self.assertEqual(set(t1._nodes.keys()), {'r', 'a', 'a1', 'b'})
+        self.assertEqual(t1.show(stdout=False), '''root
+├── A
+│   └── A1
+└── B
 ''')
 
     def test_rsearch(self):
