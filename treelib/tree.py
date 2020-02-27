@@ -281,9 +281,6 @@ class Tree(object):
         else:
             self[nid].update_successors(child_id, mode, tree_id=self._identifier)
 
-    def __real_true(self, p):
-        return True
-
     def add_node(self, node, parent=None):
         """
         Add a new node object to the tree and make the parent as the root by default.
@@ -429,7 +426,7 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        filter = self.__real_true if (filter is None) else filter
+        filter = (lambda x: True) if (filter is None) else filter
         if filter(self[nid]):
             yield nid
             queue = [self[i] for i in self[nid].successors(self._identifier) if filter(self[i])]
@@ -756,7 +753,7 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        filter = (self.__real_true) if (filter is None) else filter
+        filter = (lambda x: True) if (filter is None) else filter
 
         current = nid
         while current is not None:
