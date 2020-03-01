@@ -1,6 +1,7 @@
 from setuptools import setup
 
-from treelib import __version__
+__version__ = '1.6.1'
+
 
 setup(
     name="treelib",
