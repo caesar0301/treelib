@@ -36,9 +36,9 @@ except ImportError:
 
 import codecs
 import json
-import sys
 import uuid
 from copy import deepcopy
+from future.utils import python_2_unicode_compatible, iteritems
 
 try:
     from StringIO import StringIO
@@ -49,26 +49,6 @@ from .exceptions import *
 from .node import Node
 
 __author__ = 'chenxm'
-
-
-def python_2_unicode_compatible(klass):
-    """
-    (slightly modified from: http://django.readthedocs.org/en/latest/_modules/django/utils/encoding.html)
-
-    A decorator that defines __unicode__ and __str__ methods under Python 2.
-    Under Python 3 it does nothing.
-
-    To support Python 2 and 3 with a single code base, define a __str__ method
-    returning text and apply this decorator to the class.
-    """
-    if sys.version_info[0] == 2:
-        if '__str__' not in klass.__dict__:
-            raise ValueError("@python_2_unicode_compatible cannot be applied "
-                             "to %s because it doesn't define __str__()." %
-                             klass.__name__)
-        klass.__unicode__ = klass.__str__
-        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
-    return klass
 
 
 @python_2_unicode_compatible
@@ -102,7 +82,7 @@ class Tree(object):
 
         if tree is not None:
             self.root = tree.root
-            for nid, node in tree.nodes.items():
+            for nid, node in iteritems(tree.nodes):
                 new_node = deepcopy(node) if deep else node
                 self._nodes[nid] = new_node
                 if tree.identifier != self._identifier:
@@ -153,10 +133,6 @@ class Tree(object):
     def __len__(self):
         """Return len(_nodes)"""
         return len(self._nodes)
-
-    def __setitem__(self, key, item):
-        """Set _nodes[key]"""
-        self._nodes.update({key: item})
 
     def __str__(self):
         self._reader = ""
@@ -240,20 +216,17 @@ class Tree(object):
         return self.__get_iter(nid, level, filter_, key, reverse, dt, [])
 
     def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last):
-        dt_vline, dt_line_box, dt_line_cor = dt
+        dt_vertical_line, dt_line_box, dt_line_corner = dt
 
-        nid = self.root if (nid is None) else nid
-        if not self.contains(nid):
-            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
-
+        nid = self.root if nid is None else nid
         node = self[nid]
 
         if level == self.ROOT:
             yield "", node
         else:
-            leading = ''.join(map(lambda x: dt_vline + ' ' * 3
+            leading = ''.join(map(lambda x: dt_vertical_line + ' ' * 3
             if not x else ' ' * 4, is_last[0:-1]))
-            lasting = dt_line_cor if is_last[-1] else dt_line_box
+            lasting = dt_line_corner if is_last[-1] else dt_line_box
             yield leading + lasting, node
 
         if filter_(node) and node.expanded:
@@ -662,7 +635,7 @@ class Tree(object):
         if set_joint:
             raise ValueError('Duplicated nodes %s exists.' % list(map(text, set_joint)))
 
-        for cid, node in new_tree.nodes.items():
+        for cid, node in iteritems(new_tree.nodes):
             if deep:
                 node = deepcopy(new_tree[node])
             self._nodes.update({cid: node})
@@ -930,7 +903,7 @@ class Tree(object):
         :return: None
         """
         cn = self[nid]
-        for attr, val in attrs.items():
+        for attr, val in iteritems(attrs):
             if attr == 'identifier':
                 # Updating node id meets following contraints:
                 # * Update node identifier property

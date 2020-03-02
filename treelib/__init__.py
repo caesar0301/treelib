@@ -34,7 +34,6 @@ you have to trigger the compatibility by declaring `unicode_literals` in the cod
 
    >>> from __future__ import unicode_literals
 """
-__version__ = '1.6.1'
 
 from .tree import Tree
 from .node import Node
