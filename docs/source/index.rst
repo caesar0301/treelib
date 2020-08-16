@@ -194,7 +194,7 @@ the data field is appended into JSON string. For example,
 Advanced Usage
 ----------------
 
-Sometimes, you need trees to store your own data. The newsest version of
+Sometimes, you need trees to store your own data. The newest version of
 :mod:`treelib` supports ``.data`` variable to store whatever you want. For
 example, to define a flower tree with your own data:
 
