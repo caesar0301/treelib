@@ -889,9 +889,8 @@ class Tree(object):
             # define nodes parent/children in this tree
             # all pointers are the same as copied tree, except the root
             st[node_n].clone_pointers(self._identifier, st.identifier)
-            if node_n == nid:
-                # reset root parent for the new tree
-                st[node_n].set_predecessor(None, st.identifier)
+        # reset root parent for the new tree
+        st[nid].set_predecessor(None, st.identifier)
         return st
 
     def update_node(self, nid, **attrs):
