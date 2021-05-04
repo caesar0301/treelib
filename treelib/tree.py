@@ -305,7 +305,7 @@ class Tree(object):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
         descendant = self[nid]
-        ascendant = self[nid].predecessor
+        ascendant = self[nid]._predecessor[self._identifier]
         ascendant_level = self.level(ascendant)
 
         if level is None:
@@ -321,7 +321,7 @@ class Tree(object):
                 return self[ascendant]
             else:
                 descendant = ascendant
-                ascendant = self[descendant].predecessor
+                ascendant = self[descendant]._predecessor[self._identifier]
                 ascendant_level = self.level(ascendant)
         return None
 
