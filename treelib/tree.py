@@ -162,6 +162,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        sorting=True,
         func=print,
     ):
         """
@@ -215,17 +216,17 @@ class Tree(object):
                     return "%s[%s]" % (node.tag, node.identifier)
 
         # legacy ordering
-        if key is None:
+        if sorting and key is None:
 
             def key(node):
                 return node
 
         # iter with func
-        for pre, node in self.__get(nid, level, filter, key, reverse, line_type):
+        for pre, node in self.__get(nid, level, filter, key, reverse, line_type, sorting):
             label = get_label(node)
             func("{0}{1}".format(pre, label).encode("utf-8"))
 
-    def __get(self, nid, level, filter_, key, reverse, line_type):
+    def __get(self, nid, level, filter_, key, reverse, line_type, sorting):
         # default filter
         if filter_ is None:
 
@@ -242,9 +243,9 @@ class Tree(object):
             "ascii-emh": ("\u2502", "\u255e\u2550\u2550 ", "\u2558\u2550\u2550 "),
         }[line_type]
 
-        return self.__get_iter(nid, level, filter_, key, reverse, dt, [])
+        return self.__get_iter(nid, level, filter_, key, reverse, dt, [], sorting)
 
-    def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last):
+    def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last, sorting):
         dt_vertical_line, dt_line_box, dt_line_corner = dt
 
         nid = self.root if nid is None else nid
@@ -267,15 +268,16 @@ class Tree(object):
                 self[i] for i in node.successors(self._identifier) if filter_(self[i])
             ]
             idxlast = len(children) - 1
-            if key:
-                children.sort(key=key, reverse=reverse)
-            elif reverse:
-                children = reversed(children)
+            if sorting:
+                if key:
+                    children.sort(key=key, reverse=reverse)
+                elif reverse:
+                    children = reversed(children)
             level += 1
             for idx, child in enumerate(children):
                 is_last.append(idx == idxlast)
                 for item in self.__get_iter(
-                    child.identifier, level, filter_, key, reverse, dt, is_last
+                    child.identifier, level, filter_, key, reverse, dt, is_last, sorting
                 ):
                     yield item
                 is_last.pop()
@@ -838,6 +840,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        sorting=True,
     ):
         """
         Save the tree into file for offline analysis.
@@ -858,6 +861,7 @@ class Tree(object):
             reverse,
             line_type,
             data_property,
+            sorting,
             func=handler,
         )
 
@@ -872,6 +876,7 @@ class Tree(object):
         line_type="ascii-ex",
         data_property=None,
         stdout=True,
+        sorting=True,
     ):
         """
         Print the tree structure in hierarchy style.
@@ -893,6 +898,9 @@ class Tree(object):
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
         :param data_property: the property on the node data object to be printed.
+        :param sorting: if True perform node sorting, if False return
+            nodes in original insertion order. In latter case @key and
+            @reverse parameters are ignored.
         :return: None
         """
         self._reader = ""
@@ -910,6 +918,7 @@ class Tree(object):
                 reverse,
                 line_type,
                 data_property,
+                sorting,
                 func=write,
             )
         except NodeIDAbsentError:
