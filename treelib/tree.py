@@ -1001,23 +1001,27 @@ class Tree(object):
         f.close()
         
         
-    def map(self, key):
+    def map(self, key, deep=True):
         """Morphism of tree
         
         Work like the built-in `map`
         
         Arguments
-            key: function of a node
+            key -- function of a node
+            deep -- please keep it true
         """
-        tree = self._clone(with_tree=tree)
+        tree = self._clone(with_tree=tree, deep=deep)
         for a in tree.iternodes():
             key(a)
         return tree
     
-    def map_data(self, key):
+    def map_data(self, key, deep=True):
         """morphism of tree, but act on data of nodes.
+        
+        Arguments
+            key -- pure function of node.data
         """
-        tree = self._clone(with_tree=tree)
+        tree = self._clone(with_tree=tree, deep=deep)
         for a in tree.iternodes():
             a.data = key(a.data)
         return tree
