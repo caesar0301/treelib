@@ -295,6 +295,12 @@ class Tree(object):
         Added by William Rusnack
         """
         return self._nodes.values()
+    
+    def iternodes(self):
+        """
+        alias of `all_nodes_itr` but conform to the convention of Python.
+        """
+        return self._nodes.values()
 
     def ancestor(self, nid, level=None):
         """
@@ -993,3 +999,25 @@ class Tree(object):
             print(f.getvalue())
 
         f.close()
+        
+        
+    def map(self, key):
+        """Morphism of tree
+        
+        Work like the built-in `map`
+        
+        Arguments
+            key: function of a node
+        """
+        tree = self._clone(with_tree=tree)
+        for a in tree.iternodes():
+            key(a)
+        return tree
+    
+    def map_data(self, key):
+        """morphism of tree, but act on data of nodes.
+        """
+        tree = self._clone(with_tree=tree)
+        for a in tree.iternodes():
+            a.data = key(a.data)
+        return tree
