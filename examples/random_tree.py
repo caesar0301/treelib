@@ -1,12 +1,7 @@
-"""
-Generate a tree randomly
-"""
-
 import random
 from treelib import Tree
 
 def _random(max_depth=5, min_width=1, max_width=2, offset=(0,)):
-    # just have fun
     tree = Tree()
     root = tree.create_node(identifier=offset)
     if max_depth == 0:
@@ -22,4 +17,16 @@ def _random(max_depth=5, min_width=1, max_width=2, offset=(0,)):
             tree.paste(offset, subtree)
     return tree
 
-print(_random())
+def key(node):
+    node.tag = ''.join(map(str, node.identifier))
+
+def _map(tree, key):
+
+    tree = tree._clone(with_tree=True)
+    print(tree)
+    for a in tree.all_nodes_itr():
+        key(a)
+    return tree
+
+
+print(_map(_random(), key))
