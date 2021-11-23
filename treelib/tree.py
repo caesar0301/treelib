@@ -863,7 +863,7 @@ class Tree(object):
                 raise TypeError(
                     "level should be an integer instead of '%s'" % type(level))
 
-    def subtree(self, nid, identifier=None):
+    def subtree(self, nid, identifier=None, *args, **kwargs):
         """
         Return a shallow COPY of subtree with nid being the new root.
         If nid is None, return an empty tree.
@@ -884,7 +884,7 @@ class Tree(object):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
         st.root = nid
-        for node_n in self.expand_tree(nid):
+        for node_n in self.expand_tree(nid, *args, **kwargs):
             st._nodes.update({self[node_n].identifier: self[node_n]})
             # define nodes parent/children in this tree
             # all pointers are the same as copied tree, except the root
