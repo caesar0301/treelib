@@ -43,8 +43,10 @@ class Node(object):
     #: Mode constants for routine `update_fpointer()`.
     (ADD, DELETE, INSERT, REPLACE) = list(range(4))
 
-    def __init__(self, tag=None, identifier=None, expanded=True, data=None):
+    def __init__(self, tag=None, identifier=None, expanded=True, data=None, **kwargs):
         """Create a new Node object to be placed inside a Tree object"""
+
+        super().__init__(**kwargs)
 
         #: if given as a parameter, must be unique
         self._identifier = None
