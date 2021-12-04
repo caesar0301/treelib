@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import unittest
-
+import codecs
 import os
+import unittest
 
 from treelib import Tree
 from treelib.plugins import *
@@ -57,7 +57,6 @@ digraph tree {
 
         expected = """\
 digraph tree {
-
 }"""
         self.assertTrue(os.path.isfile('tree.dot'), "The file tree.dot could not be found.")
         generated = self.read_generated_output('tree.dot')
@@ -73,7 +72,6 @@ digraph tree {
         expected = """\
 digraph tree {
 \t"node_1" [label="Node 1", shape=circle]
-
 }"""
         self.assertTrue(os.path.isfile('ŕʩϢ.dot'), "The file ŕʩϢ.dot could not be found.")
         generated = self.read_generated_output('ŕʩϢ.dot')
@@ -86,7 +84,6 @@ digraph tree {
         expected = """\
 digraph tree {
 \t"example-node" [label="Example Node", shape=circle]
-
 }"""
 
         export_to_dot(tree, 'id_with_minus.dot')
