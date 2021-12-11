@@ -173,11 +173,21 @@ class Tree(object):
         # Factory for proper get_label() function
         if data_property:
             if idhidden:
-                def get_label(node):
-                    return getattr(node.data, data_property)
+                if type(data_property) is str:
+                    def get_label(node):
+                        return getattr(node.data, data_property)
+                elif type(data_property) is list:
+                    def get_label(node):
+                        properties = ", ".join(["%s: %s" % (d, getattr(node.data, d)) for d in data_property])
+                        return properties
             else:
-                def get_label(node):
-                    return "%s[%s]" % (getattr(node.data, data_property), node.identifier)
+                if type(data_property) is str:
+                    def get_label(node):
+                        return "%s[%s]" % (getattr(node.data, data_property), node.identifier)
+                elif type(data_property) is list:
+                    def get_label(node):
+                        properties = ", ".join(["%s: %s" % (d, getattr(node.data, d)) for d in data_property])
+                        return "%s[%s]" % (properties, node.identifier)
         else:
             if idhidden:
                 def get_label(node):
@@ -809,7 +819,7 @@ class Tree(object):
         :param key: the ``key`` param for sorting :class:`Node` objects in the same level.
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
-        :param data_property: the property on the node data object to be printed.
+        :param data_property: the property on the node data object to be printed. # modified: Now data_property can be either a str or a list of strs.
         :return: None
         """
         self._reader = ""
