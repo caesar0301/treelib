@@ -3,6 +3,20 @@ treelib
 
 Tree implementation in python: simple for you to use.
 
+## Modifications
+
+```sh
+treelib/tree.py/Tree.show()
+```
+
+The original treelib only supports `data_property` argument as a `string`, and prints the corresponding attribute of the node data. This modification allows `data_property` argument to be a `list`, and prints the corresponding attributes in the list. For instance:
+
+```python
+sent_trees[5].show(data_property=["text", "dep_"])
+```
+
+------
+
 [![Build Status](https://travis-ci.org/caesar0301/treelib.svg?branch=master)](https://travis-ci.org/caesar0301/treelib)
 [![Documentation Status](https://readthedocs.org/projects/treelib/badge/?version=latest)](http://treelib.readthedocs.io/en/latest/?badge=latest)
 [![Status](https://img.shields.io/pypi/status/treelib.svg)](https://pypi.python.org/pypi/treelib)
