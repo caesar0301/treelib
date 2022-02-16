@@ -38,7 +38,7 @@ import codecs
 import json
 import uuid
 from copy import deepcopy
-from future.utils import python_2_unicode_compatible, iteritems
+from six import python_2_unicode_compatible, iteritems
 
 try:
     from StringIO import StringIO
