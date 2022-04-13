@@ -41,5 +41,3 @@ class LoopError(Exception):
     while A is B's ancestor.
     """
     pass
-
-
