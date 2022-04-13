@@ -14,6 +14,7 @@ from string import digits, letters
 
 MAX_FILES_PER_DIR = 10
 
+
 def get_random_string(length):
     return ''.join(random.choice(digits + letters) for _ in range(length))
 
@@ -34,7 +35,7 @@ def build_recursive_tree(tree, base, depth, width):
         for i in xrange(width):
             directory = Directory()
             tree.create_node("{0}".format(directory.name), "{0}".format(hashlib.md5(directory.name)),
-                             parent=base.identifier, data=directory)  #  node identifier is md5 hash of it's name
+                             parent=base.identifier, data=directory)  # node identifier is md5 hash of it's name
         dirs_nodes = tree.children(base.identifier)
         for dir in dirs_nodes:
             newbase = tree.get_node(dir.identifier)
@@ -55,7 +56,6 @@ class Directory(object):
     @property
     def files(self):
         return self._files
-
 
 
 class File(object):

@@ -90,9 +90,9 @@ class TreeCase(unittest.TestCase):
 
     def test_paths_to_leaves(self):
         paths = self.tree.paths_to_leaves()
-        self.assertEqual( len(paths), 2 )
-        self.assertTrue( ['hárry', 'jane', 'diane'] in paths )
-        self.assertTrue( ['hárry', 'bill', 'george'] in paths )
+        self.assertEqual(len(paths), 2)
+        self.assertTrue(['hárry', 'jane', 'diane'] in paths)
+        self.assertTrue(['hárry', 'bill', 'george'] in paths)
 
     def test_nodes(self):
         self.assertEqual(len(self.tree.nodes), 5)
@@ -125,7 +125,7 @@ class TreeCase(unittest.TestCase):
             if nid == self.tree.root:
                 self.assertEqual(self.tree.parent(nid), None)
             else:
-                self.assertEqual(self.tree.parent(nid) in \
+                self.assertEqual(self.tree.parent(nid) in
                                  self.tree.all_nodes(), True)
 
     def test_ancestor(self):
@@ -134,7 +134,7 @@ class TreeCase(unittest.TestCase):
                 self.assertEqual(self.tree.ancestor(nid), None)
             else:
                 for level in range(self.tree.level(nid) - 1, 0, -1):
-                    self.assertEqual(self.tree.ancestor(nid, level=level) in \
+                    self.assertEqual(self.tree.ancestor(nid, level=level) in
                                      self.tree.all_nodes(), True)
 
     def test_children(self):
@@ -154,8 +154,8 @@ class TreeCase(unittest.TestCase):
             self.fail("The absent node should be declaimed.")
 
     def test_remove_node(self):
-        self.tree.create_node("Jill", "jill", parent = "george")
-        self.tree.create_node("Mark", "mark", parent = "jill")
+        self.tree.create_node("Jill", "jill", parent="george")
+        self.tree.create_node("Mark", "mark", parent="jill")
         self.assertEqual(self.tree.remove_node("jill"), 2)
         self.assertEqual(self.tree.get_node("jill") is None, True)
         self.assertEqual(self.tree.get_node("mark") is None, True)
@@ -163,9 +163,9 @@ class TreeCase(unittest.TestCase):
     def test_tree_wise_depth(self):
         # Try getting the level of this tree
         self.assertEqual(self.tree.depth(), 2)
-        self.tree.create_node("Jill", "jill", parent = "george")
+        self.tree.create_node("Jill", "jill", parent="george")
         self.assertEqual(self.tree.depth(), 3)
-        self.tree.create_node("Mark", "mark", parent = "jill")
+        self.tree.create_node("Mark", "mark", parent="jill")
         self.assertEqual(self.tree.depth(), 4)
 
         # Try getting the level of the node
@@ -221,7 +221,7 @@ class TreeCase(unittest.TestCase):
         self.assertEqual("mark" in self.tree.is_branch("hárry"), True)
 
     def test_expand_tree(self):
-        ## default config
+        # default config
         # Hárry
         #   |-- Jane
         #       |-- Diane
@@ -237,12 +237,12 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'george', u'jane', u'diane'])
         self.assertEqual(len(nodes), 5)
 
-        ## expanding from specific node
+        # expanding from specific node
         nodes = [nid for nid in self.tree.expand_tree(nid="bill")]
         self.assertEqual(nodes, [u'bill', u'george'])
         self.assertEqual(len(nodes), 2)
 
-        ## changing into width mode preserving insertion order
+        # changing into width mode preserving insertion order
         nodes = [nid for nid in self.tree.expand_tree(mode=Tree.WIDTH, sorting=False)]
         self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'bill', u'diane', u'george'])
         self.assertEqual(len(nodes), 5)
@@ -252,11 +252,11 @@ class TreeCase(unittest.TestCase):
         self.assertEqual(nodes, [u'h\xe1rry', u'bill', u'jane',  u'george', u'diane'])
         self.assertEqual(len(nodes), 5)
 
-        ## expanding by filters
+        # expanding by filters
         # Stops at root
-        nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag == "Bill")]
+        nodes = [nid for nid in self.tree.expand_tree(filter=lambda x: x.tag == "Bill")]
         self.assertEqual(len(nodes), 0)
-        nodes = [nid for nid in self.tree.expand_tree(filter = lambda x: x.tag != "Bill")]
+        nodes = [nid for nid in self.tree.expand_tree(filter=lambda x: x.tag != "Bill")]
         self.assertEqual(nodes, [u'h\xe1rry', u'jane', u'diane'])
         self.assertEqual(len(nodes), 3)
 
@@ -492,7 +492,7 @@ class TreeCase(unittest.TestCase):
         depth = self.tree.depth()
         self.assertEqual(self.tree.level('diane'),  depth)
         self.assertEqual(self.tree.level('diane',
-                                         lambda x: x.identifier!='jane'),
+                                         lambda x: x.identifier != 'jane'),
                          depth-1)
 
     def test_size(self):

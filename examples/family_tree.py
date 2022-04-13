@@ -7,8 +7,9 @@ __author__ = 'chenxm'
 
 from treelib import Tree, Node
 
+
 def create_family_tree():
-    ## Create the family tree
+    # Create the family tree
     tree = Tree()
     tree.create_node("Harry", "harry")  # root node
     tree.create_node("Jane", "jane", parent="harry")
@@ -18,9 +19,11 @@ def create_family_tree():
     tree.create_node("Mark", "mark", parent="jane")
     return tree
 
+
 def example(desp):
     sep = "-"*20 + '\n'
     print(sep + desp)
+
 
 if __name__ == '__main__':
     tree = create_family_tree()
