@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# A file folder scanner contributed by @holger 
+# A file folder scanner contributed by @holger
 #
 # You can spicify the scanned folder and file pattern by changing rootPath
 # and pattern variables
@@ -34,8 +34,8 @@ if PROFILING == 2:
 
 
 parser = argparse.ArgumentParser(description='Scan the given folder and print its structure in a tree.')
-parser.add_argument('abspath', type=str, help= 'An absolute path to be scanned.')
-parser.add_argument('pattern', type=str, help= 'File name pattern to filtered, e.g. *.pdf')
+parser.add_argument('abspath', type=str, help='An absolute path to be scanned.')
+parser.add_argument('pattern', type=str, help='File name pattern to filtered, e.g. *.pdf')
 
 args = parser.parse_args()
 rootPath = args.abspath
@@ -56,6 +56,7 @@ def crc32(data):
         print('crc32: ' + hex(zlib.crc32(data) & 0xffffffff))
         print('+++++++++++++++++++')
     return hex(zlib.crc32(data) & 0xffffffff)  # crc32 returns a signed value, &-ing it will match py3k
+
 
 parent = rootPath
 i = 1
@@ -97,7 +98,6 @@ def get_parentid(current_depth, root, dir):
     parentid = str(current_depth - 1) + '_' + parent_dir.replace(" ", "_") + '+++' + crc32(root)
     return parentid
     # TODO: catch error
-
 
 
 def print_node(dir, node_id, parent_id):
@@ -148,7 +148,7 @@ def crawler():
             if DEBUG:
                 print('current: ' + os.path.join(root, filename))
 
-            node_id   = get_noteid(current_depth, root, filename)
+            node_id = get_noteid(current_depth, root, filename)
             parent_id = str(get_parentid(current_depth, root, filename))
 
             if parent_id == str(None):
@@ -191,7 +191,3 @@ else:
 print('nodes: ' + str(len(dir_tree.nodes)))
 
 dir_tree.show()
-
-
-
-
