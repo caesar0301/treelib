@@ -1001,7 +1001,7 @@ class Tree(object):
         f.close()
         
         
-    def map(self, key, deep=True):
+    def apply(self, key, deep=True):
         """Morphism of tree
         
         Work like the built-in `map`
@@ -1015,7 +1015,7 @@ class Tree(object):
             key(a)
         return tree
     
-    def map_data(self, key, deep=True):
+    def apply_data(self, key, deep=True):
         """morphism of tree, but act on data of nodes.
         
         Arguments
