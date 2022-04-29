@@ -340,7 +340,7 @@ class Tree(object):
 
     def contains(self, nid):
         """Check if the tree contains node of given id"""
-        return True if nid in self._nodes else False
+        return nid in self._nodes
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """
