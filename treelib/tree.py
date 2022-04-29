@@ -1007,21 +1007,21 @@ class Tree(object):
         Work like the built-in `map`
         
         Arguments
-            key -- function of a node
+            key -- impure function of a node
             deep -- please keep it true
         """
         tree = self._clone(with_tree=tree, deep=deep)
-        for a in tree.iternodes():
+        for a in tree.all_nodes():
             key(a)
         return tree
     
     def apply_data(self, key, deep=True):
         """morphism of tree, but act on data of nodes.
+        It calls the method `apply`
         
         Arguments
             key -- pure function of node.data
         """
-        tree = self._clone(with_tree=tree, deep=deep)
-        for a in tree.iternodes():
+        def _key(a):
             a.data = key(a.data)
-        return tree
+        return self.apply(_key, deep=deep)
