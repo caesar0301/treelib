@@ -17,10 +17,8 @@ def _random(max_depth=5, min_width=1, max_width=2, offset=(0,)):
             tree.paste(offset, subtree)
     return tree
 
-def key(node):
-    node.tag = ''.join(map(str, node.identifier))
 
-def _map(tree, key):
+def _map(func, tree):
 
     tree = tree._clone(with_tree=True)
     print(tree)
@@ -29,4 +27,6 @@ def _map(tree, key):
     return tree
 
 
-print(_map(_random(), key))
+def key(node):
+    node.tag = ''.join(map(str, node.identifier))
+print(_map(key, _random()))
