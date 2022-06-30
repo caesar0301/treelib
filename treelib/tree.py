@@ -956,6 +956,26 @@ class Tree(object):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
+    def from_json(self, json_str):
+        """
+        Load tree from exported JSON string.
+
+        :param json_str: json string that exported by to_json method
+        """
+        def _iter(nodes, parent_id):
+            for k,v in nodes.items():
+                children = v.get('children', None)
+                data = v.get('data', None)
+                if children:
+                    yield (k, data, parent_id)
+                    for child in children:
+                        yield from _iter(child, k)
+                else:
+                    yield (k, data, parent_id)
+
+        for i in _iter(json.loads(json_str), None):
+            self.create_node(i[0], i[0], parent=i[2], data=i[1])
+
     def to_graphviz(self, filename=None, shape='circle', graph='digraph'):
         """Exports the tree in the dot format of the graphviz software"""
         nodes, connections = [], []
