@@ -2,6 +2,7 @@ import random
 from treelib import Tree
 
 def _random(max_depth=5, min_width=1, max_width=2, offset=(0,)):
+    # generate a tree randomly
     tree = Tree()
     root = tree.create_node(identifier=offset)
     if max_depth == 0:
@@ -19,14 +20,15 @@ def _random(max_depth=5, min_width=1, max_width=2, offset=(0,)):
 
 
 def _map(func, tree):
-
+    # tree as a functor
     tree = tree._clone(with_tree=True)
     print(tree)
     for a in tree.all_nodes_itr():
         key(a)
     return tree
 
-
 def key(node):
     node.tag = ''.join(map(str, node.identifier))
 print(_map(key, _random()))
+
+print(_random().apply(key))
