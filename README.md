@@ -12,8 +12,8 @@ Tree implementation in python: simple for you to use.
 [![GitHub contributors](https://img.shields.io/github/contributors/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/graphs/contributors/)
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pull/)
-[![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pull/)
+[![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls)
+[![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls?q=is%3Apr+is%3Aclosed)
 
 
 
