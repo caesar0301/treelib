@@ -4,6 +4,7 @@ treelib
 Tree implementation in python: simple for you to use.
 
 [![Build Status](https://github.com/caesar0301/treelib/actions/workflows/python-package.yml/badge.svg)](https://github.com/caesar0301/treelib/actions)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Documentation Status](https://readthedocs.org/projects/treelib/badge/?version=latest)](http://treelib.readthedocs.io/en/latest/?badge=latest)
 [![Status](https://img.shields.io/pypi/status/treelib.svg)](https://pypi.python.org/pypi/treelib)
 [![Latest](https://img.shields.io/pypi/v/treelib.svg)](https://pypi.python.org/pypi/treelib)
