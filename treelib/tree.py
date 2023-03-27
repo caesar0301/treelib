@@ -253,8 +253,12 @@ class Tree(object):
         if level == self.ROOT:
             yield "", node
         else:
-            leading = ''.join(map(lambda x: dt_vertical_line + ' ' * 3
-                                  if not x else ' ' * 4, is_last[0:-1]))
+            leading = "".join(
+                map(
+                    lambda x: dt_vertical_line + " " * 3 if not x else " " * 4,
+                    is_last[0:-1],
+                )
+            )
             lasting = dt_line_corner if is_last[-1] else dt_line_box
             yield leading + lasting, node
 
@@ -842,7 +846,8 @@ class Tree(object):
         def _write_line(line, f):
             f.write(line + b"\n")
 
-        def handler(x): return _write_line(x, open(filename, 'ab'))
+        def handler(x):
+            return _write_line(x, open(filename, "ab"))
 
         self.__print_backend(
             nid,
