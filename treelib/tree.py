@@ -956,12 +956,14 @@ class Tree(object):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
-    def to_graphviz(self, filename=None, shape='circle', graph='digraph'):
+    def to_graphviz(self, filename=None, shape='circle', graph='digraph',
+                    filter=None, key=None, reverse=False, sorting=True):
         """Exports the tree in the dot format of the graphviz software"""
         nodes, connections = [], []
         if self.nodes:
 
-            for n in self.expand_tree(mode=self.WIDTH):
+            for n in self.expand_tree(mode=self.WIDTH, filter=filter, key=key,
+                                      reverse=reverse, sorting=sorting):
                 nid = self[n].identifier
                 state = '"{0}" [label="{1}", shape={2}]'.format(
                     nid, self[n].tag, shape)
