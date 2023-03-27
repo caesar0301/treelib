@@ -971,7 +971,8 @@ class Tree(object):
 
                 for c in self.children(nid):
                     cid = c.identifier
-                    connections.append('"{0}" -> "{1}"'.format(nid, cid))
+                    edge = '->' if graph == 'digraph' else '--'
+                    connections.append(('"{0}" ' + edge + ' "{1}"').format(nid, cid))
 
         # write nodes and connections to dot format
         is_plain_file = filename is not None
