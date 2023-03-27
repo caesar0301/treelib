@@ -25,7 +25,7 @@ def example(desp):
     print(sep + desp)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     tree = create_family_tree()
 
     example("Tree of the whole family:")

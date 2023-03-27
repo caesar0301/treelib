@@ -33,13 +33,9 @@ if PROFILING == 2:
     import cProfile
 
 
-parser = argparse.ArgumentParser(
-    description="Scan the given folder and print its structure in a tree."
-)
-parser.add_argument("abspath", type=str, help="An absolute path to be scanned.")
-parser.add_argument(
-    "pattern", type=str, help="File name pattern to filtered, e.g. *.pdf"
-)
+parser = argparse.ArgumentParser(description='Scan the given folder and print its structure in a tree.')
+parser.add_argument('abspath', type=str, help='An absolute path to be scanned.')
+parser.add_argument('pattern', type=str, help='File name pattern to filtered, e.g. *.pdf')
 
 args = parser.parse_args()
 rootPath = args.abspath
@@ -62,6 +58,7 @@ def crc32(data):
     return hex(
         zlib.crc32(data) & 0xFFFFFFFF
     )  # crc32 returns a signed value, &-ing it will match py3k
+
 
 
 parent = rootPath
