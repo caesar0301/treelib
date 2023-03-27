@@ -22,6 +22,8 @@ Quick Start
 -----------
 
     sudo easy_install -U treelib
+    
+install with pip by pip install treelib
 
 Documentation
 -------------
