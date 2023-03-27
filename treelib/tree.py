@@ -186,11 +186,6 @@ class Tree(object):
                 def get_label(node):
                     return "%s[%s]" % (node.tag, node.identifier)
 
-        # legacy ordering
-        if key is None:
-            def key(node):
-                return node
-
         # iter with func
         for pre, node in self.__get(nid, level, filter, key, reverse,
                                     line_type):
