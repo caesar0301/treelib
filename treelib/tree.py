@@ -341,7 +341,7 @@ class Tree(object):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
         descendant = self[nid]
-        ascendant = self[nid].bpointer
+        ascendant = self[nid]._predecessor[self._identifier]
         ascendant_level = self.level(ascendant)
 
         if level is None:
@@ -360,7 +360,7 @@ class Tree(object):
                 return self[ascendant]
             else:
                 descendant = ascendant
-                ascendant = self[descendant].bpointer
+                ascendant = self[descendant]._predecessor[self._identifier]
                 ascendant_level = self.level(ascendant)
         return None
 
@@ -1063,19 +1063,22 @@ class Tree(object):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
-    def to_graphviz(self, filename=None, shape="circle", graph="digraph"):
+    def to_graphviz(self, filename=None, shape="circle", graph="digraph",
+                    filter=None, key=None, reverse=False, sorting=True):
         """Exports the tree in the dot format of the graphviz software"""
         nodes, connections = [], []
         if self.nodes:
 
-            for n in self.expand_tree(mode=self.WIDTH):
+            for n in self.expand_tree(mode=self.WIDTH, filter=filter, key=key,
+                                      reverse=reverse, sorting=sorting):
                 nid = self[n].identifier
                 state = '"{0}" [label="{1}", shape={2}]'.format(nid, self[n].tag, shape)
                 nodes.append(state)
 
                 for c in self.children(nid):
                     cid = c.identifier
-                    connections.append('"{0}" -> "{1}"'.format(nid, cid))
+                    edge = '->' if graph == 'digraph' else '--'
+                    connections.append(('"{0}" ' + edge + ' "{1}"').format(nid, cid))
 
         # write nodes and connections to dot format
         is_plain_file = filename is not None
