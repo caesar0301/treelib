@@ -31,10 +31,15 @@ def deprecated(alias):
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            simplefilter('always', DeprecationWarning)  # turn off filter
-            warn('Call to deprecated function "{}"; use "{}" instead.'.format(func.__name__, alias),
-                 category=DeprecationWarning, stacklevel=2)
-            simplefilter('default', DeprecationWarning)  # reset filter
+            simplefilter("always", DeprecationWarning)  # turn off filter
+            warn(
+                'Call to deprecated function "{}"; use "{}" instead.'.format(
+                    func.__name__, alias
+                ),
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            simplefilter("default", DeprecationWarning)  # reset filter
             return func(*args, **kwargs)
 
         return wrapper

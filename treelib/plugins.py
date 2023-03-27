@@ -29,7 +29,7 @@ from __future__ import unicode_literals
 from .misc import deprecated
 
 
-@deprecated(alias='tree.to_graphviz()')
-def export_to_dot(tree, filename=None, shape='circle', graph='digraph'):
+@deprecated(alias="tree.to_graphviz()")
+def export_to_dot(tree, filename=None, shape="circle", graph="digraph"):
     """Exports the tree in the dot format of the graphviz software"""
     tree.to_graphviz(filename=filename, shape=shape, graph=graph)
