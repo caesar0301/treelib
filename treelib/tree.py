@@ -222,7 +222,9 @@ class Tree(object):
                 return node
 
         # iter with func
-        for pre, node in self.__get(nid, level, filter, key, reverse, line_type, sorting):
+        for pre, node in self.__get(
+            nid, level, filter, key, reverse, line_type, sorting
+        ):
             label = get_label(node)
             func("{0}{1}".format(pre, label).encode("utf-8"))
 
