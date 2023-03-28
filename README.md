@@ -1,5 +1,4 @@
-treelib
--------
+# treelib
 
 Tree implementation in python: simple for you to use.
 
@@ -16,38 +15,24 @@ Tree implementation in python: simple for you to use.
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls)
 [![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls?q=is%3Apr+is%3Aclosed)
 
+## Quick Start
 
+    pip install -U treelib
 
-
-Quick Start
------------
-
-    sudo easy_install -U treelib
-    
-install with pip by pip install treelib
-
-Documentation
--------------
+## Documentation
 
 For installation, APIs and examples, see http://treelib.readthedocs.io/en/latest/
 
-Update
--------
+## Code Style
 
-* 2017-08-10: Abandon supporting Python 3.2 since v1.4.0.
-* 2012-07-07: First published.
+`treelib` complies with [black](https://github.com/psf/black) formatter and
+specific [flake8 validations](https://github.com/caesar0301/treelib/blob/master/scripts/flake8.sh).
+Before creating a pull request, please make sure you pass the local validation
+with `scripts/flake8.sh`.
 
+## Contributors
 
-Contributors
-------------
-
-> Brett Alistair Kromkamp (brettkromkamp@gmail.com): Post basic idea online.
->
-> Xiaming Chen (chenxm35@gmail.com): Finished primary parts and made the library freely public.
->
-> Holger Bast (holgerbast@gmx.de): Replaced list with `dict` for fast node index and optimized the performance.
->
-> Ilya Kuprik (ilya-spy@ynadex.ru): Added ZIGZAG tree-walk algorithm to tree traversal.
+Thank you all,
+[committers](https://github.com/caesar0301/treelib/graphs/contributors).
 
 [![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://GitHub.com/Naereen/)
-
