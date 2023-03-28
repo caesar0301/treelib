@@ -7,7 +7,7 @@ import os
 import unittest
 
 from treelib import Tree
-from treelib.plugins import *
+from treelib.plugins import export_to_dot
 
 
 class DotExportCase(unittest.TestCase):

@@ -881,7 +881,9 @@ class Tree(object):
         former two use the same backend to generate a string of tree structure in a
         text graph.
 
-        * Version >= 1.2.7a*: you can also specify the ``line_type`` parameter, such as 'ascii' (default), 'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv', 'ascii-emh') to the change graphical form.
+        * Version >= 1.2.7a*: you can also specify the ``line_type`` parameter,
+          such as 'ascii' (default), 'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv',
+          'ascii-emh') to the change graphical form.
 
         :param nid: the reference node to start expanding.
         :param level: the node level in the tree (root as level 0).
@@ -959,7 +961,7 @@ class Tree(object):
                         if self.level(node.identifier) == level
                     ]
                 )
-            except:
+            except Exception:
                 raise TypeError(
                     "level should be an integer instead of '%s'" % type(level)
                 )
@@ -1063,21 +1065,33 @@ class Tree(object):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
-    def to_graphviz(self, filename=None, shape="circle", graph="digraph",
-                    filter=None, key=None, reverse=False, sorting=True):
+    def to_graphviz(
+        self,
+        filename=None,
+        shape="circle",
+        graph="digraph",
+        filter=None,
+        key=None,
+        reverse=False,
+        sorting=True,
+    ):
         """Exports the tree in the dot format of the graphviz software"""
         nodes, connections = [], []
         if self.nodes:
-
-            for n in self.expand_tree(mode=self.WIDTH, filter=filter, key=key,
-                                      reverse=reverse, sorting=sorting):
+            for n in self.expand_tree(
+                mode=self.WIDTH,
+                filter=filter,
+                key=key,
+                reverse=reverse,
+                sorting=sorting,
+            ):
                 nid = self[n].identifier
                 state = '"{0}" [label="{1}", shape={2}]'.format(nid, self[n].tag, shape)
                 nodes.append(state)
 
                 for c in self.children(nid):
                     cid = c.identifier
-                    edge = '->' if graph == 'digraph' else '--'
+                    edge = "->" if graph == "digraph" else "--"
                     connections.append(('"{0}" ' + edge + ' "{1}"').format(nid, cid))
 
         # write nodes and connections to dot format

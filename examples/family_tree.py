@@ -5,7 +5,7 @@
 #
 __author__ = "chenxm"
 
-from treelib import Tree, Node
+from treelib import Tree
 
 
 def create_family_tree():

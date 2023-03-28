@@ -6,10 +6,6 @@ import sys
 
 import os
 
-try:
-    from StringIO import StringIO as BytesIO
-except ImportError:
-    from io import BytesIO
 import unittest
 from treelib import Tree, Node
 from treelib.tree import NodeIDAbsentError, LoopError
@@ -304,7 +300,6 @@ class TreeCase(unittest.TestCase):
         )
 
     def test_merge(self):
-
         # merge on empty initial tree
         t1 = Tree(identifier="t1")
         t2 = self.get_t2()
@@ -381,7 +376,6 @@ class TreeCase(unittest.TestCase):
         )
 
     def test_paste(self):
-
         # paste under root
         t1 = self.get_t1()
         t2 = self.get_t2()
@@ -545,7 +539,7 @@ Hárry
 
     def test_show(self):
         if sys.version_info[0] < 3:
-            reload(sys)
+            reload(sys)  # noqa: F821
             sys.setdefaultencoding("utf-8")
         sys.stdout = open(os.devnull, "w")  # stops from printing to console
 

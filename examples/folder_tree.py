@@ -105,7 +105,7 @@ def get_parentid(current_depth, root, dir):
     search_string = os.path.join(root, dir)
     pos2 = search_string.rfind("/")
     pos1 = search_string.rfind("/", 0, pos2)
-    parent_dir = search_string[pos1 + 1 : pos2]
+    parent_dir = search_string[pos1 + 1 : pos2]  # noqa: E203
     parentid = (
         str(current_depth - 1)
         + "_"
@@ -130,10 +130,8 @@ def crawler():
     global FILECOUNT
 
     for root, dirs, files in os.walk(rootPath):
-
         # +++ DIRECTORIES +++
         for dir in dirs:
-
             # calculating current depth
             current_depth = os.path.join(root, dir).count("/") - start_depth
 
@@ -155,7 +153,6 @@ def crawler():
 
         # +++ FILES +++
         for filename in fnmatch.filter(files, pattern):
-
             if dir in folder_blacklist:
                 continue
 
