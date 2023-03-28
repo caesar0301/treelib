@@ -35,5 +35,5 @@ you have to trigger the compatibility by declaring `unicode_literals` in the cod
    >>> from __future__ import unicode_literals
 """
 
-from .tree import Tree
-from .node import Node
+from .tree import Tree  # noqa: F401
+from .node import Node  # noqa: F401
