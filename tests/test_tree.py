@@ -553,6 +553,23 @@ Hárry
         self.tree = None
         self.copytree = None
 
+    def test_show_without_sorting(self):
+        t = Tree()
+        t.create_node('Students', 'Students', parent=None)
+        Node(tag='Students', identifier='Students', data=None)
+        t.create_node('Ben', 'Ben',parent='Students')
+        Node(tag='Ben', identifier='Ben', data=None)
+        t.create_node('Annie', 'Annie',parent='Students')
+        Node(tag='Annie', identifier='Annie', data=None)
+        t.show()
+        self.assertEqual(
+            t.show(sorting=False, stdout=False),
+            """Students
+├── Ben
+└── Annie
+""",
+        )
+
     def test_all_nodes_itr(self):
         """
         tests: Tree.all_nodes_iter
