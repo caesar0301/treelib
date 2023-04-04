@@ -335,6 +335,12 @@ class Tree(object):
         Added by William Rusnack
         """
         return self._nodes.values()
+    
+    def iternodes(self):
+        """
+        alias of `all_nodes_itr` but conform to the convention of Python.
+        """
+        return self._nodes.values()
 
     def ancestor(self, nid, level=None):
         """
@@ -377,7 +383,7 @@ class Tree(object):
 
     def contains(self, nid):
         """Check if the tree contains node of given id"""
-        return True if nid in self._nodes else False
+        return nid in self._nodes
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """
@@ -1003,9 +1009,8 @@ class Tree(object):
             # define nodes parent/children in this tree
             # all pointers are the same as copied tree, except the root
             st[node_n].clone_pointers(self._identifier, st.identifier)
-            if node_n == nid:
-                # reset root parent for the new tree
-                st[node_n].set_predecessor(None, st.identifier)
+        # reset root parent for the new tree
+        st[nid].set_predecessor(None, st.identifier)
         return st
 
     def update_node(self, nid, **attrs):
@@ -1128,3 +1133,29 @@ class Tree(object):
             print(f.getvalue())
 
         f.close()
+        
+        
+    def apply(self, key, deep=True):
+        """Morphism of tree
+        
+        Work like the built-in `map`
+        
+        Arguments
+            key -- impure function of a node
+            deep -- please keep it true
+        """
+        tree = self._clone(with_tree=tree, deep=deep)
+        for a in tree.all_nodes():
+            key(a)
+        return tree
+    
+    def apply_data(self, key, deep=True):
+        """morphism of tree, but act on data of nodes.
+        It calls the method `apply`
+        
+        Arguments
+            key -- pure function of node.data
+        """
+        def _key(a):
+            a.data = key(a.data)
+        return self.apply(_key, deep=deep)
