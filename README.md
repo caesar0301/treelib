@@ -1,9 +1,9 @@
-treelib
--------
+# treelib
 
 Tree implementation in python: simple for you to use.
 
-[![Build Status](https://travis-ci.org/caesar0301/treelib.svg?branch=master)](https://travis-ci.org/caesar0301/treelib)
+[![Build Status](https://github.com/caesar0301/treelib/actions/workflows/python-package.yml/badge.svg)](https://github.com/caesar0301/treelib/actions)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Documentation Status](https://readthedocs.org/projects/treelib/badge/?version=latest)](http://treelib.readthedocs.io/en/latest/?badge=latest)
 [![Status](https://img.shields.io/pypi/status/treelib.svg)](https://pypi.python.org/pypi/treelib)
 [![Latest](https://img.shields.io/pypi/v/treelib.svg)](https://pypi.python.org/pypi/treelib)
@@ -12,39 +12,27 @@ Tree implementation in python: simple for you to use.
 [![GitHub contributors](https://img.shields.io/github/contributors/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/graphs/contributors/)
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pull/)
-[![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pull/)
+[![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls)
+[![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls?q=is%3Apr+is%3Aclosed)
 
+## Quick Start
 
+    pip install -U treelib
 
-
-Quick Start
------------
-
-    sudo easy_install -U treelib
-
-Documentation
--------------
+## Documentation
 
 For installation, APIs and examples, see http://treelib.readthedocs.io/en/latest/
 
-Update
--------
+## Code Style
 
-* 2017-08-10: Abandon supporting Python 3.2 since v1.4.0.
-* 2012-07-07: First published.
+`treelib` complies with [black](https://github.com/psf/black) formatter and
+specific [flake8 validations](https://github.com/caesar0301/treelib/blob/master/scripts/flake8.sh).
+Before creating a pull request, please make sure you pass the local validation
+with `scripts/flake8.sh`.
 
+## Contributors
 
-Contributors
-------------
-
-> Brett Alistair Kromkamp (brettkromkamp@gmail.com): Post basic idea online.
->
-> Xiaming Chen (chenxm35@gmail.com): Finished primary parts and made the library freely public.
->
-> Holger Bast (holgerbast@gmx.de): Replaced list with `dict` for fast node index and optimized the performance.
->
-> Ilya Kuprik (ilya-spy@ynadex.ru): Added ZIGZAG tree-walk algorithm to tree traversal.
+Thank you all,
+[committers](https://github.com/caesar0301/treelib/graphs/contributors).
 
 [![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://GitHub.com/Naereen/)
-

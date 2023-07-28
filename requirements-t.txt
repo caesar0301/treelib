@@ -1,0 +1,5 @@
+pytest>=7.0.0
+coverage>=4.4.1
+flake8==5.0.0
+flake8-black==0.3.6
+black==23.1.0

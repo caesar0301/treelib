@@ -86,10 +86,10 @@ class Node(object):
             self._identifier = nid
 
     @property
-    @deprecated(alias='node.predecessor')
+    @deprecated(alias="node.predecessor")
     def bpointer(self):
         """Use predecessor method, this property is deprecated and only kept for retro-compatilibity. Parents of
-        a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning 
+        a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning
         bpointer of first declared tree.
         """
         if self._initial_tree_id not in self._predecessor.keys():
@@ -97,16 +97,16 @@ class Node(object):
         return self._predecessor[self._initial_tree_id]
 
     @bpointer.setter
-    @deprecated(alias='node.set_predecessor')
+    @deprecated(alias="node.set_predecessor")
     def bpointer(self, value):
         self.set_predecessor(value, self._initial_tree_id)
 
-    @deprecated(alias='node.set_predecessor')
+    @deprecated(alias="node.set_predecessor")
     def update_bpointer(self, nid):
         self.set_predecessor(nid, self._initial_tree_id)
 
     @property
-    @deprecated(alias='node.successors')
+    @deprecated(alias="node.successors")
     def fpointer(self):
         """Use successors method, this property is deprecated and only kept for retro-compatilibity. Children of
         a node are dependant on a given tree. This implementation keeps the previous behavior by keeping returning
@@ -117,11 +117,11 @@ class Node(object):
         return self._successors[self._initial_tree_id]
 
     @fpointer.setter
-    @deprecated(alias='node.update_successors')
+    @deprecated(alias="node.update_successors")
     def fpointer(self, value):
         self.set_successors(value, tree_id=self._initial_tree_id)
 
-    @deprecated(alias='node.update_successors')
+    @deprecated(alias="node.update_successors")
     def update_fpointer(self, nid, mode=ADD, replace=None):
         """Deprecated"""
         self.update_successors(nid, mode, replace, self._initial_tree_id)
@@ -148,10 +148,10 @@ class Node(object):
     def set_successors(self, value, tree_id=None):
         """Set the value of `_successors`."""
         setter_lookup = {
-            'NoneType': lambda x: list(),
-            'list': lambda x: x,
-            'dict': lambda x: list(x.keys()),
-            'set': lambda x: list(x)
+            "NoneType": lambda x: list(),
+            "list": lambda x: x,
+            "dict": lambda x: list(x.keys()),
+            "set": lambda x: list(x),
         }
 
         t = value.__class__.__name__
@@ -159,7 +159,7 @@ class Node(object):
             f_setter = setter_lookup[t]
             self._successors[tree_id] = f_setter(value)
         else:
-            raise NotImplementedError('Unsupported value type %s' % t)
+            raise NotImplementedError("Unsupported value type %s" % t)
 
     def update_successors(self, nid, mode=ADD, replace=None, tree_id=None):
         """
@@ -176,7 +176,7 @@ class Node(object):
             if nid in self.successors(tree_id):
                 self.successors(tree_id).remove(nid)
             else:
-                warn('Nid %s wasn\'t present in fpointer' % nid)
+                warn("Nid %s wasn't present in fpointer" % nid)
 
         def _manipulator_insert():
             warn("WARNING: INSERT is deprecated to ADD mode")
@@ -191,14 +191,14 @@ class Node(object):
             self.successors(tree_id)[ind] = replace
 
         manipulator_lookup = {
-            self.ADD: '_manipulator_append',
-            self.DELETE: '_manipulator_delete',
-            self.INSERT: '_manipulator_insert',
-            self.REPLACE: '_manipulator_replace'
+            self.ADD: "_manipulator_append",
+            self.DELETE: "_manipulator_delete",
+            self.INSERT: "_manipulator_insert",
+            self.REPLACE: "_manipulator_replace",
         }
 
         if mode not in manipulator_lookup:
-            raise NotImplementedError('Unsupported node updating mode %s' % str(mode))
+            raise NotImplementedError("Unsupported node updating mode %s" % str(mode))
 
         f_name = manipulator_lookup.get(mode)
         f = locals()[f_name]
