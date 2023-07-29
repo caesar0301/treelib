@@ -35,6 +35,12 @@ class TreeCase(unittest.TestCase):
         #       |-- George
         self.tree = tree
         self.copytree = Tree(self.tree, deep=True)
+        self.input_dict = {"Bill": "Harry", 
+                        "Jane": "Harry", 
+                        "Harry": None,
+                        "Diane": "Jane",
+                        "Mark": "Jane",
+                        "Mary": "Harry"}
 
     @staticmethod
     def get_t1():
@@ -734,3 +740,21 @@ Hárry
         t.create_node(identifier="root-B")
         self.assertEqual(len(t.nodes.keys()), 1)
         self.assertEqual(t.root, "root-B")
+
+    def test_from_dict(self):
+        tree = Tree.from_dict(self.input_dict)
+        self.assertTrue(tree.size() == 6)
+        self.assertTrue(tree.root == [k for k,v in self.input_dict.items() if v is None][0])
+        tree = Tree.from_dict(self.input_dict, id_func=lambda x: x.upper())
+        self.assertTrue(tree.size() == 6)
+        data_func = lambda x: x.upper()
+        tree = Tree.from_dict(self.input_dict, data_func=data_func)
+        self.assertTrue(tree.size() == 6)
+        self.assertTrue(tree.get_node(tree.root).data == data_func([k for k,v in self.input_dict.items() if v is None][0]))
+        with self.assertRaises(ValueError):
+            # invalid input payload without a root
+            tree = Tree.from_dict({'a': 'b'})
+        
+        with self.assertRaises(ValueError):
+            # invalid input payload without more than 1 root
+            tree = Tree.from_dict({'a': None, 'b': None})
