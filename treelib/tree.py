@@ -1128,3 +1128,37 @@ class Tree(object):
             print(f.getvalue())
 
         f.close()
+
+    @classmethod
+    def from_map(cls, child_parent_dict, id_func=None, data_func=None):
+        '''
+        takes a dict with child:parent, and form a tree
+        '''
+        tree = Tree()
+        if tree is None or tree.size() > 0:
+            raise ValueError('need to pass in an empty tree')
+        id_func = id_func if id_func else lambda x: x
+        data_func = data_func if data_func else lambda x: None
+        parent_child_dict = {}
+        root_node = None
+        for k, v in child_parent_dict.items():
+            if v is None and root_node is None:
+                root_node = k
+            elif v is None and root_node is not None:
+                raise ValueError('invalid input, more than 1 child has no parent')
+            else:
+                if v in parent_child_dict:
+                    parent_child_dict[v].append(k)
+                else:
+                    parent_child_dict[v] = [k]
+        if root_node is None:
+            raise ValueError('cannot find root')
+
+        tree.create_node(root_node, id_func(root_node), data=data_func(root_node))
+        queue = [root_node]
+        while len(queue) > 0:
+            parent_node = queue.pop()
+            for child in parent_child_dict.get(parent_node, []):
+                tree.create_node(child, id_func(child), parent=id_func(parent_node), data=data_func(child))
+                queue.append(child)
+        return tree
