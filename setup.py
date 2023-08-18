@@ -1,6 +1,6 @@
 from setuptools import setup
 
-__version__ = "1.6.5"
+__version__ = "1.7.0"
 
 
 setup(
@@ -9,21 +9,19 @@ setup(
     url="https://github.com/caesar0301/treelib",
     author="Xiaming Chen",
     author_email="chenxm35@gmail.com",
-    description="A Python 2/3 implementation of tree structure.",
+    description="A Python implementation of tree structure.",
     long_description="""This is a simple tree data structure implementation in python.""",
     license="Apache License, Version 2.0",
     packages=["treelib"],
     keywords=["data structure", "tree", "tools"],
     install_requires=["six"],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
