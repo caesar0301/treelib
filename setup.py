@@ -16,7 +16,7 @@ setup(
     keywords=["data structure", "tree", "tools"],
     install_requires=["six"],
     classifiers=[
-        "Development Status :: 5 - Production",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
