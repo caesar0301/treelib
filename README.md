@@ -34,5 +34,3 @@ with `scripts/flake8.sh`.
 
 Thank you all,
 [committers](https://github.com/caesar0301/treelib/graphs/contributors).
-
-[![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://GitHub.com/Naereen/)
