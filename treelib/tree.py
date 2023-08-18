@@ -929,7 +929,7 @@ class Tree(object):
             print("Tree is empty")
 
         if stdout:
-            print(self._reader)
+            print(self._reader.encode('utf-8'))
         else:
             return self._reader
 
