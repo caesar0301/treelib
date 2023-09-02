@@ -1072,9 +1072,9 @@ class Tree(object):
                 )
             return tree_dict
 
-    def to_json(self, with_data=False, sort=True, reverse=False):
+    def to_json(self, with_data=False, sort=True, reverse=False, key=None):
         """To format the tree in JSON format."""
-        return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
+        return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse, key=key))
 
     def to_graphviz(
         self,
