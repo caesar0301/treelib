@@ -672,6 +672,25 @@ Hárry
         node = tree.create_node()
         self.assertTrue(isinstance(node, SubNode))
 
+    def test_subclassing_extra_kwargs(self):
+        class SubNode(Node):
+            def __init__(self, some_argument=None, **kwargs):
+                self.some_property = some_argument
+                super().__init__(**kwargs)
+
+        class SubTree(Tree):
+            node_class = SubNode
+
+        tree = SubTree()
+        node = tree.create_node(some_argument="some_value")
+        self.assertTrue(isinstance(node, SubNode))
+        self.assertEqual(node.some_property, "some_value")
+
+        tree = Tree(node_class=SubNode)
+        node = tree.create_node(some_argument="some_value")
+        self.assertTrue(isinstance(node, SubNode))
+        self.assertEqual(node.some_property, "some_value")
+
     def test_shallow_copy_hermetic_pointers(self):
         # tree 1
         # Hárry

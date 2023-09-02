@@ -379,12 +379,12 @@ class Tree(object):
         """Check if the tree contains node of given id"""
         return True if nid in self._nodes else False
 
-    def create_node(self, tag=None, identifier=None, parent=None, data=None):
+    def create_node(self, tag=None, identifier=None, parent=None, data=None, **kwargs):
         """
         Create a child node for given @parent node. If ``identifier`` is absent,
         a UUID will be generated automatically.
         """
-        node = self.node_class(tag=tag, identifier=identifier, data=data)
+        node = self.node_class(tag=tag, identifier=identifier, data=data, **kwargs)
         self.add_node(node, parent)
         return node
 
