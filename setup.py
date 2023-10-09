@@ -14,7 +14,7 @@ setup(
     license="Apache License, Version 2.0",
     packages=["treelib"],
     keywords=["data structure", "tree", "tools"],
-    install_requires=["six"],
+    install_requires=[],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",

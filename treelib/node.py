@@ -23,8 +23,6 @@ Node structure in treelib.
 A :class:`Node` object contains basic properties such as node identifier,
 node tag, parent node, children nodes etc., and some operations for a node.
 """
-from __future__ import unicode_literals
-
 import copy
 import uuid
 from collections import defaultdict
@@ -34,7 +32,7 @@ from .exceptions import NodePropertyError
 from .misc import deprecated
 
 
-class Node(object):
+class Node:
     """
     Nodes are elementary objects that are stored in the `_nodes` dictionary of a Tree.
     Use `data` attribute to store node-specific data.
