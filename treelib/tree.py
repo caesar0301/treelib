@@ -26,24 +26,11 @@ A new tree can be created from scratch without any parameter or a shallow/deep c
 When deep=True, a deepcopy operation is performed on feeding tree parameter and more memory
 is required to create the tree.
 """
-from __future__ import print_function
-from __future__ import unicode_literals
-
-try:
-    from builtins import str as text
-except ImportError:
-    from __builtin__ import str as text
-
 import codecs
 import json
 import uuid
 from copy import deepcopy
-from six import python_2_unicode_compatible, iteritems
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 
 from .exceptions import (
     NodeIDAbsentError,
@@ -58,8 +45,7 @@ from .node import Node
 __author__ = "chenxm"
 
 
-@python_2_unicode_compatible
-class Tree(object):
+class Tree:
     """Tree objects are made of Node(s) stored in _nodes dictionary."""
 
     #: ROOT, DEPTH, WIDTH, ZIGZAG constants :
@@ -89,7 +75,7 @@ class Tree(object):
 
         if tree is not None:
             self.root = tree.root
-            for nid, node in iteritems(tree.nodes):
+            for nid, node in tree.nodes.items():
                 new_node = deepcopy(node) if deep else node
                 self._nodes[nid] = new_node
                 if tree.identifier != self._identifier:
@@ -687,9 +673,9 @@ class Tree(object):
 
         set_joint = set(new_tree._nodes) & set(self._nodes)  # joint keys
         if set_joint:
-            raise ValueError("Duplicated nodes %s exists." % list(map(text, set_joint)))
+            raise ValueError("Duplicated nodes %s exists." % list(map(str, set_joint)))
 
-        for cid, node in iteritems(new_tree.nodes):
+        for cid, node in new_tree.nodes.items():
             if deep:
                 node = deepcopy(new_tree[node])
             self._nodes.update({cid: node})
@@ -1017,7 +1003,7 @@ class Tree(object):
         :return: None
         """
         cn = self[nid]
-        for attr, val in iteritems(attrs):
+        for attr, val in attrs.items():
             if attr == "identifier":
                 # Updating node id meets following contraints:
                 # * Update node identifier property
