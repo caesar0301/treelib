@@ -521,6 +521,9 @@ class Tree(object):
             return None
         return self._nodes[nid]
 
+    def get_root(self):
+        return self.get_node(self.root)
+
     def is_branch(self, nid):
         """
         Return the children (ID) list of nid.
