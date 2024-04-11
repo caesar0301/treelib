@@ -1137,7 +1137,7 @@ class Tree(object):
     def apply(self, key, deep=True):
         """Morphism of tree
         Work like the built-in `map`
- 
+
         Arguments
             key -- impure function of a node
             deep -- please keep it true
