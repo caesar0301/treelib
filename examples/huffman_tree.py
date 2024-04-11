@@ -97,6 +97,8 @@ def huffman_tree(trees, level="", n_branches=2):
     Returns:
         Tree: Huffman tree
     """
+    assert len(trees)>=2
+
     if len(trees) == 2:
         return merge(trees, level=level)
     else:
@@ -106,8 +108,17 @@ def huffman_tree(trees, level="", n_branches=2):
         return huffman_tree(trees, level=level)
 
 
-d = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5}
-nodes = [Node(identifier="", data={"symbols": s, "frequency": f, "code": ""}) for s, f in d.items()]
-t = huffman_tree(nodes)
+def make_node(s, f):
+    """Make `Node` object
 
+    s: str
+    f: number
+    """
+    return Node(identifier="", data={"symbols": s, "frequency": f, "code": ""})
+
+
+d = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5}
+nodes = [make_node(s, f) for s, f in d.items()]
+nodes = list(nodes)
+t = huffman_tree(nodes)
 print(t)
