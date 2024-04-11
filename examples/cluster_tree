@@ -31,7 +31,7 @@ class TreeCluster(BaseEstimator, ClusterMixin, Tree):
         self.features_ = features
         self.classes_ = classes
 
-    def fit(self, X, Y=None, mean=None, level=(0,)):
+    def fit(self, X, Y=None, mean=None, level=()):
         """
         calc cond_proba, proba, priori_proba, features
         then call fit_with_proba
@@ -63,7 +63,7 @@ class TreeCluster(BaseEstimator, ClusterMixin, Tree):
                     t.fit(X[y==k], mean=m, level=level+(k,))
                     self.paste(level, t)
 
-        if level == (0,):
+        if level == ():
             # get cluster centers from the data of the nodes
             self.cluster_centers_ = [node.data['mean'] for node in self.all_nodes_itr() if node.is_leaf()]
             self.classes_ = np.arange(len(self.cluster_centers_))
