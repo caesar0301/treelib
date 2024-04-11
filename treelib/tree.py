@@ -1154,8 +1154,10 @@ class Tree(object):
         Arguments
             key -- pure function of node.data
         """
+
         def _key(a):
             a.data = key(a.data)
+
         return self.apply(_key, deep=deep)
 
     @classmethod
