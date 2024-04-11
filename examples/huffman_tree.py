@@ -11,6 +11,8 @@ import numpy as np
 
 
 def _get_symbols(tree):
+    """Get the symbols from the root of a tree or a node
+    """
     if isinstance(tree, Node):
         a = tree.data['symbols']
     else:
@@ -22,7 +24,8 @@ def _get_symbols(tree):
 
 
 def _get_frequency(tree):
-    a = tree.data['frequency']
+    """Get the frequency from the root of a tree or a node
+    """
     if isinstance(tree, Node):
         a = tree.data['frequency']
     else:
@@ -39,7 +42,7 @@ def merge(trees, level=''):
     Args:
         trees (list): list of trees or nodes
         level (tuple, optional): the prefix for identifier
-    
+
     Returns:
         Tree
     """
@@ -47,7 +50,7 @@ def merge(trees, level=''):
     data = list(concat(map(_get_symbols, trees)))
     freq = sum(map(_get_frequency, trees))
     t = Tree()
-    root = Node(tag='', identifier=level, data={'symbols':data, 'frequency':freq, 'code':''})
+    root = Node(tag='', identifier=level, data={'symbols': data, 'frequency': freq, 'code': ''})
     t.add_node(root)
     t.root = level
     root.tag = f"{root.data['code']}:{{{','.join(root.data['symbols'])}}}/{root.data['frequency']}"
@@ -70,9 +73,9 @@ def merge(trees, level=''):
                 if n.is_root():
                     n.set_successors([f'{k}' + nid for nid in n._successors[tree.identifier]], tree.identifier)
                 elif n.is_leaf():
-                    n.set_predecessor(f'{k}'+ n._predecessor[tree.identifier], tree.identifier)
+                    n.set_predecessor(f'{k}' + n._predecessor[tree.identifier], tree.identifier)
                 else:
-                    n.set_predecessor(f'{k}'+ n._predecessor[tree.identifier], tree.identifier)
+                    n.set_predecessor(f'{k}' + n._predecessor[tree.identifier], tree.identifier)
                     n.set_successors([f'{k}' + nid for nid in n._successors[tree.identifier]], tree.identifier)
 
             t.paste(level, tree, deep=True)
@@ -101,7 +104,7 @@ def huffman_tree(trees, level='', n_branches=2):
 
 
 d = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}
-nodes =[Node(identifier='', data={'symbols': s, 'frequency': f, 'code': ''}) for s, f in d.items()]
+nodes = [Node(identifier='', data={'symbols': s, 'frequency': f, 'code': ''}) for s, f in d.items()]
 t = huffman_tree(nodes)
 
 print(t)
