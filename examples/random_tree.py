@@ -22,7 +22,8 @@ def _random(max_depth=5, min_width=1, max_width=2, offset=()):
     else:
         nb = random.randint(min_width, max_width)
         for i in range(nb):
-            subtree = _random(max_depth=max_depth-1, max_width=max_width, offset=offset + (i,))
+            _offset = offset + (i,)
+            subtree = _random(max_depth=max_depth-1, max_width=max_width, offset=_offset)
             tree.paste(offset, subtree)
     return tree
 
