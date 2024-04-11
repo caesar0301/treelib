@@ -1143,7 +1143,7 @@ class Tree(object):
             key -- impure function of a node
             deep -- please keep it true
         """
-        tree = self._clone(with_tree=tree, deep=deep)
+        tree = self._clone(with_tree=True, deep=deep)
         for a in tree.all_nodes():
             key(a)
         return tree
