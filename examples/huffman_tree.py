@@ -61,13 +61,13 @@ def merge(trees, level=""):
     for k, tree in enumerate(trees):
         if isinstance(tree, Node):
             tree.identifier = f"{k}" + tree.identifier
-            tree.data['code'] = f"{k}" + tree.data['code']
+            tree.data["code"] = f"{k}" + tree.data["code"]
             tree.tag = f"{tree.data['code']}:{{{','.join(tree.data['symbols'])}}}/{tree.data['frequency']}"
             t.add_node(tree, parent=level)
         else:
             for n in tree.all_nodes_itr():
                 n.identifier = f"{k}" + n.identifier
-                n.data['code'] = f"{k}" + n.data['code']
+                n.data["code"] = f"{k}" + n.data["code"]
                 n.tag = f"{n.data['code']}:{{{','.join(n.data['symbols'])}}}/{n.data['frequency']}"
 
             nodes = {n.identifier: n for k, n in tree._nodes.items()}
