@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+"""
+Generate a tree randomly; Test the `apply` method;
+"""
 
 import random
 from treelib import Tree
