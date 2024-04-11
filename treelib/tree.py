@@ -700,7 +700,7 @@ class Tree(object):
 
         for cid, node in iteritems(new_tree.nodes):
             if deep:
-                node = deepcopy(new_tree[node])
+                node = deepcopy(node)
             self._nodes.update({cid: node})
             node.clone_pointers(new_tree.identifier, self._identifier)
 
