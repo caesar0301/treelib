@@ -335,7 +335,7 @@ class Tree(object):
         Added by William Rusnack
         """
         return self._nodes.values()
-    
+
     def iternodes(self):
         """
         alias of `all_nodes_itr` but conform to the convention of Python.
@@ -1136,9 +1136,8 @@ class Tree(object):
 
     def apply(self, key, deep=True):
         """Morphism of tree
-        
         Work like the built-in `map`
-        
+ 
         Arguments
             key -- impure function of a node
             deep -- please keep it true
@@ -1147,11 +1146,11 @@ class Tree(object):
         for a in tree.all_nodes():
             key(a)
         return tree
-    
+
     def apply_data(self, key, deep=True):
-        """morphism of tree, but act on data of nodes.
+        """morphism of tree, but acts on data of nodes.
         It calls the method `apply`
-        
+
         Arguments
             key -- pure function of node.data
         """
