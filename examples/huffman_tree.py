@@ -4,16 +4,17 @@
 """Huffman coding
 """
 
-from copy import deepcopy
-
-from toolz import *
-from treelib import *
+from toolz import concat
+from treelib import Tree, Node
 
 import numpy as np
 
 
 def _get_symbols(tree):
-    a = tree.data['symbols'] if isinstance(tree, Node) else tree.get_node(tree.root).data['symbols']
+    if isinstance(tree, Node):
+        a = tree.data['symbols']
+    else:
+        a = tree.get_node(tree.root).data['symbols']
     if isinstance(a, str):
         return [a]
     else:
@@ -21,7 +22,11 @@ def _get_symbols(tree):
 
 
 def _get_frequency(tree):
-    a = tree.data['frequency'] if isinstance(tree, Node) else tree.get_node(tree.root).data['frequency']
+    a = tree.data['frequency']
+    if isinstance(tree, Node):
+        a = tree.data['frequency']
+    else:
+        a = tree.get_node(tree.root).data['frequency']
     if isinstance(a, str):
         return [a]
     else:
@@ -30,7 +35,7 @@ def _get_frequency(tree):
 
 def merge(trees, level=''):
     """merge the trees to one tree by add a root
-    
+
     Args:
         trees (list): list of trees or nodes
         level (tuple, optional): the prefix for identifier
@@ -58,17 +63,17 @@ def merge(trees, level=''):
                 n.data['code'] = f'{k}' + n.data['code']
                 n.tag = f"{n.data['code']}:{{{','.join(n.data['symbols'])}}}/{n.data['frequency']}"
 
-            nodes = {n.identifier:n for k, n in tree._nodes.items()}
+            nodes = {n.identifier: n for k, n in tree._nodes.items()}
             tree._nodes = nodes
             tree.root = f'{k}' + tree.root
             for n in tree.all_nodes_itr():
                 if n.is_root():
-                    n.set_successors([f'{k}' + l for l in n._successors[tree.identifier]], tree.identifier)
+                    n.set_successors([f'{k}' + nid for nid in n._successors[tree.identifier]], tree.identifier)
                 elif n.is_leaf():
                     n.set_predecessor(f'{k}'+ n._predecessor[tree.identifier], tree.identifier)
                 else:
                     n.set_predecessor(f'{k}'+ n._predecessor[tree.identifier], tree.identifier)
-                    n.set_successors([f'{k}' + l for l in n._successors[tree.identifier]], tree.identifier)
+                    n.set_successors([f'{k}' + nid for nid in n._successors[tree.identifier]], tree.identifier)
 
             t.paste(level, tree, deep=True)
     return t
@@ -90,13 +95,13 @@ def huffman_tree(trees, level='', n_branches=2):
     else:
         ks = np.argsort([_get_frequency(tree) for tree in trees])[:n_branches]
         t = merge([trees[k] for k in ks], level=level)
-        t = huffman_tree([t]+[tree for i, tree in enumerate(trees) if i not in ks], level=level)
+        t = huffman_tree([t] + [tree for i, tree in enumerate(trees) if i not in ks], level=level)
         t.tag = 'root'
         return t
 
 
-d = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5}
-nodes =[Node(identifier='', data={'symbols':s, 'frequency':f, 'code':''}) for s, f in d.items()]
+d = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}
+nodes =[Node(identifier='', data={'symbols': s, 'frequency': f, 'code': ''}) for s, f in d.items()]
 t = huffman_tree(nodes)
 
 print(t)
