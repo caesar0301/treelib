@@ -54,7 +54,7 @@ def merge(trees, level=""):
     data = list(concat(map(_get_symbols, trees)))
     freq = sum(map(_get_frequency, trees))
     t = Tree()
-    root = Node(tag="", identifier=level, data={"symbols": data, "frequency": freq, "code": ""})
+    root = Node(identifier=level, data={"symbols": data, "frequency": freq, "code": ""})
     t.add_node(root)
     t.root = level
     root.tag = f"{root.data['code']}:{{{','.join(root.data['symbols'])}}}/{root.data['frequency']}"
