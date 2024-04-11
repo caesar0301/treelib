@@ -11,7 +11,9 @@ import numpy as np
 
 
 def _get_symbols(tree):
-    """Get the symbols from the root of a tree or a node
+    """Get `symbols` from the root of a tree or a node
+
+    tree: Tree or Node
     """
     if isinstance(tree, Node):
         a = tree.data['symbols']
@@ -24,7 +26,9 @@ def _get_symbols(tree):
 
 
 def _get_frequency(tree):
-    """Get the frequency from the root of a tree or a node
+    """Get `frequency` from the root of a tree or a node
+
+    tree: Tree or Node
     """
     if isinstance(tree, Node):
         a = tree.data['frequency']
