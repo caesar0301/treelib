@@ -102,8 +102,8 @@ def huffman_tree(trees, level="", n_branches=2):
     else:
         ks = np.argsort([_get_frequency(tree) for tree in trees])[:n_branches]
         t = merge([trees[k] for k in ks], level=level)
-        t = huffman_tree( [t] + [tree for k, tree in enumerate(trees) if k not in ks], level=level )
-        return t
+        trees = [t, *(tree for k, tree in enumerate(trees) if k not in ks)]
+        return huffman_tree(trees, level=level)
 
 
 d = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5}
