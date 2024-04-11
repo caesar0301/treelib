@@ -97,7 +97,7 @@ def huffman_tree(trees, level="", n_branches=2):
     Returns:
         Tree: Huffman tree
     """
-    assert len(trees)>=2
+    assert len(trees) >= 2
 
     if len(trees) == 2:
         return merge(trees, level=level)
