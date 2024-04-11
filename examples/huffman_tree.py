@@ -40,7 +40,7 @@ def _get_frequency(tree):
         return a
 
 
-def merge(trees, level=''):
+def merge(trees, level=""):
     """merge the trees to one tree by add a root
 
     Args:
@@ -86,7 +86,7 @@ def merge(trees, level=''):
     return t
 
 
-def huffman_tree(trees, level='', n_branches=2):
+def huffman_tree(trees, level="", n_branches=2):
     """Huffman coding
 
     Args:
