@@ -1,13 +1,13 @@
 import random
 from treelib import Tree
 
-def _random(max_depth=5, min_width=1, max_width=2, offset=(0,)):
+def _random(max_depth=5, min_width=1, max_width=2, offset=()):
     # generate a tree randomly
     tree = Tree()
     root = tree.create_node(identifier=offset)
     if max_depth == 0:
         return tree
-    elif max_depth ==1:
+    elif max_depth == 1:
         nb = random.randint(min_width, max_width)
         for i in range(nb):
             tree.create_node(identifier=offset+(i,), parent=offset)
@@ -27,8 +27,11 @@ def _map(func, tree):
         key(a)
     return tree
 
+
 def key(node):
     node.tag = ''.join(map(str, node.identifier))
+
+
 print(_map(key, _random()))
 
 print(_random().apply(key))
