@@ -39,7 +39,7 @@ def _map(func, tree):
 
 
 def key(node):
-    node.tag = ''.join(map(str, node.identifier))
+    node.tag = "-".join(map(str, node.identifier))
 
 
 print(_map(key, _random()))
