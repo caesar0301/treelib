@@ -23,7 +23,8 @@ def _random(max_depth=5, min_width=1, max_width=2, offset=()):
         nb = random.randint(min_width, max_width)
         for i in range(nb):
             _offset = offset + (i,)
-            subtree = _random(max_depth=max_depth-1, max_width=max_width, offset=_offset)
+            max_depth -= 1
+            subtree = _random(max_depth=max_depth, max_width=max_width, offset=_offset)
             tree.paste(offset, subtree)
     return tree
 
