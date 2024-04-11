@@ -57,7 +57,7 @@ def merge(trees, level=""):
     root = Node(identifier=level, data={"symbols": data, "frequency": freq, "code": ""})
     t.add_node(root)
     t.root = level
-    root.tag = f"{root.data['code']}:{{{','.join(root.data['symbols'])}}}/{root.data['frequency']}"
+    root.tag = f"root:{{{','.join(root.data['symbols'])}}}/{root.data['frequency']}"
     for k, tree in enumerate(trees):
         if isinstance(tree, Node):
             tree.identifier = f"{k}" + tree.identifier
@@ -102,8 +102,7 @@ def huffman_tree(trees, level="", n_branches=2):
     else:
         ks = np.argsort([_get_frequency(tree) for tree in trees])[:n_branches]
         t = merge([trees[k] for k in ks], level=level)
-        t = huffman_tree([t] + [tree for i, tree in enumerate(trees) if i not in ks], level=level)
-        t.tag = "root"
+        t = huffman_tree( [t] + [tree for k, tree in enumerate(trees) if k not in ks], level=level )
         return t
 
 
