@@ -71,15 +71,16 @@ def merge(trees, level=""):
                 n.tag = f"{n.data['code']}:{{{','.join(n.data['symbols'])}}}/{n.data['frequency']}"
 
             tree._nodes = {n.identifier: n for k, n in tree._nodes.items()}
-            tree.root = f"{k}" + tree.root
+            tree.root = f"{k}{tree.root}"
+            tid = tree.identifier
             for n in tree.all_nodes_itr():
                 if n.is_root():
-                    n.set_successors([f"{k}{nid}" for nid in n._successors[tree.identifier]], tree.identifier)
+                    n.set_successors([f"{k}{nid}" for nid in n._successors[tid]], tid)
                 elif n.is_leaf():
-                    n.set_predecessor(f"{k}{n._predecessor[tree.identifier]}", tree.identifier)
+                    n.set_predecessor(f"{k}{n._predecessor[tid]}", tid)
                 else:
-                    n.set_predecessor(f"{k}{n._predecessor[tree.identifier]}", tree.identifier)
-                    n.set_successors([f"{k}{nid}" for nid in n._successors[tree.identifier]], tree.identifier)
+                    n.set_predecessor(f"{k}{n._predecessor[tid]}", tid)
+                    n.set_successors([f"{k}{nid}" for nid in n._successors[tid]], tid)
 
             t.paste(level, tree, deep=True)
     return t
