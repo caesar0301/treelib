@@ -1,3 +1,4 @@
+
 import random
 from treelib import Tree
 
@@ -11,7 +12,8 @@ def _random(max_depth=5, min_width=1, max_width=2, offset=()):
     elif max_depth == 1:
         nb = random.randint(min_width, max_width)
         for i in range(nb):
-            tree.create_node(identifier=offset+(i,), parent=offset)
+            identifier = offset + (i,)
+            tree.create_node(identifier=identifier, parent=offset)
     else:
         nb = random.randint(min_width, max_width)
         for i in range(nb):
