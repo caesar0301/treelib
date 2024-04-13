@@ -267,7 +267,7 @@ class Node(object):
     @tag.setter
     def tag(self, value):
         """Set the value of `_tag`."""
-        self._tag = value if value is not None else None
+        self._tag = value
 
     def __repr__(self):
         name = self.__class__.__name__

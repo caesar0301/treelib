@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+
+"""Clustering Model Based on Decision Tree
+"""
+
+import numpy as np
+import numpy.linalg as LA
+from scipy.stats import entropy
+from scipy.spatial.distance import cdist
+
+import pandas as pd
+
+from treelib import Node, Tree
+
+from sklearn.base import ClusterMixin, BaseEstimator
+from sklearn.cluster import KMeans
+
+
+class TreeCluster(BaseEstimator, ClusterMixin, Tree):
+    """Decision Tree for classification/cluster
+
+    epsilon: the threshold of info gain or other select method
+    selection_method: the selection method
+    features_: the features of the input vars
+    classes_: the classes of output vars
+    """
+
+    def __init__(self, epsilon=0.6, features=None, classes=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.epsilon = epsilon
+        self.features_ = features
+        self.classes_ = classes
+
+    def fit(self, X, Y=None, mean=None, level=()):
+        """
+        calc cond_proba, proba, priori_proba, features
+        then call fit_with_proba
+        
+        Arguments:
+            X {2D array|list|dataframe} -- input vars
+        
+        Returns:
+            TreeCluster
+        """
+
+        kmeans = KMeans(n_clusters=2)
+
+        if mean is None:
+            mean = X.mean(axis=0)
+        self.add_node(Node(tag='-'.join(map(str, level)), identifier=level, data={'mean':mean}))
+
+        if len(X)>2:
+            kmeans.fit(X)
+            y = kmeans.predict(X)
+            classes_ = np.unique(y)
+            means_ = kmeans.cluster_centers_
+
+            gain = 1 - kmeans.inertia_ / LA.norm(X - mean, 'fro')**2  
+
+            if gain > self.epsilon:
+                for k, m in zip(classes_, means_):
+                    t = TreeCluster(epsilon=self.epsilon)
+                    t.fit(X[y==k], mean=m, level=level+(k,))
+                    self.paste(level, t)
+
+        if level == ():
+            # get cluster centers from the data of the nodes
+            self.cluster_centers_ = [node.data['mean'] for node in self.all_nodes_itr() if node.is_leaf()]
+            self.classes_ = np.arange(len(self.cluster_centers_))
+
+        return self
+
+    def predict_proba(self, X):
+        distances = np.exp(-cdist(X, self.cluster_centers_))
+        return distances / distances.sum(axis=0)[None,:]
+
+    def predict(self, X):
+        p = self.predict_proba(X)
+        return self.classes_[np.argmax(p, axis=1)]
+
+
+if __name__ == '__main__':
+
+    from sklearn import datasets
+
+    iris = datasets.load_iris()
+    X_train, y_train = iris.data, iris.target
+
+    tc = TreeCluster(epsilon=0.5)
+    tc.fit(X_train)
+    y_ = tc.predict(X_train)
+
+    print(tc)
+    print(tc.cluster_centers_)

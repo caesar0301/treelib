@@ -336,6 +336,12 @@ class Tree(object):
         """
         return self._nodes.values()
 
+    def iternodes(self):
+        """
+        alias of `all_nodes_itr` but conform to the convention of Python.
+        """
+        return self._nodes.values()
+
     def ancestor(self, nid, level=None):
         """
         For a given id, get ancestor node object at a given level.
@@ -377,7 +383,7 @@ class Tree(object):
 
     def contains(self, nid):
         """Check if the tree contains node of given id"""
-        return True if nid in self._nodes else False
+        return nid in self._nodes
 
     def create_node(self, tag=None, identifier=None, parent=None, data=None):
         """
@@ -514,6 +520,9 @@ class Tree(object):
         if nid is None or not self.contains(nid):
             return None
         return self._nodes[nid]
+
+    def get_root(self):
+        return self.get_node(self.root)
 
     def is_branch(self, nid):
         """
@@ -689,10 +698,12 @@ class Tree(object):
         if set_joint:
             raise ValueError("Duplicated nodes %s exists." % list(map(text, set_joint)))
 
-        for cid, node in iteritems(new_tree.nodes):
-            if deep:
-                node = deepcopy(new_tree[node])
-            self._nodes.update({cid: node})
+        if deep:
+            new_nodes = {cid: deepcopy(node) for cid, node in iteritems(new_tree.nodes)}
+        else:
+            new_nodes = new_tree.nodes
+        self._nodes.update(new_nodes)
+        for _, node in iteritems(new_nodes):
             node.clone_pointers(new_tree.identifier, self._identifier)
 
         self.__update_bpointer(new_tree.root, nid)
@@ -1003,9 +1014,8 @@ class Tree(object):
             # define nodes parent/children in this tree
             # all pointers are the same as copied tree, except the root
             st[node_n].clone_pointers(self._identifier, st.identifier)
-            if node_n == nid:
-                # reset root parent for the new tree
-                st[node_n].set_predecessor(None, st.identifier)
+        # reset root parent for the new tree
+        st[nid].set_predecessor(None, st.identifier)
         return st
 
     def update_node(self, nid, **attrs):
@@ -1128,6 +1138,32 @@ class Tree(object):
             print(f.getvalue())
 
         f.close()
+
+    def apply(self, key, deep=True):
+        """Morphism of tree
+        Work like the built-in `map`
+
+        Arguments
+            key -- impure function of a node
+            deep -- please keep it true
+        """
+        tree = self._clone(with_tree=True, deep=deep)
+        for a in tree.all_nodes():
+            key(a)
+        return tree
+
+    def apply_data(self, key, deep=True):
+        """morphism of tree, but acts on data of nodes.
+        It calls the method `apply`
+
+        Arguments
+            key -- pure function of node.data
+        """
+
+        def _key(a):
+            a.data = key(a.data)
+
+        return self.apply(_key, deep=deep)
 
     @classmethod
     def from_map(cls, child_parent_dict, id_func=None, data_func=None):
