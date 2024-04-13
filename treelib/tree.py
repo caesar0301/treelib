@@ -698,10 +698,12 @@ class Tree(object):
         if set_joint:
             raise ValueError("Duplicated nodes %s exists." % list(map(text, set_joint)))
 
-        for cid, node in iteritems(new_tree.nodes):
-            if deep:
-                node = deepcopy(node)
-            self._nodes.update({cid: node})
+        if deep:
+            new_nodes = {cid: deepcopy(node) for cid, node in iteritems(new_tree.nodes)}
+        else:
+            new_nodes = new_tree.nodes
+        self._nodes.update(new_nodes)
+        for _, node in iteritems(new_nodes):
             node.clone_pointers(new_tree.identifier, self._identifier)
 
         self.__update_bpointer(new_tree.root, nid)
