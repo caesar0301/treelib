@@ -909,6 +909,8 @@ class Tree(object):
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
         :param data_property: the property on the node data object to be printed.
+        :param render_node: a callback function that receives `node` and should return a string.
+            Useful when you want to have full control over how each node is rendered.
         :param sorting: if True perform node sorting, if False return
             nodes in original insertion order. In latter case @key and
             @reverse parameters are ignored.
