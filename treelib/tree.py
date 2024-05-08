@@ -162,6 +162,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        render_node=None,
         sorting=True,
         func=print,
     ):
@@ -190,7 +191,10 @@ class Tree(object):
         level.
         """
         # Factory for proper get_label() function
-        if data_property:
+        if render_node:
+            get_label = render_node
+
+        elif data_property:
             if idhidden:
 
                 def get_label(node):
@@ -842,6 +846,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        render_node=None,
         sorting=True,
     ):
         """
@@ -863,6 +868,7 @@ class Tree(object):
             reverse,
             line_type,
             data_property,
+            render_node,
             sorting,
             func=handler,
         )
@@ -877,6 +883,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        render_node=None,
         stdout=True,
         sorting=True,
     ):
@@ -922,6 +929,7 @@ class Tree(object):
                 reverse,
                 line_type,
                 data_property,
+                render_node,
                 sorting,
                 func=write,
             )
