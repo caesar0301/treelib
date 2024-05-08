@@ -521,6 +521,37 @@ class TreeCase(unittest.TestCase):
             sys.stdout.close()
             sys.stdout = sys.__stdout__  # stops from printing to console
 
+    def test_show_render_node(self):
+        product_tree = Tree()
+
+        def callback_fn(node):
+            if node.is_leaf():
+                return f"A {node.data.color} {node.data.brand} car"
+            return node.identifier
+
+        class Product(object):
+            def __init__(self, brand, color):
+                self.brand = brand
+                self.color = color
+
+        product_tree.create_node(tag="root", identifier="root", data={"level": 0})
+        product_tree.create_node(identifier="car", parent="root", data={"level": 1})
+        product_tree.create_node(
+            identifier="car_byd", parent="car", data=Product("BYD", "red")
+        )
+        product_tree.create_node(
+            identifier="car_geely", parent="car", data=Product("Geely", "green")
+        )
+
+        self.assertEqual(
+            product_tree.show(stdout=False, render_node=callback_fn),
+            """root
+└── car
+    ├── A red BYD car
+    └── A green Geely car
+""",
+        )
+
     def test_level(self):
         self.assertEqual(self.tree.level("hárry"), 0)
         depth = self.tree.depth()

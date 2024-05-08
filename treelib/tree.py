@@ -162,6 +162,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        render_node=None,
         sorting=True,
         func=print,
     ):
@@ -190,7 +191,10 @@ class Tree(object):
         level.
         """
         # Factory for proper get_label() function
-        if data_property:
+        if render_node:
+            get_label = render_node
+
+        elif data_property:
             if idhidden:
 
                 def get_label(node):
@@ -842,6 +846,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        render_node=None,
         sorting=True,
     ):
         """
@@ -863,6 +868,7 @@ class Tree(object):
             reverse,
             line_type,
             data_property,
+            render_node,
             sorting,
             func=handler,
         )
@@ -877,6 +883,7 @@ class Tree(object):
         reverse=False,
         line_type="ascii-ex",
         data_property=None,
+        render_node=None,
         stdout=True,
         sorting=True,
     ):
@@ -902,6 +909,8 @@ class Tree(object):
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
         :param data_property: the property on the node data object to be printed.
+        :param render_node: a callback function that receives `node` and should return a string.
+            Useful when you want to have full control over how each node is rendered.
         :param sorting: if True perform node sorting, if False return
             nodes in original insertion order. In latter case @key and
             @reverse parameters are ignored.
@@ -922,6 +931,7 @@ class Tree(object):
                 reverse,
                 line_type,
                 data_property,
+                render_node,
                 sorting,
                 func=write,
             )
