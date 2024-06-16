@@ -29,6 +29,7 @@ import copy
 import uuid
 from collections import defaultdict
 from warnings import warn
+from typing import cast, Any, Optional, Union
 
 from .exceptions import NodePropertyError
 from .misc import deprecated
@@ -43,11 +44,17 @@ class Node(object):
     #: Mode constants for routine `update_fpointer()`.
     (ADD, DELETE, INSERT, REPLACE) = list(range(4))
 
-    def __init__(self, tag=None, identifier=None, expanded=True, data=None):
+    def __init__(
+        self,
+        tag: Optional[str] = None,
+        identifier: Optional[str] = None,
+        expanded: bool = True,
+        data: Any = None,
+    ) -> None:
         """Create a new Node object to be placed inside a Tree object"""
 
         #: if given as a parameter, must be unique
-        self._identifier = None
+        self._identifier: Optional[str] = None
         self._set_identifier(identifier)
 
         #: None or something else
@@ -61,24 +68,24 @@ class Node(object):
         self.expanded = expanded
 
         #: identifier of the parent's node :
-        self._predecessor = {}
+        self._predecessor: dict = {}
         #: identifier(s) of the soons' node(s) :
-        self._successors = defaultdict(list)
+        self._successors: dict = defaultdict(list)
 
         #: User payload associated with this node.
         self.data = data
 
         # for retro-compatibility on bpointer/fpointer
-        self._initial_tree_id = None
+        self._initial_tree_id: Optional[str] = None
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return self.tag < other.tag
 
-    def set_initial_tree_id(self, tree_id):
+    def set_initial_tree_id(self, tree_id: str) -> None:
         if self._initial_tree_id is None:
             self._initial_tree_id = tree_id
 
-    def _set_identifier(self, nid):
+    def _set_identifier(self, nid: Optional[str]) -> None:
         """Initialize self._set_identifier"""
         if nid is None:
             self._identifier = str(uuid.uuid1())
@@ -98,11 +105,11 @@ class Node(object):
 
     @bpointer.setter
     @deprecated(alias="node.set_predecessor")
-    def bpointer(self, value):
+    def bpointer(self, value) -> None:
         self.set_predecessor(value, self._initial_tree_id)
 
     @deprecated(alias="node.set_predecessor")
-    def update_bpointer(self, nid):
+    def update_bpointer(self, nid) -> None:
         self.set_predecessor(nid, self._initial_tree_id)
 
     @property
@@ -118,7 +125,7 @@ class Node(object):
 
     @fpointer.setter
     @deprecated(alias="node.update_successors")
-    def fpointer(self, value):
+    def fpointer(self, value: Union[None, list, dict, set]) -> None:
         self.set_successors(value, tree_id=self._initial_tree_id)
 
     @deprecated(alias="node.update_successors")
@@ -132,11 +139,11 @@ class Node(object):
         """
         return self._predecessor[tree_id]
 
-    def set_predecessor(self, nid, tree_id):
+    def set_predecessor(self, nid: Optional[str], tree_id: Optional[str]) -> None:
         """Set the value of `_predecessor`."""
         self._predecessor[tree_id] = nid
 
-    def successors(self, tree_id):
+    def successors(self, tree_id: Optional[str]) -> list[str]:
         """
         With a getting operator, a list of IDs of node's children is obtained. With
         a setting operator, the value can be list, set, or dict. For list or set,
@@ -145,7 +152,9 @@ class Node(object):
         """
         return self._successors[tree_id]
 
-    def set_successors(self, value, tree_id=None):
+    def set_successors(
+        self, value: Union[None, list, dict, set], tree_id: Optional[str] = None
+    ) -> None:
         """Set the value of `_successors`."""
         setter_lookup = {
             "NoneType": lambda x: list(),
@@ -161,7 +170,13 @@ class Node(object):
         else:
             raise NotImplementedError("Unsupported value type %s" % t)
 
-    def update_successors(self, nid, mode=ADD, replace=None, tree_id=None):
+    def update_successors(
+        self,
+        nid: Optional[str],
+        mode: int = ADD,
+        replace: Optional[str] = None,
+        tree_id: Optional[str] = None,
+    ) -> None:
         """
         Update the children list with different modes: addition (Node.ADD or
         Node.INSERT) and deletion (Node.DELETE).
@@ -169,23 +184,23 @@ class Node(object):
         if nid is None:
             return
 
-        def _manipulator_append():
+        def _manipulator_append() -> None:
             self.successors(tree_id).append(nid)
 
-        def _manipulator_delete():
+        def _manipulator_delete() -> None:
             if nid in self.successors(tree_id):
                 self.successors(tree_id).remove(nid)
             else:
                 warn("Nid %s wasn't present in fpointer" % nid)
 
-        def _manipulator_insert():
+        def _manipulator_insert() -> None:
             warn("WARNING: INSERT is deprecated to ADD mode")
             self.update_successors(nid, tree_id=tree_id)
 
-        def _manipulator_replace():
+        def _manipulator_replace() -> None:
             if replace is None:
                 raise NodePropertyError(
-                    'Argument "repalce" should be provided when mode is {}'.format(mode)
+                    'Argument "replace" should be provided when mode is {}'.format(mode)
                 )
             ind = self.successors(tree_id).index(nid)
             self.successors(tree_id)[ind] = replace
@@ -200,38 +215,38 @@ class Node(object):
         if mode not in manipulator_lookup:
             raise NotImplementedError("Unsupported node updating mode %s" % str(mode))
 
-        f_name = manipulator_lookup.get(mode)
+        f_name = cast(str, manipulator_lookup.get(mode))
         f = locals()[f_name]
         return f()
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """
         The unique ID of a node within the scope of a tree. This attribute can be
         accessed and modified with ``.`` and ``=`` operator respectively.
         """
-        return self._identifier
+        return cast(str, self._identifier)
 
-    def clone_pointers(self, former_tree_id, new_tree_id):
+    def clone_pointers(self, former_tree_id: str, new_tree_id: str) -> None:
         former_bpointer = self.predecessor(former_tree_id)
         self.set_predecessor(former_bpointer, new_tree_id)
         former_fpointer = self.successors(former_tree_id)
         # fpointer is a list and would be copied by reference without deepcopy
         self.set_successors(copy.deepcopy(former_fpointer), tree_id=new_tree_id)
 
-    def reset_pointers(self, tree_id):
+    def reset_pointers(self, tree_id) -> None:
         self.set_predecessor(None, tree_id)
         self.set_successors([], tree_id=tree_id)
 
-    @identifier.setter
-    def identifier(self, value):
+    @identifier.setter  # type: ignore
+    def identifier(self, value: str) -> None:
         """Set the value of `_identifier`."""
         if value is None:
             print("WARNING: node ID can not be None")
         else:
             self._set_identifier(value)
 
-    def is_leaf(self, tree_id=None):
+    def is_leaf(self, tree_id: Optional[str] = None) -> bool:
         """Return true if current node has no children."""
         if tree_id is None:
             # for retro-compatilibity
@@ -245,7 +260,7 @@ class Node(object):
         else:
             return False
 
-    def is_root(self, tree_id=None):
+    def is_root(self, tree_id: Optional[str] = None) -> bool:
         """Return true if self has no parent, i.e. as root."""
         if tree_id is None:
             # for retro-compatilibity
@@ -257,19 +272,19 @@ class Node(object):
         return self.predecessor(tree_id) is None
 
     @property
-    def tag(self):
+    def tag(self) -> str:
         """
         The readable node name for human. This attribute can be accessed and
         modified with ``.`` and ``=`` operator respectively.
         """
-        return self._tag
+        return cast(str, self._tag)
 
     @tag.setter
-    def tag(self, value):
+    def tag(self, value: Optional[str]) -> None:
         """Set the value of `_tag`."""
         self._tag = value if value is not None else None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         name = self.__class__.__name__
         kwargs = [
             "tag={0}".format(self.tag),

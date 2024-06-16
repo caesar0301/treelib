@@ -32,16 +32,17 @@ from __future__ import unicode_literals
 try:
     from builtins import str as text
 except ImportError:
-    from __builtin__ import str as text
+    from __builtin__ import str as text  # type: ignore
 
 import codecs
 import json
 import uuid
 from copy import deepcopy
 from six import python_2_unicode_compatible, iteritems
+from typing import cast, Any, Callable, Optional, Union
 
 try:
-    from StringIO import StringIO
+    from StringIO import StringIO  # type: ignore
 except ImportError:
     from io import StringIO
 
@@ -66,14 +67,20 @@ class Tree(object):
     (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
     node_class = Node
 
-    def __contains__(self, identifier):
+    def __contains__(self, identifier: str) -> bool:
         return identifier in self.nodes.keys()
 
-    def __init__(self, tree=None, deep=False, node_class=None, identifier=None):
+    def __init__(
+        self,
+        tree=None,
+        deep: bool = False,
+        node_class=None,
+        identifier: Optional[str] = None,
+    ) -> None:
         """Initiate a new tree or copy another tree with a shallow or
         deep copy.
         """
-        self._identifier = None
+        self._identifier: Optional[str] = None
         self._set_identifier(identifier)
 
         if node_class:
@@ -85,7 +92,7 @@ class Tree(object):
 
         #: Get or set the identifier of the root. This attribute can be accessed and modified
         #: with ``.`` and ``=`` operator respectively.
-        self.root = None
+        self.root: Optional[str] = None
 
         if tree is not None:
             self.root = tree.root
@@ -95,7 +102,12 @@ class Tree(object):
                 if tree.identifier != self._identifier:
                     new_node.clone_pointers(tree.identifier, self._identifier)
 
-    def _clone(self, identifier=None, with_tree=False, deep=False):
+    def _clone(
+        self,
+        identifier: Optional[str] = None,
+        with_tree: bool = False,
+        deep: bool = False,
+    ):
         """Clone current instance, with or without tree.
 
         Method intended to be overloaded, to avoid rewriting whole "subtree" and "remove_subtree" methods when
@@ -122,28 +134,28 @@ class Tree(object):
         )
 
     @property
-    def identifier(self):
+    def identifier(self) -> Optional[str]:
         return self._identifier
 
-    def _set_identifier(self, nid):
+    def _set_identifier(self, nid: Optional[str]) -> None:
         """Initialize self._set_identifier"""
         if nid is None:
             self._identifier = str(uuid.uuid1())
         else:
             self._identifier = nid
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Node:
         """Return _nodes[key]"""
         try:
             return self._nodes[key]
         except KeyError:
             raise NodeIDAbsentError("Node '%s' is not in the tree" % key)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return len(_nodes)"""
         return len(self._nodes)
 
-    def __str__(self):
+    def __str__(self) -> str:
         self._reader = ""
 
         def write(line):
@@ -154,16 +166,16 @@ class Tree(object):
 
     def __print_backend(
         self,
-        nid=None,
-        level=ROOT,
-        idhidden=True,
-        filter=None,
-        key=None,
-        reverse=False,
+        nid: Optional[str] = None,
+        level: int = ROOT,
+        idhidden: bool = True,
+        filter: Optional[Callable[[Node], bool]] = None,
+        key: Optional[Callable[[Node], Node]] = None,
+        reverse: bool = False,
         line_type="ascii-ex",
         data_property=None,
-        sorting=True,
-        func=print,
+        sorting: bool = True,
+        func: Callable[[bytes], None] = print,
     ):
         """
         Another implementation of printing tree using Stack
@@ -193,12 +205,12 @@ class Tree(object):
         if data_property:
             if idhidden:
 
-                def get_label(node):
+                def get_label(node: Node) -> str:
                     return getattr(node.data, data_property)
 
             else:
 
-                def get_label(node):
+                def get_label(node: Node) -> str:
                     return "%s[%s]" % (
                         getattr(node.data, data_property),
                         node.identifier,
@@ -207,12 +219,12 @@ class Tree(object):
         else:
             if idhidden:
 
-                def get_label(node):
+                def get_label(node: Node) -> str:
                     return node.tag
 
             else:
 
-                def get_label(node):
+                def get_label(node: Node) -> str:
                     return "%s[%s]" % (node.tag, node.identifier)
 
         # legacy ordering
@@ -228,7 +240,16 @@ class Tree(object):
             label = get_label(node)
             func("{0}{1}".format(pre, label).encode("utf-8"))
 
-    def __get(self, nid, level, filter_, key, reverse, line_type, sorting):
+    def __get(
+        self,
+        nid: Optional[str],
+        level: int,
+        filter_: Optional[Callable[[Node], bool]],
+        key: Optional[Callable[[Node], Node]],
+        reverse: bool,
+        line_type: str,
+        sorting: bool,
+    ):
         # default filter
         if filter_ is None:
 
@@ -247,10 +268,20 @@ class Tree(object):
 
         return self.__get_iter(nid, level, filter_, key, reverse, dt, [], sorting)
 
-    def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last, sorting):
+    def __get_iter(
+        self,
+        nid: Optional[str],
+        level: int,
+        filter_: Callable[[Node], bool],
+        key: Optional[Callable[[Node], Node]],
+        reverse: bool,
+        dt: tuple[str, str, str],
+        is_last: list,
+        sorting: bool,
+    ):
         dt_vertical_line, dt_line_box, dt_line_corner = dt
 
-        nid = self.root if nid is None else nid
+        nid = cast(str, self.root if nid is None else nid)
         node = self[nid]
 
         if level == self.ROOT:
@@ -274,7 +305,7 @@ class Tree(object):
                 if key:
                     children.sort(key=key, reverse=reverse)
                 elif reverse:
-                    children = reversed(children)
+                    children = list(reversed(children))
             level += 1
             for idx, child in enumerate(children):
                 is_last.append(idx == idxlast)
@@ -288,13 +319,13 @@ class Tree(object):
         """set self[nid].bpointer"""
         self[nid].set_predecessor(parent_id, self._identifier)
 
-    def __update_fpointer(self, nid, child_id, mode):
+    def __update_fpointer(self, nid: str, child_id: str, mode: int):
         if nid is None:
             return
         else:
             self[nid].update_successors(child_id, mode, tree_id=self._identifier)
 
-    def add_node(self, node, parent=None):
+    def add_node(self, node: Node, parent: Optional[Union[Node, str]] = None) -> None:
         """
         Add a new node object to the tree and make the parent as the root by default.
 
@@ -320,16 +351,17 @@ class Tree(object):
         elif not self.contains(pid):
             raise NodeIDAbsentError("Parent node '%s' " "is not in the tree" % pid)
 
+        pid = cast(str, pid)
         self._nodes.update({node.identifier: node})
         self.__update_fpointer(pid, node.identifier, self.node_class.ADD)
         self.__update_bpointer(node.identifier, pid)
-        node.set_initial_tree_id(self._identifier)
+        node.set_initial_tree_id(cast(str, self._identifier))
 
-    def all_nodes(self):
+    def all_nodes(self) -> list[Node]:
         """Return all nodes in a list"""
         return list(self._nodes.values())
 
-    def all_nodes_itr(self):
+    def all_nodes_itr(self) -> Any:
         """
         Returns all nodes in an iterator.
         Added by William Rusnack
@@ -368,7 +400,7 @@ class Tree(object):
                 ascendant_level = self.level(ascendant)
         return None
 
-    def children(self, nid):
+    def children(self, nid: str) -> list[Node]:
         """
         Return the children (Node) list of nid.
         Empty list is returned if nid does not exist
@@ -379,7 +411,13 @@ class Tree(object):
         """Check if the tree contains node of given id"""
         return True if nid in self._nodes else False
 
-    def create_node(self, tag=None, identifier=None, parent=None, data=None):
+    def create_node(
+        self,
+        tag: Optional[str] = None,
+        identifier: Optional[str] = None,
+        parent: Optional[Union[Node, str]] = None,
+        data: Any = None,
+    ) -> Node:
         """
         Create a child node for given @parent node. If ``identifier`` is absent,
         a UUID will be generated automatically.
@@ -388,7 +426,7 @@ class Tree(object):
         self.add_node(node, parent)
         return node
 
-    def depth(self, node=None):
+    def depth(self, node: Optional[Node] = None) -> int:
         """
         Get the maximum level of this tree or the level of the given node.
 
@@ -415,7 +453,13 @@ class Tree(object):
         return ret
 
     def expand_tree(
-        self, nid=None, mode=DEPTH, filter=None, key=None, reverse=False, sorting=True
+        self,
+        nid: Optional[str] = None,
+        mode: int = DEPTH,
+        filter: Optional[Callable[[Node], bool]] = None,
+        key: Optional[Callable[[Node], Node]] = None,
+        reverse: bool = False,
+        sorting: bool = True,
     ):
         """
         Python generator to traverse the tree (or a subtree) with optional
@@ -439,7 +483,7 @@ class Tree(object):
         :return: Node IDs that satisfy the conditions
         :rtype: generator object
         """
-        nid = self.root if nid is None else nid
+        nid = cast(str, self.root if nid is None else nid)
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
@@ -470,7 +514,7 @@ class Tree(object):
 
             elif mode is self.ZIGZAG:
                 # Suggested by Ilya Kuprik (ilya-spy@ynadex.ru).
-                stack_fw = []
+                stack_fw: list[Node] = []
                 queue.reverse()
                 stack = stack_bw = queue
                 direction = False
@@ -493,7 +537,7 @@ class Tree(object):
             else:
                 raise ValueError("Traversal mode '{}' is not supported".format(mode))
 
-    def filter_nodes(self, func):
+    def filter_nodes(self, func: Callable[[Node], bool]):
         """
         Filters all nodes by function.
 
@@ -504,7 +548,7 @@ class Tree(object):
         """
         return filter(func, self.all_nodes_itr())
 
-    def get_node(self, nid):
+    def get_node(self, nid: Optional[str]) -> Optional[Node]:
         """
         Get the object of the node with ID of ``nid``.
 
@@ -531,7 +575,7 @@ class Tree(object):
             fpointer = []
         return fpointer
 
-    def leaves(self, nid=None):
+    def leaves(self, nid: Optional[str] = None) -> list[Node]:
         """Get leaves of the whole tree or a subtree."""
         leaves = []
         if nid is None:
@@ -555,7 +599,7 @@ class Tree(object):
         """
         return len([n for n in self.rsearch(nid, filter)]) - 1
 
-    def link_past_node(self, nid):
+    def link_past_node(self, nid: str):
         """
         Delete a node by linking past it.
 
@@ -617,7 +661,7 @@ class Tree(object):
         """Return a dict form of nodes in a tree: {id: node_instance}."""
         return self._nodes
 
-    def parent(self, nid):
+    def parent(self, nid: str) -> Optional[Node]:
         """Get parent :class:`Node` object of given id."""
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
@@ -628,7 +672,7 @@ class Tree(object):
 
         return self[pid]
 
-    def merge(self, nid, new_tree, deep=False):
+    def merge(self, nid: str, new_tree, deep: bool = False):
         """Patch @new_tree on current tree by pasting new_tree root children on current tree @nid node.
 
         Consider the following tree:
@@ -667,7 +711,7 @@ class Tree(object):
         for child in new_tree.children(new_tree.root):
             self.paste(nid=nid, new_tree=new_tree.subtree(child.identifier), deep=deep)
 
-    def paste(self, nid, new_tree, deep=False):
+    def paste(self, nid: str, new_tree, deep: bool = False):
         """
         Paste a @new_tree to the original one by linking the root
         of new tree to given node (nid).
@@ -698,7 +742,7 @@ class Tree(object):
         self.__update_bpointer(new_tree.root, nid)
         self.__update_fpointer(nid, new_tree.root, self.node_class.ADD)
 
-    def paths_to_leaves(self):
+    def paths_to_leaves(self) -> list[list[str]]:
         """
         Use this function to get the identifiers allowing to go from the root
         nodes to each leaf.
@@ -735,7 +779,7 @@ class Tree(object):
 
         return res
 
-    def remove_node(self, identifier):
+    def remove_node(self, identifier: str) -> int:
         """Remove a node indicated by 'identifier' with all its successors.
         Return the number of removed nodes.
         """
@@ -762,7 +806,7 @@ class Tree(object):
             self.nodes.pop(id_)
         return len(removed)
 
-    def remove_subtree(self, nid, identifier=None):
+    def remove_subtree(self, nid: str, identifier: Optional[str] = None):
         """
         Get a subtree with ``nid`` being the root. If nid is None, an
         empty tree is returned.
@@ -798,14 +842,16 @@ class Tree(object):
             if id_ == self.root:
                 self.root = None
             st._nodes.update({id_: self._nodes.pop(id_)})
-            st[id_].clone_pointers(self._identifier, st.identifier)
+            st[id_].clone_pointers(
+                cast(str, self._identifier), cast(str, st.identifier)
+            )
             st[id_].reset_pointers(self._identifier)
             if id_ == nid:
                 st[id_].set_predecessor(None, st.identifier)
         self.__update_fpointer(parent, nid, self.node_class.DELETE)
         return st
 
-    def rsearch(self, nid, filter=None):
+    def rsearch(self, nid: str, filter: Optional[Callable[[Node], bool]] = None):
         """
         Traverse the tree branch along the branch from nid to its
         ancestors (until root).
@@ -833,16 +879,16 @@ class Tree(object):
 
     def save2file(
         self,
-        filename,
-        nid=None,
-        level=ROOT,
-        idhidden=True,
-        filter=None,
-        key=None,
-        reverse=False,
-        line_type="ascii-ex",
-        data_property=None,
-        sorting=True,
+        filename: str,
+        nid: Optional[str] = None,
+        level: int = ROOT,
+        idhidden: bool = True,
+        filter: Optional[Callable[[Node], bool]] = None,
+        key: Optional[Callable[[Node], Node]] = None,
+        reverse: bool = False,
+        line_type: str = "ascii-ex",
+        data_property: Optional[str] = None,
+        sorting: bool = True,
     ):
         """
         Save the tree into file for offline analysis.
@@ -869,16 +915,16 @@ class Tree(object):
 
     def show(
         self,
-        nid=None,
-        level=ROOT,
-        idhidden=True,
-        filter=None,
-        key=None,
-        reverse=False,
-        line_type="ascii-ex",
-        data_property=None,
-        stdout=True,
-        sorting=True,
+        nid: Optional[str] = None,
+        level: int = ROOT,
+        idhidden: bool = True,
+        filter: Optional[Callable[[Node], bool]] = None,
+        key: Optional[Callable[[Node], Node]] = None,
+        reverse: bool = False,
+        line_type: str = "ascii-ex",
+        data_property: Optional[str] = None,
+        stdout: bool = True,
+        sorting: bool = True,
     ):
         """
         Print the tree structure in hierarchy style.
@@ -933,7 +979,7 @@ class Tree(object):
         else:
             return self._reader
 
-    def siblings(self, nid):
+    def siblings(self, nid: str) -> list[Node]:
         """
         Return the siblings of given @nid.
 
@@ -949,7 +995,7 @@ class Tree(object):
 
         return siblings
 
-    def size(self, level=None):
+    def size(self, level: Optional[int] = None) -> int:
         """
         Get the number of nodes of the whole tree if @level is not
         given. Otherwise, the total number of nodes at specific level
@@ -977,7 +1023,7 @@ class Tree(object):
                     "level should be an integer instead of '%s'" % type(level)
                 )
 
-    def subtree(self, nid, identifier=None):
+    def subtree(self, nid: str, identifier: Optional[str] = None):
         """
         Return a shallow COPY of subtree with nid being the new root.
         If nid is None, return an empty tree.
@@ -1002,13 +1048,15 @@ class Tree(object):
             st._nodes.update({self[node_n].identifier: self[node_n]})
             # define nodes parent/children in this tree
             # all pointers are the same as copied tree, except the root
-            st[node_n].clone_pointers(self._identifier, st.identifier)
+            st[node_n].clone_pointers(
+                cast(str, self._identifier), cast(str, st.identifier)
+            )
             if node_n == nid:
                 # reset root parent for the new tree
                 st[node_n].set_predecessor(None, st.identifier)
         return st
 
-    def update_node(self, nid, **attrs):
+    def update_node(self, nid: str, **attrs) -> None:
         """
         Update node's attributes.
 
@@ -1072,19 +1120,21 @@ class Tree(object):
                 )
             return tree_dict
 
-    def to_json(self, with_data=False, sort=True, reverse=False):
+    def to_json(
+        self, with_data: bool = False, sort: bool = True, reverse: bool = False
+    ):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
     def to_graphviz(
         self,
-        filename=None,
-        shape="circle",
-        graph="digraph",
+        filename: Optional[str] = None,
+        shape: str = "circle",
+        graph: str = "digraph",
         filter=None,
         key=None,
-        reverse=False,
-        sorting=True,
+        reverse: bool = False,
+        sorting: bool = True,
     ):
         """Exports the tree in the dot format of the graphviz software"""
         nodes, connections = [], []
@@ -1108,7 +1158,7 @@ class Tree(object):
         # write nodes and connections to dot format
         is_plain_file = filename is not None
         if is_plain_file:
-            f = codecs.open(filename, "w", "utf-8")
+            f = codecs.open(cast(str, filename), "w", "utf-8")
         else:
             f = StringIO()
 
@@ -1119,8 +1169,8 @@ class Tree(object):
         if len(connections) > 0:
             f.write("\n")
 
-        for c in connections:
-            f.write("\t" + c + "\n")
+        for cns in connections:
+            f.write("\t" + cns + "\n")
 
         f.write("}")
 
