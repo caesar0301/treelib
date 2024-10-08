@@ -735,6 +735,49 @@ class Tree(object):
 
         return res
 
+    def paths_to_nodes(tree, current_node = None, paths = None):
+        """
+        Finds paths from the root to all nodes in a tree, including nodes that are not leaves.
+    
+        Args: 
+            tree: the tree object
+            current_node: the current node being processed. 
+                If current_node = None, it is assumed to be the root. 
+                If current_node is given a value when originally called, the function will find paths only in the subtree where it is the root. 
+            paths: the current list of paths from the root to all other nodes. 
+        Returns: 
+            A list of paths from the root to all other nodes. The paths are lists of integer node identifiers. 
+
+        Example Result: 
+            Harry
+            ├── Bill 
+            └── Jane
+                └── Diane
+            [[Harry], [Harry, Bill], [Harry, Jane], [Harry, Jane, Diane]]
+            Even though Jane is not a leaf, the path from Harry to Jane is still included in the results. 
+        """
+        if paths is None: 
+            paths = []
+    
+        if current_node is None: 
+            current_node = tree.root 
+            paths.append([current_node])
+
+        if tree.children(current_node) == []:
+            return paths
+            
+        for path in paths: 
+            if path[-1] == current_node: 
+                parent_path = path[:]
+                    
+        if tree.children(current_node) != []:
+            for child in tree.children(current_node):
+                child_path = parent_path[:]
+                child_path.append(child.identifier)
+                paths.append(child_path)
+                paths_to_nodes(tree, child.identifier, paths)
+        return paths 
+
     def remove_node(self, identifier):
         """Remove a node indicated by 'identifier' with all its successors.
         Return the number of removed nodes.
