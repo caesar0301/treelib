@@ -1097,8 +1097,8 @@ class Tree(object):
                 sorting=sorting,
             ):
                 nid = self[n].identifier
-                tag = str(self[n].tag).translate(str.maketrans({'"': r"\""}))
-                state = '"{0}" [label="{1}", shape={2}]'.format(nid, tag, shape)
+                label = str(self[n].tag).translate(str.maketrans({'"': r"\""}))
+                state = '"{0}" [label="{1}", shape={2}]'.format(nid, label, shape)
                 nodes.append(state)
 
                 for c in self.children(nid):
