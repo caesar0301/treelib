@@ -143,7 +143,7 @@ class Node(object):
         """Set the value of `_predecessor`."""
         self._predecessor[tree_id] = nid
 
-    def successors(self, tree_id: Optional[str]) -> list[str]:
+    def successors(self, tree_id: Optional[str]):
         """
         With a getting operator, a list of IDs of node's children is obtained. With
         a setting operator, the value can be list, set, or dict. For list or set,
