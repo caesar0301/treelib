@@ -948,6 +948,7 @@ class Tree(object):
         :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
         :param line_type:
         :param data_property: the property on the node data object to be printed.
+        :param stdout: if True print it, if False return printing.
         :param sorting: if True perform node sorting, if False return
             nodes in original insertion order. In latter case @key and
             @reverse parameters are ignored.
@@ -975,7 +976,7 @@ class Tree(object):
             print("Tree is empty")
 
         if stdout:
-            print(self._reader.encode("utf-8"))
+            print(self._reader)
         else:
             return self._reader
 
