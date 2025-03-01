@@ -37,9 +37,17 @@ except ImportError:
 import codecs
 import json
 import uuid
+import sys
 from copy import deepcopy
 from six import python_2_unicode_compatible, iteritems
-from typing import cast, Any, Callable, Optional, Union
+from typing import cast, List, Any, Callable, Optional, Union
+
+if sys.version_info >= (3, 9):
+    StrList = list[str]
+    StrLList = list[list[str]]
+else:
+    StrList = List[str]  # Python 3.8 and earlier
+    StrLList = List[List[str]]
 
 try:
     from StringIO import StringIO  # type: ignore
@@ -275,7 +283,7 @@ class Tree(object):
         filter_: Callable[[Node], bool],
         key: Optional[Callable[[Node], Node]],
         reverse: bool,
-        dt,
+        dt,  # tuple[str, str, str]
         is_last: list,
         sorting: bool,
     ):
@@ -742,7 +750,7 @@ class Tree(object):
         self.__update_bpointer(new_tree.root, nid)
         self.__update_fpointer(nid, new_tree.root, self.node_class.ADD)
 
-    def paths_to_leaves(self):
+    def paths_to_leaves(self) -> StrLList:
         """
         Use this function to get the identifiers allowing to go from the root
         nodes to each leaf.

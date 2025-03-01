@@ -27,12 +27,18 @@ from __future__ import unicode_literals
 
 import copy
 import uuid
+import sys
 from collections import defaultdict
 from warnings import warn
-from typing import cast, Any, Optional, Union
+from typing import cast, List, Any, Optional, Union
 
 from .exceptions import NodePropertyError
 from .misc import deprecated
+
+if sys.version_info >= (3, 9):
+    StrList = list[str]
+else:
+    StrList = List[str]  # Python 3.8 and earlier
 
 
 class Node(object):
@@ -143,7 +149,7 @@ class Node(object):
         """Set the value of `_predecessor`."""
         self._predecessor[tree_id] = nid
 
-    def successors(self, tree_id: Optional[str]):
+    def successors(self, tree_id: Optional[str]) -> StrList:
         """
         With a getting operator, a list of IDs of node's children is obtained. With
         a setting operator, the value can be list, set, or dict. For list or set,
