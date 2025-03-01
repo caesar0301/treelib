@@ -42,13 +42,6 @@ from copy import deepcopy
 from six import python_2_unicode_compatible, iteritems
 from typing import cast, List, Any, Callable, Optional, Union
 
-if sys.version_info >= (3, 9):
-    StrList = list[str]
-    StrLList = list[list[str]]
-else:
-    StrList = List[str]  # Python 3.8 and earlier
-    StrLList = List[List[str]]
-
 try:
     from StringIO import StringIO  # type: ignore
 except ImportError:
@@ -63,6 +56,16 @@ from .exceptions import (
     LoopError,
 )
 from .node import Node
+
+if sys.version_info >= (3, 9):
+    StrList = list[str]
+    StrLList = list[list[str]]
+    NodeList = list[Node]
+else:
+    StrList = List[str]  # Python 3.8 and earlier
+    StrLList = List[List[str]]
+    NodeList = List[Node]
+
 
 __author__ = "chenxm"
 
@@ -365,7 +368,7 @@ class Tree(object):
         self.__update_bpointer(node.identifier, pid)
         node.set_initial_tree_id(cast(str, self._identifier))
 
-    def all_nodes(self) -> list[Node]:
+    def all_nodes(self) -> NodeList:
         """Return all nodes in a list"""
         return list(self._nodes.values())
 
@@ -408,7 +411,7 @@ class Tree(object):
                 ascendant_level = self.level(ascendant)
         return None
 
-    def children(self, nid: str) -> list[Node]:
+    def children(self, nid: str) -> NodeList:
         """
         Return the children (Node) list of nid.
         Empty list is returned if nid does not exist
@@ -522,7 +525,7 @@ class Tree(object):
 
             elif mode is self.ZIGZAG:
                 # Suggested by Ilya Kuprik (ilya-spy@ynadex.ru).
-                stack_fw: list[Node] = []
+                stack_fw: NodeList = []
                 queue.reverse()
                 stack = stack_bw = queue
                 direction = False
@@ -583,7 +586,7 @@ class Tree(object):
             fpointer = []
         return fpointer
 
-    def leaves(self, nid: Optional[str] = None) -> list[Node]:
+    def leaves(self, nid: Optional[str] = None) -> NodeList:
         """Get leaves of the whole tree or a subtree."""
         leaves = []
         if nid is None:
@@ -988,7 +991,7 @@ class Tree(object):
         else:
             return self._reader
 
-    def siblings(self, nid: str) -> list[Node]:
+    def siblings(self, nid: str) -> NodeList:
         """
         Return the siblings of given @nid.
 
