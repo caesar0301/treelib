@@ -275,7 +275,7 @@ class Tree(object):
         filter_: Callable[[Node], bool],
         key: Optional[Callable[[Node], Node]],
         reverse: bool,
-        dt: tuple[str, str, str],
+        dt,
         is_last: list,
         sorting: bool,
     ):
