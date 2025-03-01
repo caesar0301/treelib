@@ -15,6 +15,8 @@ setup(
     packages=["treelib"],
     keywords=["data structure", "tree", "tools"],
     install_requires=["six"],
+    include_package_data=True,
+    package_data={"": ["py.typed"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
