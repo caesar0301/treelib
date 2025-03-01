@@ -742,7 +742,7 @@ class Tree(object):
         self.__update_bpointer(new_tree.root, nid)
         self.__update_fpointer(nid, new_tree.root, self.node_class.ADD)
 
-    def paths_to_leaves(self) -> list[list[str]]:
+    def paths_to_leaves(self):
         """
         Use this function to get the identifiers allowing to go from the root
         nodes to each leaf.
