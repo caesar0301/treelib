@@ -768,3 +768,4 @@ Hárry
         with self.assertRaises(ValueError):
             # invalid input payload without more than 1 root
             tree = Tree.from_map({"a": None, "b": None})
+
