@@ -1108,7 +1108,7 @@ class Tree(object):
     def to_dict(
         self,
         nid: Optional[str] = None,
-        key: Optional[str] = None,
+        key: Optional[Callable[[str], Any]] = None,
         sort: bool = True,
         reverse: bool = False,
         with_data: bool = False,
