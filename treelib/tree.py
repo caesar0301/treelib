@@ -40,7 +40,7 @@ import uuid
 import sys
 from copy import deepcopy
 from six import python_2_unicode_compatible, iteritems
-from typing import cast, List, Any, Callable, Optional, Union
+from typing import Any, Callable, cast, Dict, List, Optional, Union
 
 try:
     from StringIO import StringIO  # type: ignore
@@ -118,7 +118,7 @@ class Tree(object):
         identifier: Optional[str] = None,
         with_tree: bool = False,
         deep: bool = False,
-    ):
+    ) -> "Tree":
         """Clone current instance, with or without tree.
 
         Method intended to be overloaded, to avoid rewriting whole "subtree" and "remove_subtree" methods when
@@ -1035,7 +1035,7 @@ class Tree(object):
                     "level should be an integer instead of '%s'" % type(level)
                 )
 
-    def subtree(self, nid: str, identifier: Optional[str] = None):
+    def subtree(self, nid: str, identifier: Optional[str] = None) -> "Tree":
         """
         Return a shallow COPY of subtree with nid being the new root.
         If nid is None, return an empty tree.
@@ -1105,7 +1105,14 @@ class Tree(object):
             else:
                 setattr(cn, attr, val)
 
-    def to_dict(self, nid=None, key=None, sort=True, reverse=False, with_data=False):
+    def to_dict(
+        self,
+        nid: Optional[str] = None,
+        key: Optional[str] = None,
+        sort: bool = True,
+        reverse: bool = False,
+        with_data: bool = False,
+    ) -> Dict[str, Any]:
         """Transform the whole tree into a dict."""
 
         nid = self.root if (nid is None) else nid
