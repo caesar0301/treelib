@@ -23,6 +23,8 @@ Tree implementation in python: simple for you to use.
 
 For installation, APIs and examples, see http://treelib.readthedocs.io/en/latest/
 
+DeepWiki Generation: https://deepwiki.com/caesar0301/treelib
+
 ## Code Style
 
 `treelib` complies with [black](https://github.com/psf/black) formatter and
