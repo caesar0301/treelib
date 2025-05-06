@@ -30,7 +30,7 @@ import uuid
 import sys
 from collections import defaultdict
 from warnings import warn
-from typing import cast, List, Any, Optional, Union
+from typing import Any, cast, List, Optional, Union
 
 from .exceptions import NodePropertyError
 from .misc import deprecated
@@ -139,7 +139,7 @@ class Node(object):
         """Deprecated"""
         self.update_successors(nid, mode, replace, self._initial_tree_id)
 
-    def predecessor(self, tree_id):
+    def predecessor(self, tree_id: str) -> Optional[str]:
         """
         The parent ID of a node in a given tree.
         """
