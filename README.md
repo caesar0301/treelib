@@ -34,5 +34,6 @@ with `scripts/flake8.sh`.
 
 ## Contributors
 
-Thank you all,
-[committers](https://github.com/caesar0301/treelib/graphs/contributors).
+Thank you all contributors ❤
+
+[![treelib contributors](https://contrib.rocks/image?repo=caesar0301/treelib "treelib contributors")](https://github.com/caesar0301/treelib/graphs/contributors)
