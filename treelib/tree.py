@@ -113,6 +113,28 @@ class Tree(object):
                 if tree.identifier != self._identifier:
                     new_node.clone_pointers(tree.identifier, self._identifier)
 
+    @classmethod
+    def from_json(cls, raw: Union[str, bytes, bytearray]):
+        """
+        Load tree from exported JSON.
+        """
+        tree = cls()
+        json_parsed = json.loads(raw)
+
+        def _append_node(subtree, parent_id=None):
+            for tag, node_info in subtree.items():
+                node_id = node_info["id"]
+                node_data = node_info.get("data")
+                tree.create_node(
+                    tag=tag, identifier=node_id, parent=parent_id, data=node_data
+                )
+
+                for child in node_info.get("children", []):
+                    _append_node(child, parent_id=node_id)
+
+        _append_node(json_parsed)
+        return tree
+
     def _clone(
         self,
         identifier: Optional[str] = None,
@@ -1110,7 +1132,8 @@ class Tree(object):
 
         nid = self.root if (nid is None) else nid
         ntag = self[nid].tag
-        tree_dict = {ntag: {"children": []}}
+        tree_dict = {ntag: {"id": nid, "children": []}}
+
         if with_data:
             tree_dict[ntag]["data"] = self[nid].data
 
@@ -1128,9 +1151,12 @@ class Tree(object):
                 )
             if len(tree_dict[ntag]["children"]) == 0:
                 tree_dict = (
-                    self[nid].tag if not with_data else {ntag: {"data": self[nid].data}}
+                    {ntag: {"id": nid}}
+                    if not with_data
+                    else {ntag: {"id": nid, "data": self[nid].data}}
                 )
-            return tree_dict
+
+        return tree_dict
 
     def to_json(
         self, with_data: bool = False, sort: bool = True, reverse: bool = False
