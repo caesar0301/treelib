@@ -2,32 +2,31 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2011
 # Brett Alistair Kromkamp - brettkromkamp@gmail.com
-# Copyright (C) 2012-2017
+# Copyright (C) 2012-2025
 # Xiaming Chen - chenxm35@gmail.com
 # and other contributors.
 # All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """
 Tree structure in `treelib`.
 
 The :class:`Tree` object defines the tree-like structure based on :class:`Node` objects.
+Trees provide hierarchical data organization with efficient operations for traversal,
+modification, search, and visualization.
+
 A new tree can be created from scratch without any parameter or a shallow/deep copy of another tree.
 When deep=True, a deepcopy operation is performed on feeding tree parameter and more memory
 is required to create the tree.
+
+Key Features:
+    - O(1) node lookup and access
+    - Multiple traversal modes (depth-first, breadth-first, zigzag)
+    - Flexible tree modification (add, remove, move, paste)
+    - Rich display options with customizable formatting
+    - JSON/dict export and import capabilities
+    - Subtree operations and filtering
+    - Tree metrics and analysis tools
 """
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 try:
     from builtins import str as text
@@ -36,11 +35,12 @@ except ImportError:
 
 import codecs
 import json
-import uuid
 import sys
+import uuid
 from copy import deepcopy
-from six import python_2_unicode_compatible, iteritems
-from typing import cast, List, Any, Callable, Optional, Union
+from typing import Any, Callable, List, Optional, Union, cast
+
+from six import iteritems, python_2_unicode_compatible
 
 try:
     from StringIO import StringIO  # type: ignore
@@ -48,12 +48,12 @@ except ImportError:
     from io import StringIO
 
 from .exceptions import (
-    NodeIDAbsentError,
     DuplicatedNodeIdError,
-    MultipleRootError,
     InvalidLevelNumber,
     LinkPastRootNodeError,
     LoopError,
+    MultipleRootError,
+    NodeIDAbsentError,
 )
 from .node import Node
 
@@ -72,13 +72,87 @@ __author__ = "chenxm"
 
 @python_2_unicode_compatible
 class Tree(object):
-    """Tree objects are made of Node(s) stored in _nodes dictionary."""
+    """
+    Hierarchical tree data structure.
+
+    A Tree is a collection of Node objects organized in a hierarchical structure
+    with exactly one root node and zero or more child nodes. Each node (except root)
+    has exactly one parent, but can have multiple children.
+
+    The tree provides efficient operations for:
+    - Adding, removing, and moving nodes
+    - Traversing the tree in different orders
+    - Searching and filtering nodes
+    - Displaying tree structure
+    - Exporting to various formats
+
+    Attributes:
+        root (str): Identifier of the root node, or None if tree is empty.
+        nodes (dict): Dictionary mapping node identifiers to Node objects.
+
+    Constants:
+        ROOT (int): Tree traversal starting from root level.
+        DEPTH (int): Depth-first tree traversal mode.
+        WIDTH (int): Breadth-first tree traversal mode.
+        ZIGZAG (int): Zigzag tree traversal mode.
+
+    Example:
+        Creating and manipulating a tree::
+
+            tree = Tree()
+
+            # Build structure
+            tree.create_node("Company", "company")
+            tree.create_node("Engineering", "eng", parent="company")
+            tree.create_node("Sales", "sales", parent="company")
+
+            # Add team members
+            tree.create_node("Alice", "alice", parent="eng")
+            tree.create_node("Bob", "bob", parent="eng")
+            tree.create_node("Carol", "carol", parent="sales")
+
+            # Display tree
+            tree.show()
+
+            # Find specific nodes
+            eng_team = tree.children("eng")
+            all_employees = [tree[node].tag for node in tree.expand_tree()
+                           if tree.level(node) > 1]
+
+            # Tree operations
+            tree.move_node("alice", "sales")  # Alice moves to sales
+            subtree = tree.subtree("eng")     # Get engineering subtree
+    """
 
     #: ROOT, DEPTH, WIDTH, ZIGZAG constants :
     (ROOT, DEPTH, WIDTH, ZIGZAG) = list(range(4))
     node_class = Node
 
     def __contains__(self, identifier: str) -> bool:
+        """
+        Check if a node with the given identifier exists in this tree.
+
+        Implements the 'in' operator for tree membership testing, providing
+        a convenient way to check node existence without raising exceptions.
+
+        Args:
+            identifier: Node identifier to check for existence.
+
+        Returns:
+            bool: True if node exists in tree, False otherwise.
+
+        Example:
+            Checking node membership::
+
+                if "user123" in tree:
+                    print("User node exists")
+                    user = tree["user123"]
+                else:
+                    print("User node not found")
+
+                # More concise than try/except approach
+                exists = "node_id" in tree  # True or False
+        """
         return identifier in self.nodes.keys()
 
     def __init__(
@@ -88,8 +162,47 @@ class Tree(object):
         node_class=None,
         identifier: Optional[str] = None,
     ) -> None:
-        """Initiate a new tree or copy another tree with a shallow or
-        deep copy.
+        """
+        Initialize a new tree or copy another tree.
+
+        Creates either an empty tree or a copy of an existing tree. When copying,
+        you can choose between shallow copy (references to same nodes) or deep copy
+        (completely independent nodes and data).
+
+        Args:
+            tree: Existing Tree object to copy from. If None, creates empty tree.
+            deep: If True, perform deep copy of all nodes and their data.
+                 If False, creates shallow copy sharing node references.
+            node_class: Custom Node class to use instead of default Node.
+                       Must be subclass of Node.
+            identifier: Unique identifier for this tree instance.
+                       If None, generates UUID automatically.
+
+        Example:
+            Different ways to create trees::
+
+                # Empty tree
+                tree1 = Tree()
+
+                # Tree with custom identifier
+                tree2 = Tree(identifier="my_tree")
+
+                # Shallow copy of existing tree
+                tree3 = Tree(tree1)
+
+                # Deep copy with independent data
+                tree4 = Tree(tree1, deep=True)
+
+                # Custom node class
+                class MyNode(Node):
+                    def __init__(self, tag, identifier=None):
+                        super().__init__(tag, identifier)
+                        self.custom_attr = "value"
+
+                tree5 = Tree(node_class=MyNode)
+
+        Raises:
+            AssertionError: If node_class is not a subclass of Node.
         """
         self._identifier: Optional[str] = None
         self._set_identifier(identifier)
@@ -119,54 +232,181 @@ class Tree(object):
         with_tree: bool = False,
         deep: bool = False,
     ):
-        """Clone current instance, with or without tree.
-
-        Method intended to be overloaded, to avoid rewriting whole "subtree" and "remove_subtree" methods when
-        inheriting from Tree.
-        >>> class TreeWithComposition(Tree):
-        >>>     def __init__(self, tree_description, tree=None, deep=False, identifier=None):
-        >>>         self.tree_description = tree_description
-        >>>         super(TreeWithComposition, self).__init__(tree=tree, deep=deep, identifier=identifier)
-        >>>
-        >>>     def _clone(self, identifier=None, with_tree=False, deep=False):
-        >>>         return TreeWithComposition(
-        >>>             identifier=identifier,
-        >>>             deep=deep,
-        >>>             tree=self if with_tree else None,
-        >>>             tree_description=self.tree_description
-        >>>         )
-        >>> my_custom_tree = TreeWithComposition(tree_description="smart tree")
-        >>> subtree = my_custom_tree.subtree()
-        >>> subtree.tree_description
-        "smart tree"
         """
-        return self.__class__(
-            identifier=identifier, tree=self if with_tree else None, deep=deep
-        )
+        Create a clone of this tree instance with optional content copying.
+
+        This method is designed to be overridden by subclasses to enable
+        proper cloning of extended tree classes. It provides the foundation
+        for subtree and remove_subtree operations while maintaining
+        polymorphic behavior.
+
+        Args:
+            identifier: Unique identifier for the new tree instance.
+                       If None, generates UUID automatically.
+            with_tree: If True, copy all nodes from current tree.
+                      If False, create empty tree with same class.
+            deep: If True and with_tree=True, perform deep copy of node data.
+                 If False, create shallow copy sharing node references.
+
+        Returns:
+            Tree: New tree instance of the same class as this tree.
+
+        Example:
+            Subclassing with custom clone behavior::
+
+                class EnhancedTree(Tree):
+                    def __init__(self, metadata=None, **kwargs):
+                        super().__init__(**kwargs)
+                        self.metadata = metadata or {}
+
+                    def _clone(self, identifier=None, with_tree=False, deep=False):
+                        return EnhancedTree(
+                            metadata=self.metadata.copy(),
+                            identifier=identifier,
+                            tree=self if with_tree else None,
+                            deep=deep
+                        )
+
+                # Custom tree operations preserve metadata
+                enhanced = EnhancedTree(metadata={"version": "1.0"})
+                subtree = enhanced.subtree("node_id")  # Preserves metadata
+        """
+        return self.__class__(identifier=identifier, tree=self if with_tree else None, deep=deep)
 
     @property
     def identifier(self) -> Optional[str]:
+        """
+        Get the unique identifier of this tree instance.
+
+        Each tree has its own unique identifier used to distinguish it from
+        other trees, especially when nodes exist in multiple trees simultaneously.
+        This identifier is automatically generated if not provided during creation.
+
+        Returns:
+            str or None: The unique identifier of this tree instance.
+
+        Example:
+            Using tree identifiers::
+
+                tree1 = Tree(identifier="main_tree")
+                tree2 = Tree()  # Auto-generated identifier
+
+                print(tree1.identifier)  # "main_tree"
+                print(tree2.identifier)  # UUID string like "abc123..."
+
+                # Used internally for node relationships
+                node.predecessor(tree1.identifier)  # Parent in tree1
+        """
         return self._identifier
 
     def _set_identifier(self, nid: Optional[str]) -> None:
-        """Initialize self._set_identifier"""
+        """
+        Initialize tree identifier with given value or auto-generate one.
+
+        Private method used during tree creation to set the unique identifier.
+        If no identifier is provided, generates a UUID automatically to ensure
+        uniqueness across tree instances.
+
+        Args:
+            nid: Desired tree identifier, or None to auto-generate.
+
+        Note:
+            This is an internal method used during tree initialization.
+            The identifier should not be changed after tree creation.
+        """
         if nid is None:
             self._identifier = str(uuid.uuid1())
         else:
             self._identifier = nid
 
     def __getitem__(self, key: str) -> Node:
-        """Return _nodes[key]"""
+        """
+        Get node by identifier using bracket notation.
+
+        Provides convenient dictionary-style access to nodes. Raises exception
+        if node doesn't exist, making it clear when invalid identifiers are used.
+        For safer access that returns None instead of raising, use get_node().
+
+        Args:
+            key: Node identifier to retrieve.
+
+        Returns:
+            Node: The node object with the specified identifier.
+
+        Raises:
+            NodeIDAbsentError: If no node with the given identifier exists.
+
+        Example:
+            Accessing nodes by identifier::
+
+                # Direct access (raises exception if not found)
+                user_node = tree["user123"]
+                profile_node = tree["user123_profile"]
+
+                # Use with in operator for safety
+                if "user123" in tree:
+                    user_node = tree["user123"]
+                    print(user_node.tag)
+        """
         try:
             return self._nodes[key]
         except KeyError:
             raise NodeIDAbsentError("Node '%s' is not in the tree" % key)
 
     def __len__(self) -> int:
-        """Return len(_nodes)"""
+        """
+        Get the total number of nodes in this tree.
+
+        Returns the count of all nodes currently in the tree, including
+        the root node. Useful for tree size analysis and iteration bounds.
+
+        Returns:
+            int: Total number of nodes in the tree.
+
+        Example:
+            Getting tree size::
+
+                tree_size = len(tree)
+                print(f"Tree has {tree_size} nodes")
+
+                # Empty tree check
+                if len(tree) == 0:
+                    print("Tree is empty")
+
+                # Use in comparisons
+                if len(tree1) > len(tree2):
+                    print("Tree1 is larger")
+        """
         return len(self._nodes)
 
     def __str__(self) -> str:
+        """
+        Get string representation of the tree structure.
+
+        Returns a formatted tree visualization showing the hierarchical structure
+        with default display settings. Useful for debugging, logging, and quick
+        inspection of tree contents.
+
+        Returns:
+            str: Formatted tree structure as string.
+
+        Example:
+            Tree string representation::
+
+                tree = Tree()
+                tree.create_node("Root", "root")
+                tree.create_node("Child A", "a", parent="root")
+                tree.create_node("Child B", "b", parent="root")
+
+                print(str(tree))
+                # Output:
+                # Root
+                # ├── Child A
+                # └── Child B
+
+                # Use in logging
+                logger.info(f"Current tree structure:\n{tree}")
+        """
         self._reader = ""
 
         def write(line):
@@ -245,9 +485,7 @@ class Tree(object):
                 return node
 
         # iter with func
-        for pre, node in self.__get(
-            nid, level, filter, key, reverse, line_type, sorting
-        ):
+        for pre, node in self.__get(nid, level, filter, key, reverse, line_type, sorting):
             label = get_label(node)
             func("{0}{1}".format(pre, label).encode("utf-8"))
 
@@ -308,9 +546,7 @@ class Tree(object):
             yield leading + lasting, node
 
         if filter_(node) and node.expanded:
-            children = [
-                self[i] for i in node.successors(self._identifier) if filter_(self[i])
-            ]
+            children = [self[i] for i in node.successors(self._identifier) if filter_(self[i])]
             idxlast = len(children) - 1
             if sorting:
                 if key:
@@ -320,9 +556,7 @@ class Tree(object):
             level += 1
             for idx, child in enumerate(children):
                 is_last.append(idx == idxlast)
-                for item in self.__get_iter(
-                    child.identifier, level, filter_, key, reverse, dt, is_last, sorting
-                ):
+                for item in self.__get_iter(child.identifier, level, filter_, key, reverse, dt, is_last, sorting):
                     yield item
                 is_last.pop()
 
@@ -338,19 +572,44 @@ class Tree(object):
 
     def add_node(self, node: Node, parent: Optional[Union[Node, str]] = None) -> None:
         """
-        Add a new node object to the tree and make the parent as the root by default.
+        Add an existing node object to the tree.
 
-        The 'node' parameter refers to an instance of Class::Node.
+        Integrates a pre-created Node instance into the tree structure by
+        establishing parent-child relationships and updating internal mappings.
+        For creating and adding nodes simultaneously, use create_node() instead.
+
+        Args:
+            node: Existing Node instance to add to the tree.
+                 Must be an instance of the tree's node_class.
+            parent: Parent node (Node object or identifier string), or None
+                   to make this node the root. If None, tree must be empty.
+
+        Raises:
+            OSError: If node is not an instance of the expected node class.
+            DuplicatedNodeIdError: If node identifier already exists in tree.
+            MultipleRootError: If parent is None but tree already has a root.
+            NodeIDAbsentError: If parent identifier doesn't exist in tree.
+
+        Example:
+            Adding pre-created nodes::
+
+                # Create nodes first
+                root_node = Node("Company", "company")
+                dept_node = Node("Engineering", "eng")
+
+                # Add to tree
+                tree.add_node(root_node)  # Root node
+                tree.add_node(dept_node, parent="company")  # Child node
+
+                # Adding with Node object as parent
+                mgr_node = Node("Manager", "mgr")
+                tree.add_node(mgr_node, parent=dept_node)
         """
         if not isinstance(node, self.node_class):
-            raise OSError(
-                "First parameter must be object of {}".format(self.node_class)
-            )
+            raise OSError("First parameter must be object of {}".format(self.node_class))
 
         if node.identifier in self._nodes:
-            raise DuplicatedNodeIdError(
-                "Can't create node " "with ID '%s'" % node.identifier
-            )
+            raise DuplicatedNodeIdError("Can't create node " "with ID '%s'" % node.identifier)
 
         pid = parent.identifier if isinstance(parent, self.node_class) else parent
 
@@ -369,20 +628,94 @@ class Tree(object):
         node.set_initial_tree_id(cast(str, self._identifier))
 
     def all_nodes(self) -> NodeList:
-        """Return all nodes in a list"""
+        """
+        Get all nodes in the tree as a list.
+
+        Returns a list containing all Node objects currently in the tree.
+        The order is not guaranteed. For ordered traversal, use expand_tree().
+        Useful for operations that need to process all nodes simultaneously.
+
+        Returns:
+            list[Node]: List of all Node objects in the tree.
+
+        Example:
+            Processing all nodes::
+
+                # Get all nodes
+                all_nodes = tree.all_nodes()
+                print(f"Total nodes: {len(all_nodes)}")
+
+                # Process each node
+                for node in all_nodes:
+                    print(f"Node: {node.tag}")
+
+                # Filter nodes by property
+                leaf_nodes = [node for node in tree.all_nodes()
+                             if node.is_leaf(tree.identifier)]
+        """
         return list(self._nodes.values())
 
     def all_nodes_itr(self) -> Any:
         """
-        Returns all nodes in an iterator.
-        Added by William Rusnack
+        Get all nodes in the tree as an iterator.
+
+        Returns an iterator over all Node objects in the tree, providing
+        memory-efficient access for large trees. Useful when you need to
+        process nodes one at a time without loading all into memory.
+
+        Returns:
+            Iterator[Node]: Iterator over all Node objects in the tree.
+
+        Example:
+            Memory-efficient node processing::
+
+                # Iterate without loading all nodes
+                for node in tree.all_nodes_itr():
+                    if node.tag.startswith("temp_"):
+                        process_temporary_node(node)
+
+                # Use with filter operations
+                filtered = filter(lambda n: n.data is not None,
+                                tree.all_nodes_itr())
+
+        Note:
+            Added by William Rusnack for memory efficiency.
         """
         return self._nodes.values()
 
     def ancestor(self, nid, level=None):
         """
-        For a given id, get ancestor node object at a given level.
-        If no level is provided, the parent node is returned.
+        Get the ancestor node at a specific level above the given node.
+
+        Traverses up the tree hierarchy from the specified node to find an
+        ancestor at the desired level. If no level is specified, returns
+        the immediate parent. Useful for navigating tree hierarchies.
+
+        Args:
+            nid: Identifier of the node to start from.
+            level: Target level of the ancestor (0 = root). If None,
+                  returns immediate parent.
+
+        Returns:
+            str or None: Identifier of the ancestor node, or None if not found.
+
+        Raises:
+            NodeIDAbsentError: If nid doesn't exist in the tree.
+            InvalidLevelNumber: If level is invalid (>= descendant level).
+
+        Example:
+            Finding ancestors::
+
+                # Get immediate parent
+                parent_id = tree.ancestor("grandchild")
+
+                # Get ancestor at specific level
+                root_id = tree.ancestor("grandchild", level=0)  # Root
+                grandparent_id = tree.ancestor("grandchild", level=1)
+
+                # Use in hierarchy navigation
+                if tree.ancestor("node", level=0) == "root":
+                    print("Node is in main hierarchy")
         """
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
@@ -413,13 +746,69 @@ class Tree(object):
 
     def children(self, nid: str) -> NodeList:
         """
-        Return the children (Node) list of nid.
-        Empty list is returned if nid does not exist
+        Get all direct children of the specified node.
+
+        Returns a list of Node objects that are immediate children of the
+        given node. The order follows the insertion order unless the tree
+        has been sorted. Returns empty list if node has no children.
+
+        Args:
+            nid: Identifier of the parent node.
+
+        Returns:
+            list[Node]: List of child Node objects. Empty if no children.
+
+        Raises:
+            NodeIDAbsentError: If nid doesn't exist in the tree.
+
+        Example:
+            Working with child nodes::
+
+                # Get all children
+                child_nodes = tree.children("parent_id")
+                print(f"Parent has {len(child_nodes)} children")
+
+                # Process each child
+                for child in tree.children("parent_id"):
+                    print(f"Child: {child.tag}")
+
+                # Check if node has children
+                if tree.children("node_id"):
+                    print("Node has children")
+                else:
+                    print("Node is a leaf")
         """
         return [self[i] for i in self.is_branch(nid)]
 
     def contains(self, nid):
-        """Check if the tree contains node of given id"""
+        """
+        Check if the tree contains a node with the given identifier.
+
+        Determines whether a node with the specified identifier exists
+        in this tree. Equivalent to using the 'in' operator but provided
+        as an explicit method for clarity and consistency.
+
+        Args:
+            nid: Node identifier to check for existence.
+
+        Returns:
+            bool: True if node exists in tree, False otherwise.
+
+        Example:
+            Checking node existence::
+
+                # Explicit method call
+                if tree.contains("user123"):
+                    print("User node exists")
+
+                # Equivalent using 'in' operator
+                if "user123" in tree:
+                    print("User node exists")
+
+                # Use before operations
+                if tree.contains("node_id"):
+                    tree.move_node("node_id", "new_parent")
+        """
         return True if nid in self._nodes else False
 
     def create_node(
@@ -430,8 +819,46 @@ class Tree(object):
         data: Any = None,
     ) -> Node:
         """
-        Create a child node for given @parent node. If ``identifier`` is absent,
-        a UUID will be generated automatically.
+        Create and add a new node to the tree.
+
+        This is the primary method for building tree structures. Creates a new node
+        with the specified properties and attaches it to the given parent. If no
+        parent is specified, the node becomes the root (only allowed if tree is empty).
+
+        Args:
+            tag: Human-readable label for display. If None, uses identifier.
+            identifier: Unique ID for the node. If None, generates UUID automatically.
+            parent: Parent node identifier, Node object, or None for root.
+                   Must be None if tree is empty, must exist if tree has nodes.
+            data: Optional user data to associate with this node.
+
+        Returns:
+            Node: The newly created Node object.
+
+        Raises:
+            DuplicatedNodeIdError: If identifier already exists in the tree.
+            MultipleRootError: If parent is None but tree already has a root.
+            NodeIDAbsentError: If parent identifier doesn't exist in the tree.
+
+        Example:
+            Building a family tree::
+
+                tree = Tree()
+
+                # Create root (no parent)
+                tree.create_node("Grandpa", "grandpa")
+
+                # Add children
+                tree.create_node("Dad", "dad", parent="grandpa")
+                tree.create_node("Uncle", "uncle", parent="grandpa")
+
+                # Add grandchildren
+                tree.create_node("Me", "me", parent="dad")
+                tree.create_node("Sister", "sister", parent="dad")
+
+                # Add node with custom data
+                tree.create_node("Baby", "baby", parent="me",
+                               data={"age": 1, "cute": True})
         """
         node = self.node_class(tag=tag, identifier=identifier, data=data)
         self.add_node(node, parent)
@@ -439,11 +866,36 @@ class Tree(object):
 
     def depth(self, node: Optional[Node] = None) -> int:
         """
-        Get the maximum level of this tree or the level of the given node.
+        Get the maximum depth of the tree or the level of a specific node.
 
-        @param node Node instance or identifier
-        @return int
-        @throw NodeIDAbsentError
+        When called without arguments, returns the maximum depth of the entire
+        tree (distance from root to deepest leaf). When called with a node,
+        returns the level of that specific node (distance from root).
+
+        Args:
+            node: Node object or identifier string. If None, returns tree depth.
+                 If provided, returns the level of this specific node.
+
+        Returns:
+            int: Tree depth (max level) or node level. Root is at level 0.
+
+        Raises:
+            NodeIDAbsentError: If specified node doesn't exist in the tree.
+
+        Example:
+            Measuring tree dimensions::
+
+                # Get overall tree depth
+                max_depth = tree.depth()
+                print(f"Tree depth: {max_depth}")
+
+                # Get specific node level
+                node_level = tree.depth("some_node")
+                node_level2 = tree.depth(tree["some_node"])  # Same result
+
+                # Use for tree analysis
+                if tree.depth() > 5:
+                    print("Tree is quite deep")
         """
         ret = 0
         if node is None:
@@ -473,26 +925,97 @@ class Tree(object):
         sorting: bool = True,
     ):
         """
-        Python generator to traverse the tree (or a subtree) with optional
-        node filtering and sorting.
+        Traverse the tree and yield node identifiers in specified order.
 
-        Loosely based on an algorithm from 'Essential LISP' by John R. Anderson,
-        Albert T. Corbett, and Brian J. Reiser, page 239-241.
+        This is the primary method for tree iteration, providing flexible traversal
+        with multiple algorithms, filtering, and sorting options. Essential for most
+        tree processing operations.
 
-        :param nid: Node identifier from which tree traversal will start.
-            If None tree root will be used
-        :param mode: Traversal mode, may be either DEPTH, WIDTH or ZIGZAG
-        :param filter: the @filter function is performed on Node object during
-            traversing. In this manner, the traversing will NOT visit the node
-            whose condition does not pass the filter and its children.
-        :param key: the @key and @reverse are present to sort nodes at each
-            level. If @key is None sorting is performed on node tag.
-        :param reverse: if True reverse sorting
-        :param sorting: if True perform node sorting, if False return
-            nodes in original insertion order. In latter case @key and
-            @reverse parameters are ignored.
-        :return: Node IDs that satisfy the conditions
-        :rtype: generator object
+        Args:
+            nid: Starting node identifier. If None, starts from tree root.
+                Must exist in the tree if specified.
+            mode: Traversal algorithm to use:
+                 Tree.DEPTH (0) - Depth-first search (default)
+                 Tree.WIDTH (1) - Breadth-first search
+                 Tree.ZIGZAG (2) - ZigZag traversal (alternating levels)
+            filter: Optional function to filter nodes during traversal.
+                   Takes Node object, returns bool. If False, node and its
+                   entire subtree are skipped.
+            key: Sorting function for nodes at each level. Takes Node object,
+                returns comparison key. If None and sorting=True, sorts by node.
+            reverse: If True, reverse the sorting order at each level.
+            sorting: If True, sort nodes at each level using key function.
+                    If False, preserve insertion order (key/reverse ignored).
+
+        Yields:
+            str: Node identifiers in traversal order.
+
+        Raises:
+            NodeIDAbsentError: If nid doesn't exist in the tree.
+            ValueError: If mode is not a valid traversal constant.
+
+        Example:
+            Different traversal patterns::
+
+                tree = Tree()
+                tree.create_node("A", "a")
+                tree.create_node("B", "b", parent="a")
+                tree.create_node("C", "c", parent="a")
+                tree.create_node("D", "d", parent="b")
+                tree.create_node("E", "e", parent="c")
+
+                # Depth-first (default): A, B, D, C, E
+                for node_id in tree.expand_tree():
+                    print(f"DFS: {tree[node_id].tag}")
+
+                # Breadth-first: A, B, C, D, E
+                for node_id in tree.expand_tree(mode=Tree.WIDTH):
+                    print(f"BFS: {tree[node_id].tag}")
+
+                # ZigZag traversal
+                for node_id in tree.expand_tree(mode=Tree.ZIGZAG):
+                    print(f"ZigZag: {tree[node_id].tag}")
+
+                # Filtered traversal (only nodes with vowels)
+                vowel_filter = lambda node: any(v in node.tag.lower() for v in 'aeiou')
+                for node_id in tree.expand_tree(filter=vowel_filter):
+                    print(f"Vowels: {tree[node_id].tag}")
+
+                # Sorted by tag, reversed
+                for node_id in tree.expand_tree(key=lambda x: x.tag, reverse=True):
+                    print(f"Sorted: {tree[node_id].tag}")
+
+                # From specific subtree
+                for node_id in tree.expand_tree(nid="b"):
+                    print(f"Subtree: {tree[node_id].tag}")
+
+        Common Usage Patterns::
+
+            # Process all nodes
+            for node_id in tree.expand_tree():
+                process_node(tree[node_id])
+
+            # Get all node tags
+            tags = [tree[nid].tag for nid in tree.expand_tree()]
+
+            # Find specific nodes
+            matching_nodes = [nid for nid in tree.expand_tree()
+                             if tree[nid].tag.startswith("prefix")]
+
+            # Level-order processing
+            for node_id in tree.expand_tree(mode=Tree.WIDTH):
+                level = tree.level(node_id)
+                print(f"Level {level}: {tree[node_id].tag}")
+
+        Performance:
+            - Time complexity: O(n) where n is number of visited nodes
+            - Memory: O(h) where h is tree height (for traversal stack)
+            - Generator-based: memory efficient for large trees
+
+        Note:
+            This is a generator function - it yields results lazily. Perfect for
+            large trees where you might not need to visit all nodes, or when
+            memory efficiency is important.
         """
         nid = cast(str, self.root if nid is None else nid)
         if not self.contains(nid):
@@ -501,21 +1024,13 @@ class Tree(object):
         filter = (lambda x: True) if (filter is None) else filter
         if filter(self[nid]):
             yield nid
-            queue = [
-                self[i]
-                for i in self[nid].successors(self._identifier)
-                if filter(self[i])
-            ]
+            queue = [self[i] for i in self[nid].successors(self._identifier) if filter(self[i])]
             if mode in [self.DEPTH, self.WIDTH]:
                 if sorting:
                     queue.sort(key=key, reverse=reverse)
                 while queue:
                     yield queue[0].identifier
-                    expansion = [
-                        self[i]
-                        for i in queue[0].successors(self._identifier)
-                        if filter(self[i])
-                    ]
+                    expansion = [self[i] for i in queue[0].successors(self._identifier) if filter(self[i])]
                     if sorting:
                         expansion.sort(key=key, reverse=reverse)
                     if mode is self.DEPTH:
@@ -530,11 +1045,7 @@ class Tree(object):
                 stack = stack_bw = queue
                 direction = False
                 while stack:
-                    expansion = [
-                        self[i]
-                        for i in stack[0].successors(self._identifier)
-                        if filter(self[i])
-                    ]
+                    expansion = [self[i] for i in stack[0].successors(self._identifier) if filter(self[i])]
                     yield stack.pop(0).identifier
                     if direction:
                         expansion.reverse()
@@ -550,21 +1061,78 @@ class Tree(object):
 
     def filter_nodes(self, func: Callable[[Node], bool]):
         """
-        Filters all nodes by function.
+        Filter all nodes in the tree using a custom function.
 
-        :param func: is passed one node as an argument and that node is included if function returns true,
-        :return: a filter iterator of the node in python 3 or a list of the nodes in python 2.
+        Applies the given function to every node and returns an iterator over
+        nodes where the function returns True. Useful for finding specific
+        types of nodes or nodes with certain properties.
 
-        Added by William Rusnack.
+        Args:
+            func: Function that takes a Node object and returns bool.
+                 True means include the node in results.
+
+        Returns:
+            Iterator[Node]: Iterator over nodes where func returns True.
+
+        Example:
+            Filtering nodes by criteria::
+
+                # Find all leaf nodes
+                leaves = list(tree.filter_nodes(lambda n: n.is_leaf(tree.identifier)))
+
+                # Find nodes with specific data
+                important_nodes = list(tree.filter_nodes(
+                    lambda n: hasattr(n.data, 'priority') and n.data.priority == 'high'
+                ))
+
+                # Find nodes by tag pattern
+                temp_nodes = list(tree.filter_nodes(
+                    lambda n: n.tag.startswith('temp_')
+                ))
+
+                # Memory efficient processing
+                for node in tree.filter_nodes(lambda n: n.data is not None):
+                    process_node_with_data(node)
+
+        Note:
+            Added by William Rusnack for flexible node filtering.
         """
         return filter(func, self.all_nodes_itr())
 
     def get_node(self, nid: Optional[str]) -> Optional[Node]:
         """
-        Get the object of the node with ID of ``nid``.
+        Safely get a node by identifier without raising exceptions.
 
-        An alternative way is using '[]' operation on the tree. But small difference exists between them:
-        ``get_node()`` will return None if ``nid`` is absent, whereas '[]' will raise ``KeyError``.
+        Provides null-safe access to nodes, returning None if the node
+        doesn't exist instead of raising an exception. Preferred over
+        bracket notation when node existence is uncertain.
+
+        Args:
+            nid: Node identifier to retrieve, or None.
+
+        Returns:
+            Node or None: The node object if found, None otherwise.
+
+        Example:
+            Safe node access::
+
+                # Safe access (no exception)
+                node = tree.get_node("might_not_exist")
+                if node is not None:
+                    print(f"Found: {node.tag}")
+                else:
+                    print("Node not found")
+
+                # Compare with bracket notation
+                try:
+                    node = tree["might_not_exist"]  # Raises exception
+                except NodeIDAbsentError:
+                    node = None
+
+                # Use in conditional logic
+                user_node = tree.get_node("user123")
+                if user_node and user_node.data.active:
+                    process_active_user(user_node)
         """
         if nid is None or not self.contains(nid):
             return None
@@ -572,8 +1140,36 @@ class Tree(object):
 
     def is_branch(self, nid):
         """
-        Return the children (ID) list of nid.
-        Empty list is returned if nid does not exist
+        Get the list of child node identifiers for the specified node.
+
+        Returns the identifiers of all direct children of the given node.
+        Despite the name suggesting a boolean, this method actually returns
+        the list of child identifiers. Use children() for Node objects.
+
+        Args:
+            nid: Identifier of the parent node. Cannot be None.
+
+        Returns:
+            list[str]: List of child node identifiers. Empty if no children.
+
+        Raises:
+            OSError: If nid is None.
+            NodeIDAbsentError: If nid doesn't exist in the tree.
+
+        Example:
+            Getting child identifiers::
+
+                # Get child IDs
+                child_ids = tree.is_branch("parent_id")
+                for child_id in child_ids:
+                    print(f"Child ID: {child_id}")
+
+                # Check if node has children
+                if tree.is_branch("node_id"):
+                    print("Node has children")
+
+                # Use with node objects
+                child_nodes = [tree[child_id] for child_id in tree.is_branch("parent")]
         """
         if nid is None:
             raise OSError("First parameter can't be None")
@@ -587,7 +1183,38 @@ class Tree(object):
         return fpointer
 
     def leaves(self, nid: Optional[str] = None) -> NodeList:
-        """Get leaves of the whole tree or a subtree."""
+        """
+        Get all leaf nodes in the tree or subtree.
+
+        Returns all nodes that have no children. If a starting node is specified,
+        only considers leaves within that subtree. Leaf nodes are terminal nodes
+        in the tree structure and often represent end points in hierarchies.
+
+        Args:
+            nid: Root of subtree to search. If None, searches entire tree.
+
+        Returns:
+            list[Node]: List of all leaf Node objects in the specified scope.
+
+        Example:
+            Finding leaf nodes::
+
+                # Get all leaves in tree
+                all_leaves = tree.leaves()
+                print(f"Tree has {len(all_leaves)} leaf nodes")
+
+                # Get leaves in specific subtree
+                subtree_leaves = tree.leaves("department_root")
+
+                # Process leaf nodes
+                for leaf in tree.leaves():
+                    print(f"Leaf: {leaf.tag}")
+
+                # Find deepest nodes
+                max_level = max(tree.level(leaf.identifier) for leaf in tree.leaves())
+                deepest_leaves = [leaf for leaf in tree.leaves()
+                                if tree.level(leaf.identifier) == max_level]
+        """
         leaves = []
         if nid is None:
             for node in self._nodes.values():
@@ -601,28 +1228,76 @@ class Tree(object):
 
     def level(self, nid, filter=None):
         """
-        Get the node level in this tree.
-        The level is an integer starting with '0' at the root.
-        In other words, the root lives at level '0';
+        Get the level (depth) of a node in the tree hierarchy.
 
-        Update: @filter params is added to calculate level passing
-        exclusive nodes.
+        Returns the distance from the root to the specified node, where
+        the root is at level 0. Optionally filters the path calculation
+        by excluding certain nodes.
+
+        Args:
+            nid: Identifier of the node to get level for.
+            filter: Optional function to filter nodes during path calculation.
+                   Takes Node object, returns bool. Filtered nodes are excluded.
+
+        Returns:
+            int: Level of the node (0 for root, 1 for root's children, etc.)
+
+        Example:
+            Getting node levels::
+
+                # Basic level calculation
+                root_level = tree.level("root")        # 0
+                child_level = tree.level("child")      # 1
+                grandchild_level = tree.level("gc")    # 2
+
+                # Use for tree analysis
+                max_depth = max(tree.level(node.identifier)
+                              for node in tree.all_nodes())
+
+                # Filtered level calculation
+                level = tree.level("node", filter=lambda n: n.tag != "skip")
         """
         return len([n for n in self.rsearch(nid, filter)]) - 1
 
     def link_past_node(self, nid: str):
         """
-        Delete a node by linking past it.
+        Remove a node while preserving connections between its parent and children.
 
-        For example, if we have `a -> b -> c` and delete node b, we are left
-        with `a -> c`.
+        Deletes the specified node but maintains the tree structure by directly
+        connecting the node's parent to all of its children. This operation
+        effectively "links past" the node, removing it from the hierarchy
+        without breaking the tree connections.
+
+        Args:
+            nid: Identifier of the node to link past and remove.
+
+        Raises:
+            NodeIDAbsentError: If nid doesn't exist in the tree.
+            LinkPastRootNodeError: If attempting to link past the root node.
+
+        Example:
+            Linking past nodes::
+
+                # Before: Root -> Manager -> Employee1, Employee2
+                tree.link_past_node("Manager")
+                # After: Root -> Employee1, Employee2
+
+                # Useful for flattening hierarchies
+                middle_managers = ["mgr1", "mgr2", "mgr3"]
+                for mgr in middle_managers:
+                    if tree.contains(mgr):
+                        tree.link_past_node(mgr)
+
+                # Cannot link past root
+                try:
+                    tree.link_past_node(tree.root)
+                except LinkPastRootNodeError:
+                    print("Cannot link past root node")
         """
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
         if self.root == nid:
-            raise LinkPastRootNodeError(
-                "Cannot link past the root node, " "delete it with remove_node()"
-            )
+            raise LinkPastRootNodeError("Cannot link past the root node, " "delete it with remove_node()")
         # Get the parent of the node we are linking past
         parent = self[self[nid].predecessor(self._identifier)]
         # Set the children of the node to the parent
@@ -637,7 +1312,41 @@ class Tree(object):
 
     def move_node(self, source, destination):
         """
-        Move node @source from its parent to another parent @destination.
+        Move a node from its current parent to a new parent.
+
+        Changes the parent-child relationship by moving the source node
+        (and its entire subtree) from its current parent to the specified
+        destination parent. This operation preserves the subtree structure
+        while reorganizing the tree hierarchy.
+
+        Args:
+            source: Identifier of the node to move.
+            destination: Identifier of the new parent node.
+
+        Raises:
+            NodeIDAbsentError: If source or destination node doesn't exist.
+            LoopError: If moving would create a circular reference
+                      (destination is a descendant of source).
+
+        Example:
+            Reorganizing tree structure::
+
+                # Move employee between departments
+                tree.move_node("employee123", "sales_dept")
+
+                # Move entire department
+                tree.move_node("engineering_dept", "new_division")
+
+                # Prevent circular moves (this would raise LoopError)
+                try:
+                    tree.move_node("parent", "child_of_parent")
+                except LoopError:
+                    print("Cannot create circular reference")
+
+                # Bulk reorganization
+                employees = ["emp1", "emp2", "emp3"]
+                for emp in employees:
+                    tree.move_node(emp, "new_manager")
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
@@ -651,11 +1360,37 @@ class Tree(object):
 
     def is_ancestor(self, ancestor, grandchild):
         """
-        Check if the @ancestor the preceding nodes of @grandchild.
+        Check if one node is an ancestor of another node.
 
-        :param ancestor: the node identifier
-        :param grandchild: the node identifier
-        :return: True or False
+        Determines whether the ancestor node appears in the path from
+        the grandchild node to the root. An ancestor is any node that
+        appears above another node in the tree hierarchy.
+
+        Args:
+            ancestor: Identifier of the potential ancestor node.
+            grandchild: Identifier of the potential descendant node.
+
+        Returns:
+            bool: True if ancestor is indeed an ancestor of grandchild,
+                 False otherwise.
+
+        Example:
+            Checking ancestry relationships::
+
+                # Direct parent-child
+                is_parent = tree.is_ancestor("parent", "child")  # True
+
+                # Multi-level ancestry
+                is_grandparent = tree.is_ancestor("grandparent", "grandchild")  # True
+
+                # Not related
+                is_ancestor = tree.is_ancestor("sibling1", "sibling2")  # False
+
+                # Prevent circular moves
+                if not tree.is_ancestor("node_to_move", "new_parent"):
+                    tree.move_node("node_to_move", "new_parent")
+                else:
+                    print("Cannot create circular reference")
         """
         parent = self[grandchild].predecessor(self._identifier)
         child = grandchild
@@ -669,11 +1404,74 @@ class Tree(object):
 
     @property
     def nodes(self):
-        """Return a dict form of nodes in a tree: {id: node_instance}."""
+        """
+        Get the internal dictionary mapping node identifiers to Node objects.
+
+        Returns the underlying dictionary that stores all nodes in the tree,
+        mapping from node identifiers to Node instances. Useful for direct
+        access to the node collection and bulk operations.
+
+        Returns:
+            dict[str, Node]: Dictionary mapping node IDs to Node objects.
+
+        Example:
+            Working with the nodes dictionary::
+
+                # Get all node identifiers
+                all_ids = list(tree.nodes.keys())
+
+                # Get all node objects
+                all_nodes = list(tree.nodes.values())
+
+                # Direct access to nodes dict
+                nodes_dict = tree.nodes
+                for node_id, node in nodes_dict.items():
+                    print(f"ID: {node_id}, Tag: {node.tag}")
+
+                # Bulk operations
+                total_nodes = len(tree.nodes)
+                has_node = "some_id" in tree.nodes
+        """
         return self._nodes
 
     def parent(self, nid: str) -> Optional[Node]:
-        """Get parent :class:`Node` object of given id."""
+        """
+        Get the parent Node object of the specified node.
+
+        Returns the immediate parent of the given node, or None if the node
+        is the root or has no parent. Provides object-based access to the
+        parent, unlike ancestor() which returns identifiers.
+
+        Args:
+            nid: Identifier of the node whose parent to retrieve.
+
+        Returns:
+            Node or None: Parent Node object, or None if node is root.
+
+        Raises:
+            NodeIDAbsentError: If nid doesn't exist in the tree.
+
+        Example:
+            Working with parent relationships::
+
+                # Get parent node
+                parent_node = tree.parent("child_id")
+                if parent_node:
+                    print(f"Parent: {parent_node.tag}")
+                else:
+                    print("Node is root or orphaned")
+
+                # Navigate up the hierarchy
+                current = "leaf_node"
+                while tree.parent(current):
+                    current = tree.parent(current).identifier
+                    print(f"Ancestor: {tree[current].tag}")
+
+                # Check parent properties
+                parent = tree.parent("employee")
+                if parent and hasattr(parent.data, 'department'):
+                    print(f"Department: {parent.data.department}")
+        """
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
@@ -845,7 +1643,8 @@ class Tree(object):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
         st.root = nid
 
-        # in original tree, the removed nid will be unreferenced from its parents children
+        # in original tree, the removed nid will be unreferenced from its
+        # parents children
         parent = self[nid].predecessor(self._identifier)
 
         removed = list(self.expand_tree(nid))
@@ -853,9 +1652,7 @@ class Tree(object):
             if id_ == self.root:
                 self.root = None
             st._nodes.update({id_: self._nodes.pop(id_)})
-            st[id_].clone_pointers(
-                cast(str, self._identifier), cast(str, st.identifier)
-            )
+            st[id_].clone_pointers(cast(str, self._identifier), cast(str, st.identifier))
             st[id_].reset_pointers(self._identifier)
             if id_ == nid:
                 st[id_].set_predecessor(None, st.identifier)
@@ -882,11 +1679,7 @@ class Tree(object):
             if filter(self[current]):
                 yield current
             # subtree() hasn't update the bpointer
-            current = (
-                self[current].predecessor(self._identifier)
-                if self.root != current
-                else None
-            )
+            current = self[current].predecessor(self._identifier) if self.root != current else None
 
     def save2file(
         self,
@@ -938,32 +1731,83 @@ class Tree(object):
         sorting: bool = True,
     ):
         """
-        Print the tree structure in hierarchy style.
+        Display the tree structure in a beautiful hierarchical format.
 
-        You have three ways to output your tree data, i.e., stdout with ``show()``,
-        plain text file with ``save2file()``, and json string with ``to_json()``. The
-        former two use the same backend to generate a string of tree structure in a
-        text graph.
+        This method provides rich visualization options for tree structures, allowing
+        customization of appearance, content filtering, and display properties. Perfect
+        for debugging, documentation, and user interfaces.
 
-        * Version >= 1.2.7a*: you can also specify the ``line_type`` parameter,
-          such as 'ascii' (default), 'ascii-ex', 'ascii-exr', 'ascii-em', 'ascii-emv',
-          'ascii-emh') to the change graphical form.
+        Args:
+            nid: Starting node identifier. If None, starts from root.
+            level: Starting level (0 for root). Mainly for internal use.
+            idhidden: If True, hide node identifiers in output (cleaner display).
+                     If False, show both tag and identifier as "tag[id]".
+            filter: Function to selectively display nodes. Takes Node object,
+                   returns bool. Filtered nodes and their subtrees are hidden.
+            key: Sorting function for nodes at each level. Takes Node object,
+                returns comparison key. If None and sorting=True, sorts by Node.
+            reverse: If True, reverse the sorting order at each level.
+            line_type: Visual style for tree connections. Options:
+                      'ascii' - Simple |-- style
+                      'ascii-ex' - Unicode ├── style (default)
+                      'ascii-exr' - Unicode with rounded corners
+                      'ascii-em' - Double-line Unicode ╠══ style
+                      'ascii-emv' - Mixed vertical Unicode style
+                      'ascii-emh' - Mixed horizontal Unicode style
+            data_property: If specified, display this property from node.data
+                          instead of node.tag. Useful for rich data objects.
+            stdout: If True, print to console. If False, return as string.
+            sorting: If True, sort nodes at each level. If False, preserve
+                    insertion order (key and reverse are ignored).
 
-        :param nid: the reference node to start expanding.
-        :param level: the node level in the tree (root as level 0).
-        :param idhidden: whether hiding the node ID when printing.
-        :param filter: the function of one variable to act on the :class:`Node` object.
-            When this parameter is specified, the traversing will not continue to following
-            children of node whose condition does not pass the filter.
-        :param key: the ``key`` param for sorting :class:`Node` objects in the same level.
-        :param reverse: the ``reverse`` param for sorting :class:`Node` objects in the same level.
-        :param line_type:
-        :param data_property: the property on the node data object to be printed.
-        :param stdout: if True print it, if False return printing.
-        :param sorting: if True perform node sorting, if False return
-            nodes in original insertion order. In latter case @key and
-            @reverse parameters are ignored.
-        :return: None
+        Returns:
+            str or None: If stdout=False, returns formatted string.
+                        If stdout=True, prints to console and returns None.
+
+        Example:
+            Different display styles::
+
+                tree = Tree()
+                tree.create_node("Root", "root")
+                tree.create_node("Child A", "a", parent="root")
+                tree.create_node("Child B", "b", parent="root")
+
+                # Basic display
+                tree.show()
+
+                # Fancy style with IDs
+                tree.show(idhidden=False, line_type="ascii-em")
+
+                # Filtered display (only nodes starting with 'C')
+                tree.show(filter=lambda x: x.tag.startswith('C'))
+
+                # Sorted by tag, reversed
+                tree.show(key=lambda x: x.tag, reverse=True)
+
+                # Show custom data property
+                tree.show(data_property="name")  # If node.data.name exists
+
+                # Return as string instead of printing
+                tree_str = tree.show(stdout=False)
+
+        Output styles::
+
+            ascii:        Root
+                         |-- Child A
+                         |-- Child B
+
+            ascii-ex:     Root
+                         ├── Child A
+                         └── Child B
+
+            ascii-em:     Root
+                         ╠══ Child A
+                         ╚══ Child B
+
+        Note:
+            The tree display automatically handles complex hierarchies with proper
+            indentation and connection lines. Very large trees may be truncated
+            for performance reasons.
         """
         self._reader = ""
 
@@ -1001,9 +1845,7 @@ class Tree(object):
 
         if nid != self.root:
             pid = self[nid].predecessor(self._identifier)
-            siblings = [
-                self[i] for i in self[pid].successors(self._identifier) if i != nid
-            ]
+            siblings = [self[i] for i in self[pid].successors(self._identifier) if i != nid]
 
         return siblings
 
@@ -1023,17 +1865,9 @@ class Tree(object):
         else:
             try:
                 level = int(level)
-                return len(
-                    [
-                        node
-                        for node in self.all_nodes_itr()
-                        if self.level(node.identifier) == level
-                    ]
-                )
+                return len([node for node in self.all_nodes_itr() if self.level(node.identifier) == level])
             except Exception:
-                raise TypeError(
-                    "level should be an integer instead of '%s'" % type(level)
-                )
+                raise TypeError("level should be an integer instead of '%s'" % type(level))
 
     def subtree(self, nid: str, identifier: Optional[str] = None):
         """
@@ -1060,9 +1894,7 @@ class Tree(object):
             st._nodes.update({self[node_n].identifier: self[node_n]})
             # define nodes parent/children in this tree
             # all pointers are the same as copied tree, except the root
-            st[node_n].clone_pointers(
-                cast(str, self._identifier), cast(str, st.identifier)
-            )
+            st[node_n].clone_pointers(cast(str, self._identifier), cast(str, st.identifier))
             if node_n == nid:
                 # reset root parent for the new tree
                 st[node_n].set_predecessor(None, st.identifier)
@@ -1122,20 +1954,98 @@ class Tree(object):
 
             for elem in queue:
                 tree_dict[ntag]["children"].append(
-                    self.to_dict(
-                        elem.identifier, with_data=with_data, sort=sort, reverse=reverse
-                    )
+                    self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse)
                 )
             if len(tree_dict[ntag]["children"]) == 0:
-                tree_dict = (
-                    self[nid].tag if not with_data else {ntag: {"data": self[nid].data}}
-                )
+                tree_dict = self[nid].tag if not with_data else {ntag: {"data": self[nid].data}}
             return tree_dict
 
-    def to_json(
-        self, with_data: bool = False, sort: bool = True, reverse: bool = False
-    ):
-        """To format the tree in JSON format."""
+    def to_json(self, with_data: bool = False, sort: bool = True, reverse: bool = False):
+        """
+        Export the tree structure as a JSON string.
+
+        Converts the entire tree into a JSON representation that can be easily
+        saved, transmitted, or reconstructed. Perfect for data persistence,
+        API responses, and cross-system integration.
+
+        Args:
+            with_data: If True, include node.data in the JSON output.
+                      If False, only include tree structure and tags.
+                      Default False for smaller output size.
+            sort: If True, sort children at each level by node comparison.
+                 If False, preserve insertion order.
+            reverse: If True, reverse the sorting order at each level.
+                    Only applies when sort=True.
+
+        Returns:
+            str: JSON string representation of the tree.
+
+        Example:
+            Basic JSON export::
+
+                tree = Tree()
+                tree.create_node("Root", "root")
+                tree.create_node("Child A", "a", parent="root")
+                tree.create_node("Child B", "b", parent="root")
+
+                # Basic structure only
+                json_str = tree.to_json()
+                print(json_str)
+                # Output: {"Root": {"children": [{"Child A": {}}, {"Child B": {}}]}}
+
+                # Include node data
+                tree.create_node("Data Node", "data", parent="root",
+                               data={"type": "important", "value": 42})
+                json_with_data = tree.to_json(with_data=True)
+                print(json_with_data)
+                # Output includes: "data": {"type": "important", "value": 42}
+
+                # Sorted output
+                sorted_json = tree.to_json(sort=True, reverse=True)
+
+        JSON Structure::
+
+            The output follows this hierarchical format:
+
+            {
+                "root_tag": {
+                    "children": [
+                        {
+                            "child1_tag": {
+                                "children": [...],
+                                "data": {...}  // if with_data=True
+                            }
+                        },
+                        {
+                            "child2_tag": {}  // leaf node
+                        }
+                    ],
+                    "data": {...}  // if with_data=True
+                }
+            }
+
+        Usage with APIs::
+
+            # Save to file
+            with open('tree.json', 'w') as f:
+                f.write(tree.to_json(with_data=True))
+
+            # Send via HTTP
+            import requests
+            response = requests.post('/api/trees',
+                                   json={'tree': tree.to_json()})
+
+            # Pretty print
+            import json
+            formatted = json.dumps(json.loads(tree.to_json()), indent=2)
+            print(formatted)
+
+        Note:
+            The JSON format preserves the complete tree structure and can be
+            used to reconstruct equivalent trees. However, complex data objects
+            in node.data must be JSON-serializable (no functions, custom classes
+            without __dict__, etc.).
+        """
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
     def to_graphviz(

@@ -1,0 +1,17 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+You're working on **treelib**—a pure python implemented tree data structure library.
+
+## CODE OF CONDUCT
+
+- After generation, always make sure the code format and linting are performed well.
+- Always DO NOT change unrelated parts beyond user requirements.
+
+## CODE STYLE
+
+- Always perfer modularized design for each module.
+- Always consider compability for python versions declared in supported range.
