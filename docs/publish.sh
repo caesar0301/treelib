@@ -5,7 +5,7 @@ PYLIB=../treelib
 TARGET=html
 BUILT=build
 
-rm -rf $BUILD
+rm -rf $BUILT
 sphinx-apidoc -o $SOURCE $PYLIB
 make $TARGET
 touch $BUILT/$TARGET/.nojekyll
