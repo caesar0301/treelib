@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test test-coverage lint autofix autofix-imports autofix-pep8 autofix-unused format format-check clean build docs
+.PHONY: help install install-dev test test-coverage lint autofix autofix-imports autofix-unused format format-check clean build docs
 .DEFAULT_GOAL := help
 
 # Variables
@@ -54,10 +54,7 @@ autofix-unused: install-dev ## Remove unused imports and variables
 autofix-imports: install-dev ## Sort and organize imports
 	$(POETRY) run isort $(DIRS) --profile black
 
-autofix-pep8: install-dev ## Fix PEP 8 style issues
-	$(POETRY) run autopep8 --max-line-length $(MAX_LINE_LENGTH) --in-place --recursive --aggressive $(DIRS)
-
-autofix: autofix-unused autofix-imports autofix-pep8 format
+autofix: autofix-unused autofix-imports format
 
 format: install-dev ## Format code with black
 	$(POETRY) run black $(DIRS)

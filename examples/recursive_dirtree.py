@@ -201,7 +201,7 @@ def analyze_tree(tree):
                 total_size += file.size
 
     print(f"📄 Total files: {total_files}")
-    print(f"💾 Total size: {total_size:, } bytes ({total_size/1024/1024: .2f} MB)")
+    print(f"💾 Total size: {total_size:,} bytes ({total_size/1024/1024:.2f} MB)")
 
 
 def demonstrate_tree_traversal(tree):

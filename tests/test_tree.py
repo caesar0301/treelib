@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
 import os
 import sys
 import unittest
@@ -789,6 +790,228 @@ Hárry
         self.assertEqual(deep_copy.root, self.tree.root)
         self.assertIsNot(deep_copy["hárry"], self.tree["hárry"])
         self.assertEqual(deep_copy["hárry"].tag, self.tree["hárry"].tag)
+
+    def test_display_options_comprehensive(self):
+        """Test comprehensive display options and formatting."""
+        # Test different line types
+        line_types = ["ascii", "ascii-ex", "ascii-exr", "ascii-em", "ascii-emv", "ascii-emh"]
+
+        for line_type in line_types:
+            output = self.tree.show(line_type=line_type, stdout=False)
+            self.assertIn("Hárry", output)
+            self.assertIsInstance(output, str)
+
+        # Test with reversed sorting
+        output_reversed = self.tree.show(reverse=True, stdout=False)
+        self.assertIn("Hárry", output_reversed)
+
+        # Test with custom key function
+        output_key = self.tree.show(key=lambda x: len(x.tag), stdout=False)
+        self.assertIn("Hárry", output_key)
+
+        # Test without sorting
+        output_no_sort = self.tree.show(sorting=False, stdout=False)
+        self.assertIn("Hárry", output_no_sort)
+
+        # Test starting from specific node
+        output_subtree = self.tree.show(nid="jane", stdout=False)
+        self.assertIn("Jane", output_subtree)
+        self.assertNotIn("Bill", output_subtree)
+
+    def test_tree_metrics_comprehensive(self):
+        """Test comprehensive tree metrics and analysis."""
+        # Test paths to leaves
+        paths = self.tree.paths_to_leaves()
+        self.assertEqual(len(paths), 2)  # Two leaf nodes
+
+        # Verify each path starts with root
+        for path in paths:
+            self.assertEqual(path[0], "hárry")
+
+        # Test size at different levels
+        self.assertEqual(self.tree.size(level=0), 1)  # Root only
+        self.assertEqual(self.tree.size(level=1), 2)  # Jane and Bill
+        self.assertEqual(self.tree.size(level=2), 2)  # Diane and George
+
+        # Test depth calculation
+        self.assertEqual(self.tree.depth(), 2)
+
+    def test_node_relationship_comprehensive(self):
+        """Test comprehensive node relationship queries."""
+        # Test siblings for all nodes
+        harry_siblings = self.tree.siblings("hárry")
+        self.assertEqual(len(harry_siblings), 0)  # Root has no siblings
+
+        jane_siblings = self.tree.siblings("jane")
+        self.assertEqual(len(jane_siblings), 1)
+        self.assertEqual(jane_siblings[0].identifier, "bill")
+
+        bill_siblings = self.tree.siblings("bill")
+        self.assertEqual(len(bill_siblings), 1)
+        self.assertEqual(bill_siblings[0].identifier, "jane")
+
+        # Test ancestor relationships at different levels
+        self.assertEqual(self.tree.ancestor("diane", level=0), self.tree["hárry"])
+        self.assertEqual(self.tree.ancestor("diane", level=1), self.tree["jane"])
+        self.assertEqual(self.tree.ancestor("diane"), "jane")  # Immediate parent
+
+    def test_tree_modification_edge_cases(self):
+        """Test edge cases in tree modification operations."""
+        # Test moving node to itself (should change parent to itself)
+        self.tree.move_node("jane", "jane")
+        # Node should now be its own parent
+        self.assertEqual(self.tree.parent("jane").identifier, "jane")
+
+        # Test moving node to its descendant (should fail)
+        with self.assertRaises(LoopError):
+            self.tree.move_node("jane", "diane")
+
+        # Test moving siblings (should work)
+        single_tree = Tree()
+        single_tree.create_node("Root", "root")
+        single_tree.create_node("Child1", "child1", parent="root")
+        single_tree.create_node("Child2", "child2", parent="root")
+
+        # Move one child under another
+        single_tree.move_node("child1", "child2")
+        self.assertEqual(single_tree.parent("child1").identifier, "child2")
+
+    def test_advanced_filtering_scenarios(self):
+        """Test advanced filtering scenarios."""
+        # Create tree with mixed data types
+        data_tree = Tree()
+        data_tree.create_node("Root", "root", data={"type": "root", "value": 0})
+        data_tree.create_node("Branch1", "b1", parent="root", data={"type": "branch", "value": 1})
+        data_tree.create_node("Branch2", "b2", parent="root", data={"type": "branch", "value": 2})
+        data_tree.create_node("Leaf1", "l1", parent="b1", data={"type": "leaf", "value": 10})
+        data_tree.create_node("Leaf2", "l2", parent="b2", data={"type": "leaf", "value": 20})
+
+        # Filter by data type
+        branches = list(data_tree.filter_nodes(lambda n: n.data and n.data.get("type") == "branch"))
+        self.assertEqual(len(branches), 2)
+
+        # Filter by data value
+        high_value = list(data_tree.filter_nodes(lambda n: n.data and n.data.get("value", 0) > 5))
+        self.assertEqual(len(high_value), 2)  # Leaf1 and Leaf2
+
+        # Complex filter combining multiple conditions
+        branch_with_high_value = list(
+            data_tree.filter_nodes(lambda n: n.data and n.data.get("type") == "branch" and n.data.get("value", 0) > 1)
+        )
+        self.assertEqual(len(branch_with_high_value), 1)  # Only Branch2
+
+    def test_tree_serialization_edge_cases(self):
+        """Test edge cases in tree serialization."""
+        # Test tree with None data
+        none_tree = Tree()
+        none_tree.create_node("Root", "root", data=None)
+        none_tree.create_node("Child", "child", parent="root", data=None)
+
+        # Should handle None data gracefully
+        json_str = none_tree.to_json(with_data=True)
+        self.assertIsInstance(json_str, str)
+
+        dict_repr = none_tree.to_dict(with_data=True)
+        self.assertIsInstance(dict_repr, dict)
+
+        # Test tree with complex nested data
+        complex_tree = Tree()
+        complex_data = {
+            "metadata": {
+                "created": "2023-01-01",
+                "tags": ["important", "test"],
+                "properties": {"active": True, "score": 95.5},
+            },
+            "items": [1, 2, 3, {"nested": "value"}],
+        }
+        complex_tree.create_node("Complex", "complex", data=complex_data)
+
+        # Should serialize complex data
+        json_str = complex_tree.to_json(with_data=True)
+        parsed = json.loads(json_str)
+        self.assertIn("Complex", parsed)
+
+    def test_unicode_and_encoding_comprehensive(self):
+        """Test comprehensive Unicode and encoding scenarios."""
+        # Test with various Unicode scripts
+        unicode_tree = Tree()
+
+        # Latin with diacritics
+        unicode_tree.create_node("Café résumé", "cafe")
+
+        # Cyrillic
+        unicode_tree.create_node("Привет мир", "cyrillic", parent="cafe")
+
+        # Chinese
+        unicode_tree.create_node("你好世界", "chinese", parent="cyrillic")
+
+        # Arabic
+        unicode_tree.create_node("مرحبا بالعالم", "arabic", parent="chinese")
+
+        # Emoji
+        unicode_tree.create_node("Hello 🌍🚀✨", "emoji", parent="arabic")
+
+        # Test that all operations work with Unicode
+        self.assertEqual(len(unicode_tree), 5)
+        self.assertTrue(unicode_tree.is_ancestor("cafe", "emoji"))
+
+        # Test display with Unicode
+        output = unicode_tree.show(stdout=False)
+        self.assertIn("Café", output)
+        self.assertIn("你好", output)
+
+        # Test JSON serialization with Unicode
+        json_str = unicode_tree.to_json()
+        self.assertIsInstance(json_str, str)
+
+    def test_memory_management_scenarios(self):
+        """Test scenarios that could cause memory issues."""
+        # Test with large amounts of data
+        large_data_tree = Tree()
+        large_data = {"data": "x" * 10000}  # 10KB of data per node
+
+        large_data_tree.create_node("Root", "root", data=large_data)
+        for i in range(10):
+            large_data_tree.create_node(f"Child{i}", f"child{i}", parent="root", data=large_data)
+
+        # Should handle large data without issues
+        self.assertEqual(len(large_data_tree), 11)
+
+        # Test subtree operations with large data
+        subtree = large_data_tree.subtree("child0")
+        self.assertEqual(len(subtree), 1)
+
+        # Test removal
+        removed = large_data_tree.remove_subtree("child1")
+        self.assertEqual(len(removed), 1)
+
+    def test_error_handling_comprehensive(self):
+        """Test comprehensive error handling scenarios."""
+        # Test operations on nodes that don't exist
+        error_tree = Tree()
+        error_tree.create_node("Root", "root")
+
+        operations_that_should_fail = [
+            (lambda: error_tree.parent("nonexistent"), NodeIDAbsentError),
+            (lambda: error_tree.children("nonexistent"), NodeIDAbsentError),
+            (lambda: error_tree.siblings("nonexistent"), NodeIDAbsentError),
+            (lambda: error_tree.level("nonexistent"), NodeIDAbsentError),
+            (lambda: error_tree.remove_node("nonexistent"), NodeIDAbsentError),
+            (lambda: error_tree.move_node("nonexistent", "root"), NodeIDAbsentError),
+            (lambda: error_tree.move_node("root", "nonexistent"), NodeIDAbsentError),
+        ]
+
+        for operation, expected_error in operations_that_should_fail:
+            with self.assertRaises(expected_error):
+                operation()
+
+        # Test invalid parameter types
+        with self.assertRaises(TypeError):
+            error_tree.size(level="invalid")
+
+        # Test adding invalid node types
+        with self.assertRaises(OSError):
+            error_tree.add_node("not_a_node")
 
     def test_special_methods_comprehensive(self):
         """Test __contains__, __len__, __str__, __getitem__ methods"""
