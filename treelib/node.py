@@ -28,7 +28,7 @@ import copy
 import sys
 import uuid
 from collections import defaultdict
-from typing import Any, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union, cast
 from warnings import warn
 
 from .exceptions import NodePropertyError
@@ -36,8 +36,12 @@ from .misc import deprecated
 
 if sys.version_info >= (3, 9):
     StrList = list[str]
+    StrDict = dict[str, Optional[str]]
+    StrListDict = dict[str, list[str]]
 else:
     StrList = List[str]  # Python 3.8 and earlier
+    StrDict = Dict[str, Optional[str]]
+    StrListDict = Dict[str, List[str]]
 
 
 class Node(object):
@@ -72,7 +76,14 @@ class Node(object):
     """
 
     #: Mode constants for routine `update_fpointer()`.
-    (ADD, DELETE, INSERT, REPLACE) = list(range(4))
+    ADD: int = 0
+    DELETE: int = 1
+    INSERT: int = 2
+    REPLACE: int = 3
+
+    # Type aliases for internal use
+    _PredecessorDict = StrDict
+    _SuccessorDict = StrListDict
 
     def __init__(
         self,
@@ -113,25 +124,25 @@ class Node(object):
         #: None or something else
         #: if None, self._identifier will be set to the identifier's value.
         if tag is None:
-            self._tag = self._identifier
+            self._tag: Optional[str] = self._identifier
         else:
             self._tag = tag
 
         #: boolean
-        self.expanded = expanded
+        self.expanded: bool = expanded
 
         #: identifier of the parent's node :
-        self._predecessor: dict = {}
+        self._predecessor: StrDict = {}
         #: identifier(s) of the soons' node(s) :
-        self._successors: dict = defaultdict(list)
+        self._successors: StrListDict = defaultdict(list)
 
         #: User payload associated with this node.
-        self.data = data
+        self.data: Any = data
 
         # for retro-compatibility on bpointer/fpointer
         self._initial_tree_id: Optional[str] = None
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: "Node") -> bool:
         """
         Compare nodes for sorting based on their tags.
 
@@ -192,37 +203,45 @@ class Node(object):
 
     @property
     @deprecated(alias="node.predecessor")
-    def bpointer(self):
-        if self._initial_tree_id not in self._predecessor.keys():
+    def bpointer(self) -> Optional[str]:
+        if self._initial_tree_id is None or self._initial_tree_id not in self._predecessor.keys():
             return None
         return self._predecessor[self._initial_tree_id]
 
     @bpointer.setter
     @deprecated(alias="node.set_predecessor")
-    def bpointer(self, value) -> None:
+    def bpointer(self, value: Optional[str]) -> None:
+        if self._initial_tree_id is None:
+            self._initial_tree_id = str(uuid.uuid1())
         self.set_predecessor(value, self._initial_tree_id)
 
     @deprecated(alias="node.set_predecessor")
-    def update_bpointer(self, nid) -> None:
+    def update_bpointer(self, nid: Optional[str]) -> None:
+        if self._initial_tree_id is None:
+            self._initial_tree_id = str(uuid.uuid1())
         self.set_predecessor(nid, self._initial_tree_id)
 
     @property
     @deprecated(alias="node.successors")
-    def fpointer(self):
-        if self._initial_tree_id not in self._successors:
+    def fpointer(self) -> StrList:
+        if self._initial_tree_id is None or self._initial_tree_id not in self._successors:
             return []
         return self._successors[self._initial_tree_id]
 
     @fpointer.setter
     @deprecated(alias="node.update_successors")
-    def fpointer(self, value: Union[None, list, dict, set]) -> None:
+    def fpointer(self, value: Union[None, List[str], Dict[str, Any], set]) -> None:
+        if self._initial_tree_id is None:
+            self._initial_tree_id = str(uuid.uuid1())
         self.set_successors(value, tree_id=self._initial_tree_id)
 
     @deprecated(alias="node.update_successors")
-    def update_fpointer(self, nid, mode=ADD, replace=None):
+    def update_fpointer(self, nid: Optional[str], mode: int = ADD, replace: Optional[str] = None) -> None:
+        if self._initial_tree_id is None:
+            self._initial_tree_id = str(uuid.uuid1())
         self.update_successors(nid, mode, replace, self._initial_tree_id)
 
-    def predecessor(self, tree_id):
+    def predecessor(self, tree_id: Optional[str]) -> Optional[str]:
         """
         Get the parent node identifier in the specified tree.
 
@@ -243,7 +262,9 @@ class Node(object):
                 if parent_id:
                     print(f"Parent in tree1: {parent_id}")
         """
-        return self._predecessor[tree_id]
+        if tree_id is None:
+            return None
+        return self._predecessor.get(tree_id)
 
     def set_predecessor(self, nid: Optional[str], tree_id: Optional[str]) -> None:
         """
@@ -263,7 +284,8 @@ class Node(object):
                 node.set_predecessor("parent_id", "tree1")
                 node.set_predecessor(None, "tree1")  # Make root
         """
-        self._predecessor[tree_id] = nid
+        if tree_id is not None:
+            self._predecessor[tree_id] = nid
 
     def successors(self, tree_id: Optional[str]) -> StrList:
         """
@@ -290,9 +312,11 @@ class Node(object):
                 tree1_children = node.successors("tree1")
                 tree2_children = node.successors("tree2")
         """
+        if tree_id is None:
+            return []
         return self._successors[tree_id]
 
-    def set_successors(self, value: Union[None, list, dict, set], tree_id: Optional[str] = None) -> None:
+    def set_successors(self, value: Union[None, List[str], Dict[str, Any], set], tree_id: Optional[str] = None) -> None:
         """
         Set the complete list of child node identifiers for a specific tree.
 
@@ -325,6 +349,9 @@ class Node(object):
                 # Clear children
                 node.set_successors(None, "tree1")
         """
+        if tree_id is None:
+            return
+
         setter_lookup = {
             "NoneType": lambda x: list(),
             "list": lambda x: x,
@@ -380,7 +407,7 @@ class Node(object):
                 node.update_successors("old_child", Node.REPLACE,
                                      replace="new_child", tree_id="tree1")
         """
-        if nid is None:
+        if nid is None or tree_id is None:
             return
 
         def _manipulator_append() -> None:
@@ -466,7 +493,7 @@ class Node(object):
         # fpointer is a list and would be copied by reference without deepcopy
         self.set_successors(copy.deepcopy(former_fpointer), tree_id=new_tree_id)
 
-    def reset_pointers(self, tree_id) -> None:
+    def reset_pointers(self, tree_id: Optional[str]) -> None:
         """
         Reset all parent-child relationships for a specific tree context.
 

@@ -74,7 +74,7 @@ class Directory:
         """
         self.name = name if name else get_random_string(12)
         self.files = [File() for _ in range(random.randint(1, MAX_FILES_PER_DIR))]
-        self.created_at = f"2023-{random.randint(1,12):02d}-{random.randint(1,28):02d}"
+        self.created_at = f"2023-{random.randint(1, 12): 02d}-{random.randint(1, 28): 02d}"
 
     def __str__(self):
         return f"Directory(name='{self.name}', files={len(self.files)})"
@@ -201,7 +201,7 @@ def analyze_tree(tree):
                 total_size += file.size
 
     print(f"📄 Total files: {total_files}")
-    print(f"💾 Total size: {total_size:,} bytes ({total_size/1024/1024:.2f} MB)")
+    print(f"💾 Total size: {total_size:, } bytes ({total_size/1024/1024: .2f} MB)")
 
 
 def demonstrate_tree_traversal(tree):
@@ -265,7 +265,7 @@ def demonstrate_directory_operations(tree):
         target_dir = directories_with_files[0][2]  # Directory with most files
         path = tree.rsearch(target_dir)
         path_names = [tree.get_node(node_id).tag for node_id in path]
-        print(f"\n🗂️  Path to '{directories_with_files[0][0]}':")
+        print(f"\n🗂️  Path to '{directories_with_files[0][0]}': ")
         print(f"   {' → '.join(path_names)}")
 
 

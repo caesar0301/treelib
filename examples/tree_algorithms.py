@@ -171,13 +171,13 @@ def demonstrate_tree_analysis():
             level = tree.level(node_id)
             salary_by_level[level].append(salary)
 
-    print(f"   • Total payroll: ${total_salary:,}")
-    print(f"   • Average salary: ${total_salary/tree.size():,.0f}")
+    print(f"   • Total payroll: ${total_salary:, }")
+    print(f"   • Average salary: ${total_salary/tree.size():, .0f}")
 
     for level in sorted(salary_by_level.keys()):
         salaries = salary_by_level[level]
         avg_salary = sum(salaries) / len(salaries)
-        print(f"   • Level {level} average: ${avg_salary:,.0f}")
+        print(f"   • Level {level} average: ${avg_salary:, .0f}")
 
     print("\n🔍 Tree Balance Analysis:")
 
@@ -199,7 +199,7 @@ def demonstrate_tree_analysis():
         balance_factors[node_id] = calculate_balance_factor(tree, node_id)
 
     avg_balance = sum(balance_factors.values()) / len(balance_factors)
-    print(f"   • Average balance factor: {avg_balance:.2f}")
+    print(f"   • Average balance factor: {avg_balance: .2f}")
     print(f"   • Most unbalanced node: {max(balance_factors, key=balance_factors.get)}")
 
 
@@ -453,7 +453,7 @@ def demonstrate_tree_comparison():
     print(f"   • Only in Tree 1: {sorted(comparison['only_in_tree1'])}")
     print(f"   • Only in Tree 2: {sorted(comparison['only_in_tree2'])}")
     print(f"   • Structure matches: {comparison['structure_matches']}")
-    print(f"   • Similarity score: {comparison['similarity']:.2%}")
+    print(f"   • Similarity score: {comparison['similarity']: .2%}")
 
 
 def demonstrate_tree_algorithms_performance():
@@ -492,20 +492,20 @@ def demonstrate_tree_algorithms_performance():
     start_time = time.time()
     all_nodes = list(large_tree.expand_tree())
     traversal_time = time.time() - start_time
-    print(f"   • Full traversal: {traversal_time*1000:.2f}ms ({len(all_nodes)} nodes)")
+    print(f"   • Full traversal: {traversal_time * 1000: .2f}ms ({len(all_nodes)} nodes)")
 
     # Benchmark search
     start_time = time.time()
     target_node = random.choice(all_nodes)
     path = list(large_tree.rsearch(target_node))
     search_time = time.time() - start_time
-    print(f"   • Path search: {search_time*1000:.2f}ms (path length: {len(path)})")
+    print(f"   • Path search: {search_time * 1000: .2f}ms (path length: {len(path)})")
 
     # Benchmark filtering
     start_time = time.time()
     leaves = large_tree.leaves()
     filter_time = time.time() - start_time
-    print(f"   • Find leaves: {filter_time*1000:.2f}ms ({len(leaves)} leaves)")
+    print(f"   • Find leaves: {filter_time * 1000: .2f}ms ({len(leaves)} leaves)")
 
     print("\n💡 Performance Tips:")
     print("   • Use expand_tree() for bulk operations")

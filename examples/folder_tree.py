@@ -134,10 +134,10 @@ class FileSystemScanner:
 
         for unit in ["B", "KB", "MB", "GB", "TB"]:
             if size_bytes < 1024.0:
-                return f"{size_bytes:.1f} {unit}"
+                return f"{size_bytes: .1f} {unit}"
             size_bytes /= 1024.0
 
-        return f"{size_bytes:.1f} PB"
+        return f"{size_bytes: .1f} PB"
 
     def scan_directory(self, root_path: str, pattern: str = "*") -> Tree:
         """
@@ -270,7 +270,7 @@ class FileSystemScanner:
         if self.show_sizes:
             print(f"💾 Total size: {self._format_size(self.total_size)}")
 
-        print(f"⏱️  Scan time: {duration:.2f} seconds")
+        print(f"⏱️  Scan time: {duration: .2f} seconds")
         print(f"❌ Errors: {len(self.errors)}")
 
         if self.errors:
@@ -297,7 +297,7 @@ def demonstrate_scanning():
     scanner = FileSystemScanner(max_depth=2, max_files=20)
     tree = scanner.scan_directory(str(current_dir), "*.py")
 
-    print(f"🌳 Python files in {current_dir.name} (max depth 2):")
+    print(f"🌳 Python files in {current_dir.name} (max depth 2): ")
     tree.show(line_type="ascii-em")
 
     scanner.print_statistics()
@@ -310,7 +310,7 @@ def demonstrate_scanning():
     scanner_with_sizes = FileSystemScanner(max_depth=1, max_files=10, show_sizes=True)
     tree_with_sizes = scanner_with_sizes.scan_directory(str(current_dir), "*")
 
-    print(f"🌳 All files in {current_dir.name} (with sizes, depth 1):")
+    print(f"🌳 All files in {current_dir.name} (with sizes, depth 1): ")
     tree_with_sizes.show(line_type="ascii-em")
 
     scanner_with_sizes.print_statistics()
@@ -385,7 +385,7 @@ Examples:
 
         # Display tree
         if not args.export or not args.output:
-            print(f"\n🌳 Directory tree for {args.path}:")
+            print(f"\n🌳 Directory tree for {args.path}: ")
             tree.show(line_type="ascii-em")
 
         # Export if requested

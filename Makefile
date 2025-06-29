@@ -5,6 +5,7 @@
 PYTHON := python3
 POETRY := poetry
 DIRS := examples treelib tests
+MAX_LINE_LENGTH := 120
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -45,7 +46,7 @@ run-examples: install ## Run all example scripts to verify they work correctly
 	@echo "🎉 All examples completed successfully!"
 
 lint: install-dev ## Run linting checks (flake8)
-	$(POETRY) run flake8 $(DIRS) --count --select=E9,F63,F7,F82 --ignore=E231 --max-line-length=120 --show-source --statistics
+	$(POETRY) run flake8 $(DIRS) --count --select=E9,F63,F7,F82 --ignore=E231 --max-line-length=$(MAX_LINE_LENGTH) --show-source --statistics
 
 autofix-unused: install-dev ## Remove unused imports and variables
 	$(POETRY) run autoflake --remove-all-unused-imports --remove-unused-variables --in-place --recursive $(DIRS)
@@ -54,7 +55,7 @@ autofix-imports: install-dev ## Sort and organize imports
 	$(POETRY) run isort $(DIRS) --profile black
 
 autofix-pep8: install-dev ## Fix PEP 8 style issues
-	$(POETRY) run autopep8 --in-place --recursive --aggressive --aggressive $(DIRS)
+	$(POETRY) run autopep8 --max-line-length $(MAX_LINE_LENGTH) --in-place --recursive --aggressive $(DIRS)
 
 autofix: autofix-unused autofix-imports autofix-pep8 format
 

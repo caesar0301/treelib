@@ -176,7 +176,7 @@ def demonstrate_basic_json_export():
     print(pretty_json[:500] + "..." if len(pretty_json) > 500 else pretty_json)
 
     print("\n📊 JSON statistics:")
-    print(f"   • JSON length: {len(json_output):,} characters")
+    print(f"   • JSON length: {len(json_output): , } characters")
     print(f"   • Number of nodes in JSON: {len(json_data)}")
 
 

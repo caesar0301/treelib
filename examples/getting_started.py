@@ -328,7 +328,7 @@ def lesson_7_node_data():
     print("\n📊 Accessing node data:")
     alice = tree["alice"]
     print(f"   Alice's role: {alice.data['role']}")
-    print(f"   Alice's salary: ${alice.data['salary']:,}")
+    print(f"   Alice's salary: ${alice.data['salary']: , }")
     print(f"   Alice's skills: {', '.join(alice.data['skills'])}")
 
     print("\n💰 Department budgets:")
@@ -336,7 +336,7 @@ def lesson_7_node_data():
         dept = tree[dept_id]
         budget = dept.data["budget"]
         headcount = dept.data["headcount"]
-        print(f"   {dept.tag}: ${budget:,} budget, {headcount} people")
+        print(f"   {dept.tag}: ${budget: , } budget, {headcount} people")
 
     print("\n📈 Total company salary expenses:")
     total_salary = 0
@@ -344,7 +344,7 @@ def lesson_7_node_data():
         node = tree[node_id]
         if node.data and "salary" in node.data:
             total_salary += node.data["salary"]
-    print(f"   Total: ${total_salary:,}")
+    print(f"   Total: ${total_salary: , }")
 
     print("\n📝 Key concepts:")
     print("   • Use 'data' parameter to store custom information")
