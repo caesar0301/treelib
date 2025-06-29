@@ -29,7 +29,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5.4.0
       with:
-        python-version: '3.10'  # Use specific version for consistency
+        python-version: '3.11'  # Use specific version for consistency
     
     - name: Install Poetry
       uses: snok/install-poetry@v1
@@ -59,8 +59,17 @@ jobs:
         RELEASE_TAG=${GITHUB_REF#refs/tags/}
         echo "Poetry version: $POETRY_VERSION"
         echo "Release tag: $RELEASE_TAG"
-        if [ "v$POETRY_VERSION" != "$RELEASE_TAG" ]; then
-          echo "❌ Version mismatch: Poetry version ($POETRY_VERSION) does not match release tag ($RELEASE_TAG)"
+        
+        # Handle both v1.8.0 style and v1.0 style tags
+        if [ "v$POETRY_VERSION" = "$RELEASE_TAG" ]; then
+          echo "✅ Exact match: v$POETRY_VERSION = $RELEASE_TAG"
+        elif [ "$POETRY_VERSION" = "${RELEASE_TAG#v}" ]; then
+          echo "✅ Version match: $POETRY_VERSION = ${RELEASE_TAG#v}"
+        else
+          echo "❌ Version mismatch:"
+          echo "  Poetry version: $POETRY_VERSION"
+          echo "  Release tag: $RELEASE_TAG"
+          echo "  Expected: v$POETRY_VERSION"
           exit 1
         fi
         echo "✅ Version verification passed"
