@@ -15,6 +15,8 @@ Tree implementation in python: simple for you to use.
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls)
 [![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls?q=is%3Apr+is%3Aclosed)
 
+[![AI Assisted Yes](https://img.shields.io/badge/AI%20Assisted-Yes-green?style=for-the-badge)](https://github.com/mefengl/made-by-ai)
+
 
 ## Quick Start
 
