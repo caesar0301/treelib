@@ -23,7 +23,6 @@ Welcome to treelib's documentation!
 * 📊 **Export Ready**: JSON, dictionary, and GraphViz export capabilities
 * 🔍 **Advanced Search**: Powerful filtering and traversal algorithms
 * 💾 **Memory Efficient**: Optimized for both small and large tree structures
-* 🐍 **Python 2/3 Compatible**: Seamless cross-version compatibility
 
 **Perfect for:**
 
