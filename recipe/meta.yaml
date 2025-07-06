@@ -20,6 +20,6 @@ requirements:
     - python
     - setuptools
     - pip
-  
+
   run:
     - python

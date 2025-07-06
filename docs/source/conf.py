@@ -16,12 +16,17 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
-from setup import __version__
+# Get version from pyproject.toml
+import toml
+pyproject_path = os.path.join(os.path.dirname(__file__), '..', '..', 'pyproject.toml')
+with open(pyproject_path, 'r') as f:
+    pyproject = toml.load(f)
+    __version__ = pyproject['tool']['poetry']['version']
 
 # -- Project information -----------------------------------------------------
 
 project = u'treelib'
-copyright = u'2018, Xiaming Chen'
+copyright = u'2025, Xiaming Chen'
 author = u'Xiaming Chen'
 
 # The short X.Y version

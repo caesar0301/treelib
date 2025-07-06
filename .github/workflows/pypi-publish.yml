@@ -1,4 +1,4 @@
-# This workflow will upload a Python Package using Twine when a release is created
+# This workflow will upload a Python Package using Poetry when a release is created
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
 
 # This workflow uses actions that are not certified by GitHub.
@@ -14,26 +14,95 @@ on:
 
 permissions:
   contents: read
+  id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
-
+    environment:
+      name: pypi
+      url: https://pypi.org/p/treelib
+    
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up Python
       uses: actions/setup-python@v5.4.0
       with:
-        python-version: '3.x'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install build
-    - name: Build package
-      run: python -m build
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+        python-version: '3.11'  # Use specific version for consistency
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
       with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+    
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-3.11-${{ hashFiles('**/poetry.lock') }}
+    
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+    
+    - name: Install project
+      run: poetry install --no-interaction
+    
+    - name: Verify version matches release tag
+      run: |
+        POETRY_VERSION=$(poetry version --short)
+        RELEASE_TAG=${GITHUB_REF#refs/tags/}
+        echo "Poetry version: $POETRY_VERSION"
+        echo "Release tag: $RELEASE_TAG"
+        
+        # Handle both v1.8.0 style and v1.0 style tags
+        if [ "v$POETRY_VERSION" = "$RELEASE_TAG" ]; then
+          echo "✅ Exact match: v$POETRY_VERSION = $RELEASE_TAG"
+        elif [ "$POETRY_VERSION" = "${RELEASE_TAG#v}" ]; then
+          echo "✅ Version match: $POETRY_VERSION = ${RELEASE_TAG#v}"
+        else
+          echo "❌ Version mismatch:"
+          echo "  Poetry version: $POETRY_VERSION"
+          echo "  Release tag: $RELEASE_TAG"
+          echo "  Expected: v$POETRY_VERSION"
+          exit 1
+        fi
+        echo "✅ Version verification passed"
+    
+    - name: Run tests before publishing
+      run: |
+        echo "🧪 Running tests to ensure package quality..."
+        make test
+    
+    - name: Check code format and lint
+      run: |
+        echo "🔍 Running code quality checks..."
+        make format-check
+        make lint
+    
+    - name: Build package
+      run: |
+        echo "🏗️ Building package with Poetry..."
+        make build
+    
+    - name: Verify build artifacts
+      run: |
+        echo "📦 Verifying build artifacts..."
+        ls -la dist/
+        # Check that both wheel and source distribution were created
+        if [ ! -f dist/*.whl ] || [ ! -f dist/*.tar.gz ]; then
+          echo "❌ Missing build artifacts"
+          exit 1
+        fi
+        echo "✅ Build artifacts verified"
+    
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        verbose: true
+        print-hash: true

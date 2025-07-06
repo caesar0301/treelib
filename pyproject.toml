@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "treelib"
+version = "1.8.0"
+description = "A Python implementation of tree structure."
+authors = ["Xiaming Chen <chenxm35@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/caesar0301/treelib"
+repository = "https://github.com/caesar0301/treelib"
+keywords = ["data structure", "tree", "tools"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+packages = [{include = "treelib"}]
+include = [
+    "treelib/py.typed",
+    "README.md",
+    "HISTORY",
+    "LICENSE",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+six = ">=1.13.0"
+
+[tool.poetry.group.dev.dependencies]
+# Testing dependencies - pytest for all Python versions
+pytest = ">=6.0.0"
+pytest-cov = ">=2.8.0"
+# Code quality tools (Python 3.8+ only, as they require newer Python)
+flake8 = {version = ">=5.0.0,<6.0.0", python = ">=3.8"}
+flake8-black = {version = ">=0.3.6", python = ">=3.8"}
+black = {version = ">=23.1.0", python = ">=3.8"}
+# Autofix tools (compatible versions)
+autopep8 = {version = ">=2.0.0", python = ">=3.8"}
+isort = {version = ">=5.12.0", python = ">=3.8"}
+autoflake = {version = ">=1.7.0,<2.0.0", python = ">=3.8"}
+
+[tool.black]
+line-length = 120
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api" 

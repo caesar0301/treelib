@@ -10,10 +10,11 @@ Tree implementation in python: simple for you to use.
 [![PyV](https://img.shields.io/pypi/pyversions/treelib.svg)](https://pypi.python.org/pypi/treelib)
 [![PyPI download month](https://img.shields.io/pypi/dm/treelib.svg)](https://pypi.python.org/pypi/treelib/)
 [![GitHub contributors](https://img.shields.io/github/contributors/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/graphs/contributors/)
-
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls)
 [![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/caesar0301/treelib.svg)](https://GitHub.com/caesar0301/treelib/pulls?q=is%3Apr+is%3Aclosed)
+
+[![AI Assisted Yes](https://img.shields.io/badge/AI%20Assisted-Yes-green?style=for-the-badge)](https://github.com/mefengl/made-by-ai)
+
 
 ## Quick Start
 
@@ -23,14 +24,14 @@ Tree implementation in python: simple for you to use.
 
 For installation, APIs and examples, see http://treelib.readthedocs.io/en/latest/
 
-DeepWiki Generation: https://deepwiki.com/caesar0301/treelib
+Ask DeepWiki: https://deepwiki.com/caesar0301/treelib
 
-## Code Style
+### Development Commands
 
-`treelib` complies with [black](https://github.com/psf/black) formatter and
-specific [flake8 validations](https://github.com/caesar0301/treelib/blob/master/scripts/flake8.sh).
+We provide a convenient Makefile for common development tasks. Run `make help` to show usage.
+
 Before creating a pull request, please make sure you pass the local validation
-with `scripts/flake8.sh`.
+with `make check`.
 
 ## Contributors
 
