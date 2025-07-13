@@ -38,3 +38,7 @@ with `make check`.
 Thank you all contributors ❤
 
 [![treelib contributors](https://contrib.rocks/image?repo=caesar0301/treelib "treelib contributors")](https://github.com/caesar0301/treelib/graphs/contributors)
+
+## Trend
+
+[![Star History Chart](https://api.star-history.com/svg?repos=caesar0301/treelib&type=Date)](https://star-history.com/#caesar0301/treelib&Date)
