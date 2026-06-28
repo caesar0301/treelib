@@ -1976,7 +1976,9 @@ class Tree(object):
                 )
             if len(tree_dict[ntag]["children"]) == 0:
                 tree_dict = self[nid].tag if not with_data else {ntag: {"data": self[nid].data}}
-            return tree_dict
+        else:
+            tree_dict = self[nid].tag if not with_data else {ntag: {"data": self[nid].data}}
+        return tree_dict
 
     def to_json(self, with_data: bool = False, sort: bool = True, reverse: bool = False):
         """
