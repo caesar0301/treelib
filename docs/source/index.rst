@@ -108,6 +108,7 @@ Store rich data in your tree nodes:
 
 .. code-block:: python
 
+    from types import SimpleNamespace
     from treelib import Tree
 
     # Employee data structure
@@ -122,7 +123,8 @@ Store rich data in your tree nodes:
 
     # Create tree with custom data
     tree = Tree()
-    tree.create_node("Company", "company")
+    tree.create_node("Company", "company",
+                 data=SimpleNamespace(role="Company"))
 
     # Add employees with rich data
     tree.create_node("Alice", "alice", parent="company",
