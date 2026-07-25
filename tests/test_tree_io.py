@@ -162,6 +162,13 @@ class TreeIOTestCase(unittest.TestCase):
         project_data = parsed["Project"]
         self.assertNotIn("data", project_data)
 
+    def test_from_json_preserves_falsy_data(self):
+        """from_json must preserve falsy-but-valid data values like 0, not collapse them to None."""
+        tree = Tree()
+        tree.create_node("root", "root", data=0)
+        restored = Tree.from_json(tree.to_json(with_data=True))
+        self.assertEqual(restored.all_nodes()[0].data, 0)
+
     def test_from_map_basic(self):
         """Test from_map basic functionality."""
         child_parent_dict = {"CEO": None, "CTO": "CEO", "CFO": "CEO", "VP_Eng": "CTO", "Developer": "VP_Eng"}

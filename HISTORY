@@ -1,5 +1,8 @@
 # History
 
+Jul 25, 2026
+from_json() no longer collapses falsy data values (0, False, "") to None.
+
 Mar 27, 2023 V1.6.3
 Apply to black code style. Migrate future to six
 
