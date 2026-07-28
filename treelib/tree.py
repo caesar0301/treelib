@@ -243,21 +243,39 @@ class Tree(object):
         Load tree from exported JSON.
         """
         tree = cls()
-        json_parsed = json.loads(raw)
+        try:
+            json_parsed = json.loads(raw)
+        except RecursionError:
+            raise ValueError(
+                "JSON input has excessive nesting depth and cannot be parsed safely."
+            )
 
-        def _append_node(subtree, parent_id=None):
+        if not isinstance(json_parsed, dict):
+            raise ValueError(
+                "Invalid JSON structure: expected a JSON object at the root."
+            )
+
+        max_depth = 500
+
+        def _append_node(subtree, parent_id=None, depth=0):
+            if depth > max_depth:
+                raise ValueError(
+                    "JSON nesting depth exceeds maximum allowed depth (%d)." % max_depth
+                )
             for tag, node_info in subtree.items():
+                if not isinstance(node_info, dict):
+                    tree.create_node(tag=tag, parent=parent_id, data=node_info)
+                    continue
                 node_id = node_info.get("id") or None
                 node_data = node_info.get("data") or None
 
                 node = tree.create_node(tag=tag, identifier=node_id, parent=parent_id, data=node_data)
 
-                if isinstance(node_info, dict):
-                    for child in node_info.get("children", []):
-                        if isinstance(child, dict):
-                            _append_node(child, parent_id=node.identifier)
-                        else:
-                            tree.create_node(tag=str(child), parent=node.identifier)
+                for child in node_info.get("children", []):
+                    if isinstance(child, dict):
+                        _append_node(child, parent_id=node.identifier, depth=depth + 1)
+                    else:
+                        tree.create_node(tag=str(child), parent=node.identifier)
 
         _append_node(json_parsed)
         return tree
@@ -1737,8 +1755,9 @@ class Tree(object):
         def _write_line(line, f):
             f.write(line + b"\n")
 
+        fh = open(filename, "ab")
         def handler(x):
-            return _write_line(x, open(filename, "ab"))
+            return _write_line(x, fh)
 
         self.__print_backend(
             nid,
@@ -1752,6 +1771,7 @@ class Tree(object):
             sorting,
             func=handler,
         )
+        fh.close()
 
     def show(
         self,
