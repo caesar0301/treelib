@@ -711,6 +711,18 @@ Hárry
         node = tree.create_node()
         self.assertTrue(isinstance(node, SubNode))
 
+    def test_create_node_forwards_kwargs_to_node_class(self):
+        class FileNode(Node):
+            def __init__(self, tag=None, identifier=None, size=0, **kwargs):
+                super().__init__(tag=tag, identifier=identifier, **kwargs)
+                self.size = size
+
+        tree = Tree(node_class=FileNode)
+        node = tree.create_node("Large File", "big_file", size=1024)
+        self.assertTrue(isinstance(node, FileNode))
+        self.assertEqual(node.size, 1024)
+        self.assertEqual(tree["big_file"].size, 1024)
+
     def test_shallow_copy_hermetic_pointers(self):
         # tree 1
         # Hárry

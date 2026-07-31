@@ -853,6 +853,7 @@ class Tree(object):
         identifier: Optional[str] = None,
         parent: Optional[Union[Node, str]] = None,
         data: Any = None,
+        **kwargs: Any,
     ) -> Node:
         """
         Create and add a new node to the tree.
@@ -867,6 +868,8 @@ class Tree(object):
             parent: Parent node identifier, Node object, or None for root.
                    Must be None if tree is empty, must exist if tree has nodes.
             data: Optional user data to associate with this node.
+            **kwargs: Extra keyword arguments forwarded to the tree's
+                     ``node_class`` constructor, for custom Node subclasses.
 
         Returns:
             Node: The newly created Node object.
@@ -896,7 +899,7 @@ class Tree(object):
                 tree.create_node("Baby", "baby", parent="me",
                                data={"age": 1, "cute": True})
         """
-        node = self.node_class(tag=tag, identifier=identifier, data=data)
+        node = self.node_class(tag=tag, identifier=identifier, data=data, **kwargs)
         self.add_node(node, parent)
         return node
 
