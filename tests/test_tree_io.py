@@ -163,11 +163,26 @@ class TreeIOTestCase(unittest.TestCase):
         self.assertNotIn("data", project_data)
 
     def test_from_json_preserves_falsy_data(self):
-        """from_json must preserve falsy-but-valid data values like 0, not collapse them to None."""
-        tree = Tree()
-        tree.create_node("root", "root", data=0)
-        restored = Tree.from_json(tree.to_json(with_data=True))
-        self.assertEqual(restored.all_nodes()[0].data, 0)
+        """from_json must preserve falsy-but-valid data values, not collapse them to None."""
+        # assertIs on the type is deliberate: assertEqual alone would accept
+        # False for 0 and 0 for 0.0, which would hide a type change.
+        for value in [0, 0.0, False, "", [], {}]:
+            with self.subTest(data=value):
+                tree = Tree()
+                tree.create_node("root", "root", data=value)
+                restored = Tree.from_json(tree.to_json(with_data=True))
+                data = restored.all_nodes()[0].data
+                self.assertEqual(data, value)
+                self.assertIs(type(data), type(value))
+
+    def test_from_json_preserves_none_and_truthy_data(self):
+        """None data stays None, and truthy data is unaffected by the falsy fix."""
+        for value in [None, 42, "text", ["a"], {"k": "v"}]:
+            with self.subTest(data=value):
+                tree = Tree()
+                tree.create_node("root", "root", data=value)
+                restored = Tree.from_json(tree.to_json(with_data=True))
+                self.assertEqual(restored.all_nodes()[0].data, value)
 
     def test_from_map_basic(self):
         """Test from_map basic functionality."""
