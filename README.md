@@ -41,4 +41,4 @@ Thank you all contributors ❤
 
 ## Trend
 
-[![Star History Chart](https://api.star-history.com/svg?repos=caesar0301/treelib&type=Date)](https://star-history.com/#caesar0301/treelib&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=caesar0301/treelib&type=Date)](https://star-history.dera.page/#caesar0301/treelib&Date)
