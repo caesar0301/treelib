@@ -703,8 +703,8 @@ Extend the Node class for specialized functionality:
     from treelib import Node, Tree
 
     class FileNode(Node):
-        def __init__(self, tag, identifier=None, size=0, file_type="unknown"):
-            super().__init__(tag, identifier)
+        def __init__(self, tag, identifier=None, size=0, file_type="unknown", **kwargs):
+            super().__init__(tag, identifier, **kwargs)
             self.size = size
             self.file_type = file_type
 
