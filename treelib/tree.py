@@ -248,7 +248,7 @@ class Tree(object):
         def _append_node(subtree, parent_id=None):
             for tag, node_info in subtree.items():
                 node_id = node_info.get("id") or None
-                node_data = node_info.get("data") or None
+                node_data = node_info.get("data")
 
                 node = tree.create_node(tag=tag, identifier=node_id, parent=parent_id, data=node_data)
 

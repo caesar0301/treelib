@@ -504,18 +504,33 @@ class TreeCase(unittest.TestCase):
         r = t.create_node(tag="root", data={"val": 42})
         t.create_node("child1", parent=r, data=None)
         t.create_node("child2", parent=r, data={"name": "Christian"})
+        t.create_node("child3", parent=r, data=123)
+        t.create_node("child4", parent=r, data=-1)
+        t.create_node("child5", parent=r, data=0.5)
+        t.create_node("child6", parent=r, data="Hello, string!")
+        t.create_node("child7", parent=r, data=[1, 2, 3])
 
         nd = Tree.from_json(t.to_json(with_data=False))
 
         self.assertEqual(nd.get_node(nd.root).data, None)
         self.assertEqual(nd.children(nd.root)[0].data, None)
         self.assertEqual(nd.children(nd.root)[1].data, None)
+        self.assertEqual(nd.children(nd.root)[2].data, None)
+        self.assertEqual(nd.children(nd.root)[3].data, None)
+        self.assertEqual(nd.children(nd.root)[4].data, None)
+        self.assertEqual(nd.children(nd.root)[5].data, None)
+        self.assertEqual(nd.children(nd.root)[6].data, None)
 
         wd = Tree.from_json(t.to_json(with_data=True))
 
         self.assertEqual(wd.get_node(wd.root).data, {"val": 42})
         self.assertEqual(wd.children(wd.root)[0].data, None)
         self.assertEqual(wd.children(wd.root)[1].data, {"name": "Christian"})
+        self.assertEqual(wd.children(wd.root)[2].data, 123)
+        self.assertEqual(wd.children(wd.root)[3].data, -1)
+        self.assertEqual(wd.children(wd.root)[4].data, 0.5)
+        self.assertEqual(wd.children(wd.root)[5].data, "Hello, string!")
+        self.assertEqual(wd.children(wd.root)[6].data, [1, 2, 3])
 
     def test_from_json_with_identifier(self):
         t = Tree()
