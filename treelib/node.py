@@ -24,7 +24,6 @@ Note:
 """
 from __future__ import unicode_literals
 
-import copy
 import sys
 import uuid
 from collections import defaultdict
@@ -490,8 +489,8 @@ class Node(object):
         former_bpointer = self.predecessor(former_tree_id)
         self.set_predecessor(former_bpointer, new_tree_id)
         former_fpointer = self.successors(former_tree_id)
-        # fpointer is a list and would be copied by reference without deepcopy
-        self.set_successors(copy.deepcopy(former_fpointer), tree_id=new_tree_id)
+        # Copy the list, not the identifiers of the shared child nodes.
+        self.set_successors(list(former_fpointer), tree_id=new_tree_id)
 
     def reset_pointers(self, tree_id: Optional[str]) -> None:
         """
