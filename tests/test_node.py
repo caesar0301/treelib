@@ -247,7 +247,7 @@ class NodeCase(unittest.TestCase):
         self.assertEqual(self.node1.predecessor(self.tree_id1), "parent")
         self.assertEqual(self.node1.successors(self.tree_id1), ["child1", "child2"])
 
-        # Verify that modifying one doesn't affect the other (deep copy)
+        # Verify that the successor lists are independent
         self.node1.successors(self.tree_id2).append("child3")
         self.assertNotEqual(self.node1.successors(self.tree_id1), self.node1.successors(self.tree_id2))
 
