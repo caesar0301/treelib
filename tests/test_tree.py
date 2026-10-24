@@ -1274,6 +1274,45 @@ Hárry
         with self.assertRaises(NodeIDAbsentError):
             tree.link_past_node("nonexistent")
 
+    def test_update_node_rejects_duplicate_identifier(self):
+        """A rejected rename must preserve nodes and their relationships."""
+        for source, destination in (("a", "b"), ("a", "r"), ("r", "a"), ("a", "a1")):
+            with self.subTest(source=source, destination=destination):
+                tree = self.get_t1()
+                nodes = tree.nodes.copy()
+                before = tree.to_dict(with_data=True, with_identifier=True)
+                with self.assertRaises(DuplicatedNodeIdError):
+                    tree.update_node(source, tag="Changed", identifier=destination)
+                self.assertEqual(tree.to_dict(with_data=True, with_identifier=True), before)
+                self.assertEqual(tree.root, "r")
+                self.assertEqual(set(tree.nodes), set(nodes))
+                for identifier, node in nodes.items():
+                    self.assertIs(tree[identifier], node)
+                    self.assertEqual(node.identifier, identifier)
+
+    def test_update_node_rejects_unhashable_identifier_before_changes(self):
+        """An invalid dictionary key must not remove the original node."""
+        tree = self.get_t1()
+        before = tree.to_dict(with_data=True, with_identifier=True)
+        with self.assertRaises(TypeError):
+            tree.update_node("a", tag="Changed", identifier=[])
+        self.assertEqual(tree.to_dict(with_data=True, with_identifier=True), before)
+        self.assertEqual(tree["a"].identifier, "a")
+
+    def test_update_node_accepts_unchanged_identifier(self):
+        """Keeping an identifier still permits other attribute updates."""
+        for identifier in ("r", "a", "a1"):
+            with self.subTest(identifier=identifier):
+                tree = self.get_t1()
+                node = tree[identifier]
+                tree.update_node(identifier, tag="Changed", identifier=identifier)
+                self.assertIs(tree[identifier], node)
+                self.assertEqual(node.tag, "Changed")
+                self.assertEqual(tree.root, "r")
+                self.assertEqual(tree.parent("a").identifier, "r")
+                self.assertEqual(tree.parent("a1").identifier, "a")
+                self.assertEqual(set(tree.expand_tree()), {"r", "a", "b", "a1"})
+
     def test_update_node_comprehensive(self):
         """Test update_node method"""
         tree = Tree()
