@@ -1942,9 +1942,14 @@ class Tree(object):
 
         :param nid: the identifier of modified node
         :param attrs: attribute pairs recognized by Node object
+        :raises DuplicatedNodeIdError: if the new identifier belongs to another node
         :return: None
         """
         cn = self[nid]
+        if "identifier" in attrs:
+            identifier = attrs["identifier"]
+            if identifier != nid and identifier in self._nodes:
+                raise DuplicatedNodeIdError("Can't update node with ID '%s'" % identifier)
         for attr, val in iteritems(attrs):
             if attr == "identifier":
                 # Updating node id meets following contraints:
