@@ -921,10 +921,10 @@ Hárry
 
     def test_tree_modification_edge_cases(self):
         """Test edge cases in tree modification operations."""
-        # Test moving node to itself (should change parent to itself)
-        self.tree.move_node("jane", "jane")
-        # Node should now be its own parent
-        self.assertEqual(self.tree.parent("jane").identifier, "jane")
+        # A node cannot become its own parent.
+        with self.assertRaises(LoopError):
+            self.tree.move_node("jane", "jane")
+        self.assertEqual(self.tree.parent("jane").identifier, "hárry")
 
         # Test moving node to its descendant (should fail)
         with self.assertRaises(LoopError):
@@ -939,6 +939,22 @@ Hárry
         # Move one child under another
         single_tree.move_node("child1", "child2")
         self.assertEqual(single_tree.parent("child1").identifier, "child2")
+
+    def test_self_moves_preserve_tree(self):
+        tree = Tree()
+        tree.create_node("Root", "root")
+        tree.create_node("Branch", "branch", parent="root")
+        tree.create_node("Leaf", "leaf", parent="branch")
+
+        for identifier in ("root", "branch", "leaf"):
+            with self.assertRaises(LoopError):
+                tree.move_node(identifier, identifier)
+            self.assertEqual(tree.root, "root")
+            self.assertIsNone(tree.parent("root"))
+            self.assertEqual(tree.parent("branch").identifier, "root")
+            self.assertEqual(tree.parent("leaf").identifier, "branch")
+            self.assertEqual(list(tree.expand_tree()), ["root", "branch", "leaf"])
+            self.assertEqual(list(tree.rsearch("leaf")), ["leaf", "branch", "root"])
 
     def test_advanced_filtering_scenarios(self):
         """Test advanced filtering scenarios."""

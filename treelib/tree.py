@@ -1362,7 +1362,7 @@ class Tree(object):
         Raises:
             NodeIDAbsentError: If source or destination node doesn't exist.
             LoopError: If moving would create a circular reference
-                      (destination is a descendant of source).
+                      (destination is source or a descendant of source).
 
         Example:
             Reorganizing tree structure::
@@ -1386,7 +1386,7 @@ class Tree(object):
         """
         if not self.contains(source) or not self.contains(destination):
             raise NodeIDAbsentError
-        elif self.is_ancestor(source, destination):
+        elif source == destination or self.is_ancestor(source, destination):
             raise LoopError
 
         parent = self[source].predecessor(self._identifier)
