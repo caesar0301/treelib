@@ -1344,6 +1344,8 @@ class Tree(object):
             parent.update_successors(id_, tree_id=self._identifier)
         # Delete the node
         parent.update_successors(nid, mode=parent.DELETE, tree_id=self._identifier)
+        # A shared node may be reused; clear only this tree's former links.
+        self[nid].reset_pointers(self._identifier)
         del self._nodes[nid]
 
     def move_node(self, source: str, destination: str) -> None:
