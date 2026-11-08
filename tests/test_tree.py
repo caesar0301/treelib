@@ -226,6 +226,93 @@ class TreeCase(unittest.TestCase):
         self.tree.link_past_node("jill")
         self.assertEqual("mark" in self.tree.is_branch("hárry"), True)
 
+    def test_link_past_node_clears_only_removed_tree_context(self):
+        copied = Tree(self.tree)
+        jane = self.tree["jane"]
+        copied.link_past_node("jane")
+
+        self.assertNotIn("jane", copied)
+        self.assertEqual(copied.parent("diane").identifier, "hárry")
+        self.assertIn("diane", [node.identifier for node in copied.children("hárry")])
+        self.assertEqual(jane.successors(copied.identifier), [])
+        self.assertIsNone(jane.predecessor(copied.identifier))
+        self.assertIs(self.tree["jane"], jane)
+        self.assertIs(copied["diane"], self.tree["diane"])
+        self.assertEqual(jane.successors(self.tree.identifier), ["diane"])
+        self.assertEqual(self.tree.parent("jane").identifier, "hárry")
+        self.assertEqual(self.tree.parent("diane").identifier, "jane")
+
+    def test_merge_shared_source_after_link_past_and_remove_subtree(self):
+        source = Tree()
+        x_data, y_data, r_data = {"value": "x"}, {"value": "y"}, {"value": "r"}
+        x = source.create_node("x", "x", data=x_data)
+        y = source.create_node("y", "y", parent="x", data=y_data)
+        retained = source.subtree("x")
+        target = Tree()
+        r = target.create_node("r", "r", data=r_data)
+        removed = None
+
+        def assert_retained_contexts():
+            for tree in (source, retained):
+                self.assertEqual(tree.root, "x")
+                self.assertEqual(set(tree.nodes), {"x", "y"})
+                self.assertIsNone(tree.parent("x"))
+                self.assertEqual(tree.children("x"), [y])
+                self.assertEqual(tree.children("y"), [])
+                self.assertIs(tree.parent("y"), x)
+                self.assertIs(tree["x"], x)
+                self.assertIs(tree["y"], y)
+                self.assertIs(tree["x"].data, x_data)
+                self.assertIs(tree["y"].data, y_data)
+            if removed is not None:
+                self.assertEqual(removed.root, "r")
+                self.assertEqual(set(removed.nodes), {"r", "y"})
+                self.assertIsNone(removed.parent("r"))
+                self.assertEqual(removed.children("r"), [y])
+                self.assertEqual(removed.children("y"), [])
+                self.assertIs(removed.parent("y"), r)
+                self.assertIs(removed["r"], r)
+                self.assertIs(removed["y"], y)
+                self.assertIs(removed["r"].data, r_data)
+                self.assertIs(removed["y"].data, y_data)
+            self.assertEqual(x_data, {"value": "x"})
+            self.assertEqual(y_data, {"value": "y"})
+            self.assertEqual(r_data, {"value": "r"})
+
+        target.paste("r", source)
+        self.assertIs(target["x"], x)
+        self.assertIs(target["y"], y)
+        self.assertIs(target["x"].data, x_data)
+        self.assertIs(target["y"].data, y_data)
+        self.assertEqual(target.children("r"), [x])
+        self.assertEqual(target.children("x"), [y])
+        assert_retained_contexts()
+
+        target.link_past_node("x")
+        self.assertEqual(target.children("r"), [y])
+        self.assertIs(target.parent("y"), r)
+        assert_retained_contexts()
+
+        removed = target.remove_subtree("r")
+        self.assertIsNone(target.root)
+        self.assertEqual(len(target), 0)
+        assert_retained_contexts()
+
+        target.merge(None, source)
+        self.assertEqual(target.root, "x")
+        self.assertIsNone(target.parent("x"))
+        self.assertIs(target.parent("y"), x)
+        self.assertEqual(target.children("x"), [y])
+        self.assertEqual(list(target.expand_tree()), ["x", "y"])
+        self.assertIs(target["x"], x)
+        self.assertIs(target["y"], y)
+        assert_retained_contexts()
+
+        self.assertEqual(target.remove_node("x"), 2)
+        self.assertIsNone(target.root)
+        self.assertEqual(len(target), 0)
+        assert_retained_contexts()
+
     def test_expand_tree(self):
         # default config
         # Hárry
