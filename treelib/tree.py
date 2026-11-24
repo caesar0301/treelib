@@ -244,6 +244,9 @@ class Tree(object):
         """
         tree = cls()
         json_parsed = json.loads(raw)
+        if isinstance(json_parsed, str):
+            tree.create_node(tag=json_parsed)
+            return tree
 
         def _append_node(subtree, parent_id=None):
             for tag, node_info in subtree.items():
