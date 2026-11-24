@@ -182,6 +182,52 @@ class TreeIOTestCase(unittest.TestCase):
         self.assertEqual(wd.children(wd.root)[3].data, False)
         self.assertEqual(wd.children(wd.root)[4].data, 0)
 
+    def test_from_json_single_node(self):
+        """A single node's default export is a JSON string, not an object."""
+        for tag in ("root", "", "根 🌳"):
+            tree = Tree()
+            tree.create_node(tag, "root-id")
+            exported = tree.to_json()
+            encoded = exported.encode("utf-8")
+            for raw in (exported, encoded, bytearray(encoded)):
+                with self.subTest(tag=tag, input_type=type(raw).__name__):
+                    restored = Tree.from_json(raw)
+                    self.assertEqual(restored.size(), 1)
+                    self.assertEqual(restored[restored.root].tag, tag)
+                    self.assertIsNone(restored.parent(restored.root))
+                    self.assertEqual(restored.children(restored.root), [])
+                    self.assertEqual(restored.to_json(), exported)
+
+    def test_from_json_single_node_with_metadata(self):
+        """Single-node exports with metadata keep their object representation."""
+        tree = Tree()
+        tree.create_node("root", "root-id", data=0)
+        for options in (
+            {"with_data": True},
+            {"with_identifier": True},
+            {"with_data": True, "with_identifier": True},
+        ):
+            with self.subTest(options=options):
+                restored = Tree.from_json(tree.to_json(**options))
+                self.assertEqual(restored.size(), 1)
+                self.assertEqual(restored.to_json(**options), tree.to_json(**options))
+                if options.get("with_identifier"):
+                    self.assertEqual(restored.root, tree.root)
+                if options.get("with_data"):
+                    self.assertEqual(restored[restored.root].data, 0)
+
+    def test_from_json_single_node_subclass(self):
+        """Importing a string root preserves the requested Tree subclass."""
+
+        class CustomTree(Tree):
+            pass
+
+        tree = CustomTree()
+        tree.create_node("root", "root-id")
+        restored = CustomTree.from_json(tree.to_json())
+        self.assertIsInstance(restored, CustomTree)
+        self.assertEqual(restored.to_json(), tree.to_json())
+
     def test_from_map_basic(self):
         """Test from_map basic functionality."""
         child_parent_dict = {"CEO": None, "CTO": "CEO", "CFO": "CEO", "VP_Eng": "CTO", "Developer": "VP_Eng"}
